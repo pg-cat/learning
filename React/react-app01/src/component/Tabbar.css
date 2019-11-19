@@ -1,0 +1,32 @@
+.tabbar{
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  border-radius: 50% 50% 0 0;
+  box-shadow: 0 -2px 7px #ccc ;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+}
+.tabbar button{
+  width: 100%;
+  height: 1.3rem;
+  overflow: hidden;
+  display: block;
+  background: #eee;
+  border: #fff 1px solid;
+  box-sizing: border-box;
+}
+.tabbar button a{
+  width: 100%;
+  height: 100%;
+  display: block;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 1.3rem;
+  background: pink;
+}
+.tabbar button.red a{
+  color: red;
+}

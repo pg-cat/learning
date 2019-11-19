@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<style type="text/css">
+			.row{
+				background:gray;
+				/*将父级元素转化为弹性盒子*/
+				display:flex;
+				/*控制内部元素的排列方式*/
+				/*flex-direction:column-reverse;*/
+				height:550px;
+
+				/*内部元素是否换行*/
+				/*flex-wrap:wrap-reverse;*/
+
+				/*对齐方式*/
+				justify-content: space-around;
+				align-items:baseline;
+			}
+			.item{
+				padding:50px;
+				width:40px;
+				height:40px;
+				margin:10px;
+				background:white;
+				border-radius:10px;
+				border:1px solid black;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="row">
+			<div class="item" style="height:100px;line-height: 100px"></div>
+			<div class="item" style="height:150px"></div>
+			<div class="item" style="height:0px"></div>
+			<div class="item" style="height:200px"></div>
+			<div class="item" style="height:300px"></div>
+		</div>
+	</body>
+</html>

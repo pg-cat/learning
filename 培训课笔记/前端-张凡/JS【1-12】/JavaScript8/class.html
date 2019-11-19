@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+  </body>
+</html>
+<script type="text/javascript">
+
+  class Teacher {
+
+    // food是参数，我们需要传入该参数，并且赋值给对象的自定义属性food
+    constructor(food){
+      this.food = food
+    }
+
+    cook(){
+      // 对象的自定义属性food输出 出来
+      console.log(this.food);
+    }
+  }
+
+  let zhangfan = new Teacher('黄瓜');
+
+  zhangfan.cook();
+
+</script>

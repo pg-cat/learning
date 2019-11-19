@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+  let widthBody = document.documentElement.clientWidth;
+  let heightBody = document.documentElement.clientHeight;
+  let arr = [];
+
+  let divMake = (m, n) => {
+
+    for (let i = 0; i < m * n; i++) {
+      let div = document.createElement('div');
+      div.style.width = (widthBody - 2 * m) / m + 'px';
+      div.style.height = (heightBody - 2 * n) / n + 'px';
+      div.style.margin = '1px';
+      div.style.float = 'left';
+      div.style.background = '#eee';
+      document.body.appendChild(div);
+    }
+
+    let divs = document.getElementsByTagName('div');
+    arr = [...new Set(divs)];
+
+    for (let i = 0; i < m; i++) {
+      let arrDiv = arr.splice(0, m);
+      arr.push(arrDiv);
+    }
+
+    arr[Math.floor((m - 1) / 2)][Math.floor((n - 1) / 2)].style.background = '#ccc';
+
+    goDiv(Math.floor((m - 1) / 2), Math.floor((n - 1) / 2), n - 1);
+
+  }
+
+  let goDiv = (m, n, nn) => {
+
+    let clearBg = () => {
+      let divs = document.getElementsByTagName('div');
+      for (let i = 0; i < divs.length; i++) {
+        divs[i].style.background = '#eee';
+      }
+    }
+
+    window.onkeydown = function (e) {
+      console.log(e.keyCode);
+
+      // 左
+      if (e.keyCode == 37) {
+        n--;
+        if (n < 0) {
+          n = 0;
+        }
+        console.log(n, "+n");
+      }
+
+      // 上
+      if (e.keyCode == 38) {
+        m--;
+        if (m < 0) {
+          m = 0;
+        }
+      }
+
+      // 右
+      if (e.keyCode == 39) {
+        n++;
+        if (n > nn) {
+          n = nn;
+        }
+      }
+
+      // 下
+      if (e.keyCode == 40) {
+        m++;
+        if (m > nn) {
+          m = nn;
+        }
+      }
+
+      clearBg();
+      console.log(m, n, '+mn');
+      arr[m][n].style.background = '#ccc';
+    }
+  }
+
+  divMake(7, 7);
+</script>

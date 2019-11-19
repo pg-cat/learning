@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+      color: #333;
+      font-size: 14px;
+      list-style: none;
+      text-decoration: none;
+    }
+
+    nav {
+      width: 100%;
+      height: 60px;
+      background: #eee;
+    }
+
+    nav>div {
+      width: 100px;
+      height: 60px;
+      display: inline-block;
+      text-align: center;
+      line-height: 60px;
+      font-weight: bold;
+    }
+
+    nav ul {
+      height: 60px;
+      margin: 0 auto;
+      display: inline-block;
+    }
+
+    nav ul li {
+      height: 60px;
+      padding: 0 25px;
+      display: inline-block;
+      line-height: 60px;
+    }
+
+    nav ul li:hover {
+      background: #999;
+    }
+
+    nav ul li>a {
+      color: red;
+    }
+
+    nav ul li:hover>a {
+      color: #fff;
+    }
+
+    nav ul li div.out {
+      width: 100%;
+      overflow: hidden;
+      display: none;
+      position: fixed;
+      top: 60px;
+      left: 0;
+    }
+
+    nav ul li:hover div.out {
+      display: block;
+      background: #eee;
+    }
+
+    nav ul li div.out div {
+      width: 444px;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+    nav ul li div.out div a{
+      padding: 33px;
+      display: inline-block;
+    }
+
+    nav ul li div.out div a:hover {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <nav>
+    <div>LOGO</div>
+    <ul>
+      <li><a href="#">Find 系列</a>
+        <div class="out">
+          <div>
+            <a href="#">Find 系列</a>
+            <a href="#">Find X</a>
+            <a href="#">Find X</a>
+          </div>
+        </div>
+      </li>
+      <li><a href="#">Reno 系列</a>
+        <div class="out">
+          <div>
+            <a href="#">Reno 系列</a>
+            <a href="#">Find X</a>
+            <a href="#">Find X</a>
+          </div>
+        </div>
+      </li>
+      <li><a href="#">R 系列</a>
+        <div class="out">
+          <div>
+            <a href="#">R 系列</a>
+            <a href="#">Find X</a>
+            <a href="#">Find X</a>
+          </div>
+        </div>
+      </li>
+      <li><a href="#">A 系列</a>
+        <div class="out">
+          <div>
+            <a href="#">A 系列</a>
+            <a href="#">Find X</a>
+            <a href="#">Find X</a>
+          </div>
+        </div>
+      </li>
+      <li><a href="#">K 系列</a>
+        <div class="out">
+          <div>
+            <a href="#">K 系列</a>
+            <a href="#">Find X</a>
+            <a href="#">Find X</a>
+          </div>
+        </div>
+      </li>
+      <li><a href="#">配件</a>
+        <div class="out">
+          <div>
+            <a href="#">配件</a>
+            <a href="#">Find X</a>
+            <a href="#">Find X</a>
+          </div>
+        </div>
+      </li>
+      <li><a href="#">服务</a>
+        <div class="out">
+          <div>
+            <a href="#">服务</a>
+            <a href="#">Find X</a>
+            <a href="#">Find X</a>
+          </div>
+        </div>
+      </li>
+      <li><a href="#">商城</a>
+        <div class="out">
+          <div>
+            <a href="#">商城</a>
+            <a href="#">Find X</a>
+            <a href="#">Find X</a>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </nav>
+</body>
+
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>
+      #ppt{
+        width:1280px;
+        height:600px;
+        border:1px solid red;
+      }
+      #ppt div{
+        float:left;
+        width:128px;
+        height:120px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="ppt">
+
+    </div>
+  </body>
+</html>
+<script src="./jquery.js" charset="utf-8"></script>
+<script type="text/javascript">
+  $(function(){
+
+    // console.log($('#ppt').width());
+    // console.log($('#ppt').width());
+
+    for ( i = 0 ; i < 50 ; i ++ ){
+
+      var div = document.createElement('div');
+
+      div.style.backgroundImage = 'url("./image/3.jpg")';
+
+      // 背景图片大小属性
+      div.style.backgroundSize = $('#ppt').width() + 'px ' + $('#ppt').height() + 'px';
+
+      // 每一行的横坐标都是i除以10取余，乘以128
+      //
+      div.style.backgroundPosition = '-'+ (i%10)*128 + 'px -'+ Math.floor((i/10))*120  + 'px';
+      //
+      div.className = 'index:' + i;
+
+      $('#ppt').append(div);
+
+      // 1-9  除以10  余 1-9  商 0
+      // 11-19  除以10  余 1-9  商 1
+      // 21-29  除以10  余 1-9  商 2
+
+    }
+
+  })
+
+
+
+</script>

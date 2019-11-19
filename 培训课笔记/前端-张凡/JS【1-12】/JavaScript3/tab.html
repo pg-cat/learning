@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <style>
+    * {
+      margin: 0px;
+      padding: 0px;
+      list-style: none;
+      outline: none;
+    }
+
+    button {
+      width: 100px;
+      height: 40px;
+
+    }
+
+    .big {
+      width: 320px;
+      height: 220px;
+      border: 5px solid blue;
+
+    }
+
+    .small {
+      width: 300px;
+      height: 200px;
+      background: gray;
+      border: 10px solid white;
+      font-size: 30px;
+      text-align: center;
+      line-height: 200px;
+      color: white;
+      float: left;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <button style="color: red;">家电</button>
+  <button>电脑</button>
+  <button>手机</button>
+
+  <div class="big">
+    <div class="small" style="display: block;">
+      这是家电
+    </div>
+    <div class="small">
+      这是电脑
+    </div>
+    <div class="small">
+      这是手机
+    </div>
+  </div>
+</body>
+
+<script>
+  var btn = document.getElementsByTagName('button');
+
+  var small = document.getElementsByClassName('small');
+
+  for (i = 0; i < btn.length; i++) {
+
+    btn[i].index = i;
+
+    btn[i].onclick = function () {
+
+      for (y = 0; y < btn.length; y++) {
+
+        btn[y].style.color = 'black';
+
+        small[y].style.display = 'none';
+
+      }
+
+      this.style.color = 'red';
+
+      small[this.index].style.display = 'block';
+
+    }
+
+    btn[i].onmouseenter = function () {
+
+      for (x = 0; x < btn.length; x++) {
+
+        btn[x].style.background = '#eee';
+
+      }
+
+      this.style.background = 'pink';
+
+    }
+
+    btn[i].onmouseleave = function () {
+
+      for (x = 0; x < btn.length; x++) {
+
+        btn[x].style.background = '#eee';
+
+      }
+
+    }
+
+  }
+</script>
+
+</html>

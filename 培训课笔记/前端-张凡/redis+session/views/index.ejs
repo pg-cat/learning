@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <button type="button" onclick="first()" name="button">第一次登陆</button>
+    <button type="button" onclick="second()" name="button">第二次登陆</button>
+  </body>
+</html>
+<script type="text/javascript">
+
+  function first(){
+
+    fetch('http://localhost:3000/users/').then(res => res.json()).then(res => {
+      console.log(res);
+    })
+  }
+  function second(){
+    fetch('http://localhost:3000/users/dier').then(res => res.json()).then(res => {
+      console.log(res);
+    })
+  }
+
+</script>

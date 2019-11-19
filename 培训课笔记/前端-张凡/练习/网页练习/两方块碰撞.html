@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    div {
+      width: 111px;
+      height: 111px;
+      background: orange;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div></div>
+  <div></div>
+
+</body>
+
+</html>
+<script>
+
+  // 获取节点及相关值
+  var div = document.getElementsByTagName('div');
+
+  // 获取 div 可移动的高宽及碰撞相关的值
+  var divCH = document.documentElement.clientHeight - div[1].clientHeight;
+  var divCW = document.documentElement.clientWidth - div[1].clientWidth;
+
+  // 改变第二个 div 的位置
+  div[1].style.top = divCH -1 + 'px';
+
+
+  // div 移动效果
+  var addTop0 = 3;
+  var addLeft0 = 2;
+  var addTop1 = 5;
+  var addLeft1 = 7;
+  function goTo() {
+
+    // 第一个 div 的碰撞效果
+    div[0].style.top = div[0].offsetTop + addTop0 + 'px';
+    div[0].style.left = div[0].offsetLeft + addLeft0 + 'px';
+    if (div[0].offsetTop >= divCH || div[0].offsetTop < 0) {
+      addTop0 = -addTop0;
+    }
+    if (div[0].offsetLeft >= divCW || div[0].offsetLeft < 0) {
+      addLeft0 = -addLeft0;
+    }
+
+    // 第二个 div 的碰撞效果
+    div[1].style.top = div[1].offsetTop + addTop1 + 'px';
+    div[1].style.left = div[1].offsetLeft + addLeft1 + 'px';
+    if (div[1].offsetTop >= divCH || div[1].offsetTop < 0) {
+      addTop1 = -addTop1;
+    }
+    if (div[1].offsetLeft >= divCW || div[1].offsetLeft < 0) {
+      addLeft1 = -addLeft1;
+    }
+
+    // 两个方块碰撞的效果
+    if(Math.abs(div[0].offsetTop-div[1].offsetTop)<=div[0].clientHeight && Math.abs(div[0].offsetLeft-div[1].offsetLeft)<=div[0].clientWidth){
+      addTop0 = -addTop0;
+      addLeft0 = -addLeft0;
+      addTop1 = -addTop1;
+      addLeft1 = -addLeft1;
+    }
+  }
+
+  // 移动 div
+  var timer = setInterval(goTo, 13);
+
+
+</script>

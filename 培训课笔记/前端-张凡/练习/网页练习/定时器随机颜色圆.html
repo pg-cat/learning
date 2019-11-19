@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        div {
+            width: 222px;
+            height: 222px;
+            border-radius: 50%;
+            background: orange;
+        }
+    </style>
+</head>
+
+<body>
+    <div></div>
+    <hr>
+    <button>点击开始 / 暂停</button>
+</body>
+
+</html>
+<script>
+
+    // 获取节点
+    var div = document.getElementsByTagName('div')[0];
+    var button = document.getElementsByTagName('button')[0];
+
+    // 获取0-255随机数
+    function numC(num) {
+        num = Math.floor(Math.random() * 10000 % 256);
+        return num;
+    }
+
+    // 改变节点 div 背景颜色
+    function bgColor() {
+        div.style.backgroundColor = 'rgba(' + numC() + ',' + numC() + ',' + numC() + ',' + Math.random() + ')';
+    }
+
+    // 开始定时器
+    function goTo() {
+        time = setInterval(bgColor, 222);
+        return;
+    }
+
+    // 取消定时器
+    function goStop() {
+        clearInterval(time);
+        time = null;
+        return;
+    }
+
+
+    // 点击按钮控制定时器
+    var go = false;
+    var time = null;
+    button.onclick = function () {
+
+        // 改变点击状态
+        go = !go;
+
+        // 开始
+        if (go) {
+            goTo();
+        }
+
+        // 暂停
+        if (!go) {
+            goStop();
+        }
+
+    }
+
+</script>

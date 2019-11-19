@@ -1,0 +1,58 @@
+<!doctype HTML>
+<html>
+
+<head>
+  <title>这是一个带图片的标签</title>
+  <link href="D:\学习计划\代码\import.js">
+</head>
+
+<style>
+  div {
+    width: 100px;
+    height: 2000px;
+    background: red;
+    margin: 0;
+    z-index: 0;
+    font-weight: bold;
+  }
+</style>
+
+<body>
+
+  <div id="a">222222</div>
+
+  <a href="#a">111111111</a>
+
+</body>
+
+</html>
+<script>
+  var formData = new FormData();
+  var fileField = document.querySelector("input[type='file']");
+
+  formData.append('username', 'abc123');
+  formData.append('avatar', fileField.files[0]);
+
+  fetch('https://example.com/profile/avatar', {
+    method: 'PUT',
+    body: formData
+  })
+    .then(response => response.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => console.log('Success:', response));
+</script>
+
+<!-- <script>
+  // 函数的合成
+  export function compose(...funcs) {
+    if (funcs.length === 0) {
+      return arg => arg
+    }
+    if (funcs.length === 1) {
+      return funcs[0]
+    }
+    return funcs.reduce(
+      (a, b) => (...args) => a(b(...args))
+    )
+  }
+</script> -->

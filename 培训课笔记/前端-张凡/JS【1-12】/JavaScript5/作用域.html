@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <div id="one"></div>
+  </body>
+</html>
+<script>
+
+  // var a = '这是a变量';
+  //
+  // function zuoyong(){
+  //
+  //     var b = '这是b变量';    //函数内部声明的变量，如果函数执行完毕，该变量就销毁了
+  //
+  // }
+  //
+  // console.log(a);
+  //
+  // console.log(b);   //没有声明
+
+  var a = 1;
+
+  function waibu(){
+
+      var b = 2;
+
+      function neibu(){
+
+          var c = 3;
+
+          console.log(a);
+          console.log(b);
+          console.log(c);
+
+      }
+
+        neibu();
+
+  }
+
+  waibu();
+
+  var one = document.querySelectorAll('div#one');
+
+  console.log(one);
+
+
+</script>

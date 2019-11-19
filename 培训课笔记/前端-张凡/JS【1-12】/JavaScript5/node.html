@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>
+        *{
+          margin:0px;
+          padding:0px;
+          list-style:none;
+        }
+        ul{
+          border:4px solid black;
+        }
+        .ball{
+          background:orange;
+          width:100px;
+          height:100px;
+          border-radius:50%;
+        }
+    </style>
+  </head>
+  <body>
+    <ul>
+      <li class="ball"></li>
+
+    </ul>
+    <button onclick="addnode()">点击添加</button>
+    <button onclick = "searchNode()">查找父级</button>
+    <button onclick = "removeFirst()">删除第一个li</button>
+  </body>
+</html>
+
+<script type="text/javascript">
+
+  function addnode(){
+    var newli = document.createElement('li');
+
+    newli.className = 'ball';
+
+    var ul = document.getElementsByTagName('ul')[0];
+
+    ul.appendChild(newli);
+  }
+
+  function searchNode(){
+
+    var ball = document.getElementsByClassName('ball')[0];
+
+    console.log(ball.parentNode);
+
+  }
+
+  function removeFirst(){
+
+    var ul = document.getElementsByTagName('ul')[0];
+
+    var li = document.getElementsByTagName('li');
+
+    ul.removeChild(li[0]);
+
+  }
+
+</script>

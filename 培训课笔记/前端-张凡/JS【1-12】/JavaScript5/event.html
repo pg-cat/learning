@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+      <button>点击确定</button>
+  </body>
+</html>
+<script>
+
+  // 给button添加点击事件
+  var btn = document.getElementsByTagName('button')[0];
+  //
+  // btn.onclick = function(){
+  //
+  //   alert('按钮已经被点击了');
+  //
+  // }
+
+  // // 另一个函数，在括号中添加点击事件
+  // //
+  // function ling(m){
+  //
+  //   alert('这是方法2');
+  //
+  //   console.log(m);
+  //
+  // }
+
+  // 第三个函数
+  //
+  function fun(){
+
+    alert('这是方法3');
+
+  }
+
+  btn.addEventListener('click',fun);
+
+</script>

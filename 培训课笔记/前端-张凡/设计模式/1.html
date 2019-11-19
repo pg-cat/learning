@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+  </body>
+</html>
+<script type="text/javascript">
+
+  function Person(){
+    this.name = 'person';
+    this.age = 24;
+
+    this.print = function(){
+      console.log('hello');
+    }
+  }
+
+  (function(){
+    this.print();
+  }).call(new Person());
+
+  // function Son(){
+  //   Person.call(this);
+  // }
+  //
+  // var son = new Son();
+  //
+  // console.log(son);
+
+  var arr = 'wo jin tian fei chang yu men';
+
+  console.log(arr.includes('fei'));
+
+</script>

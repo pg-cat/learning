@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <div id="name">请开始点名</div>
+    <button id="btn">点击开始</button>
+  </body>
+  <script type="text/javascript">
+
+    //获取页面上的元素
+    var name = document.getElementById('name');
+    var btn = document.getElementById('btn');
+
+    var arr = ['大娃','千里眼','金刚娃','火娃','水娃','隐身娃','葫芦'];
+
+    //随机数函数，取0-6数字
+    function rannum(){
+
+      return (Math.floor(Math.random()*1000000)%7);
+
+    }
+
+    var num = rannum();
+
+    console.log(arr.slice(num,num+2));
+
+  </script>
+</html>

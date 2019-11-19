@@ -1,0 +1,52 @@
+.App {
+  overflow: hidden;
+}
+
+.App-header {
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  background-color: #282c34;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+  animation: App-logo-spin infinite 20s linear;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.star {
+  width: 5rem;
+  height: 1rem;
+  overflow: hidden;
+}
+
+.star0 {
+  position: relative;
+  background: url('/img/star0.png') repeat-x;
+  background-size: contain;
+}
+
+.star1 {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.star2 {
+  background: url('/img/star1.png') repeat-x;
+  background-size: contain;
+}

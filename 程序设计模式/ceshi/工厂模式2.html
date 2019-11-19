@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script type="text/javascript">
+
+  //  创建工厂模式函数，安全模式的工厂函数
+  let Factory = function (role) {
+    console.log("执行了");
+    if (this instanceof Factory) {
+
+      console.log("执行了 if");
+      if (!this[role]) {
+        return { err: "出错了，老铁，没有这个选项" };
+      }
+
+      var s = new this[role]();
+      return s;
+
+    } else {
+
+      console.log("执行了 else");
+      return new Factory(role);
+
+    }
+  }
+
+  Factory.prototype = {
+    SuperAdmin: function () {
+      this.name = '超级管理员';
+      this.viewPage = ['首页', '权限管理', 'APP的数据']
+    },
+    Admin: function () {
+      this.name = '管理员';
+      this.viewPage = ['首页', 'APP的数据'];
+    }
+  }
+
+  let SuperAdmin = Factory('Admins');
+  console.log(SuperAdmin);
+
+</script>

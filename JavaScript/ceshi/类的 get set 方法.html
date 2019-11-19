@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+  class Obb {
+    constructor(a, b) {
+      this.a = a;
+      this.b = b;
+    }
+    get ab() {
+      console.log("get");
+      this.a = 33;
+    }
+    set ab(c) {
+      console.log("set");
+      this.a = 55;
+      return c;
+    }
+  }
+
+  let abc = new Obb(3, 5);
+
+  console.log(abc);
+  // 打印结果为 Obb {a: 3, b: 5, ab: undefined}
+
+// get set 方法名为被监控的属性名
+// 此处会生成一个没有被声明的 ab 属性，其值为 undefined
+</script>

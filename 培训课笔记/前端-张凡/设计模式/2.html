@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+  </body>
+</html>
+<script type="text/javascript">
+
+  //  判断一个对象的数据类型
+  // function isType(Obj,type){
+  //   return Object.prototype.toString.call(Obj).includes(type);
+  // }
+
+  // 高阶函数
+  //
+  function isType(type){
+    return  function(obj){
+      return Object.prototype.toString.call(obj).includes(type);
+    }
+  }
+  var a = true;
+  var fnc = {};
+  var types = ['String','Object','Array','Null','undefined','Boolean'];
+  types.forEach(type=>{
+    fnc['is'+type] = isType(type);
+  });
+  console.log(fnc);
+  console.log(fnc.isBoolean(a));
+</script>

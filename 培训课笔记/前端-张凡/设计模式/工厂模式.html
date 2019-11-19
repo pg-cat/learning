@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script type="text/javascript">
+
+  let Factory = function (role) {
+    function SuperAdmin() {
+      this.name = '超级管理员';
+      this.viewPage = ['首页', '权限管理', 'APP的数据']
+    }
+    function Admin() {
+      this.name = '管理员';
+      this.viewPage = ['首页', 'APP的数据'];
+    }
+    function User() {
+      this.name = '用户';
+      this.viewPage = ['首页'];
+    }
+    switch (role) {
+      case 'SuperAdmin':
+        return new SuperAdmin();
+        break;
+      case 'Admin':
+        return new Admin();
+        break;
+      case 'User':
+        return new User();
+        break;
+    }
+  }
+
+  var yonghu = new Factory('User');
+  console.log(yonghu);
+
+</script>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Vue幻灯片</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <style>
+    div#app {
+      overflow: hidden;
+    }
+
+    a {
+      overflow: hidden;
+    }
+
+    img {
+      width: 1000px;
+      transition: all 0.3s;
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <a href="#">
+      <img v-bind:src="imgSrc" v-bind:style='{opacity: isShow}' alt="">
+    </a>
+  </div>
+</body>
+
+</html>
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      imgSrc: './img/1.jpg',
+      n: 0,
+      isShow: 1
+    },
+    methods: {
+      setinter: function () {
+        setInterval(function () {
+          app.n++;
+          if (app.n > 4) {
+            app.n = 1
+          }
+
+          app.imgSrc = './img/' + app.n + '.jpg';
+          app.isShow = - app.isShow;
+
+        }, 3000)
+      },
+      // click: function () {
+      //   this.n++;
+      //   if (this.n > 4) {
+      //     this.n = 1
+      //   }
+      //   this.imgSrc = './img/' + this.n + '.jpg'
+      // }
+    }
+  })
+
+  app.setinter();
+</script>

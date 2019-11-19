@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>
+      div{
+        width:300px;
+        height:300px;
+        background:skyblue;
+        animation:change 5s linear 0s infinite normal;
+      }
+      /* 声明动画怎么播放 */
+      @keyframes change{
+        0%{ border-radius:0%;background:skyblue }
+        20%{ border-radius:10%;background:green }
+        40%{ border-radius:20%;background:yellow }
+        60%{ border-radius:30%;background:red }
+        80%{ border-radius:40%;background:black }
+        100%{ border-radius:50%;background:skyblue }
+      }
+    </style>
+  </head>
+  <body>
+      <div></div>
+  </body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <input id="blurinput" type="text">
+    <select class="sex" name="sex">
+      <option value="男">男</option>
+      <option value="女">女</option>
+      <option value="嬲">嬲</option>
+      <option value="扶她">扶她</option>
+    </select>
+  </body>
+</html>
+<script>
+//页面加载完毕之后
+window.onload = function(){
+
+    var blurinput = document.getElementById('blurinput');
+
+    var sex = document.getElementsByClassName('sex')[0];
+
+    // blurinput.onblur = function(){
+    //
+    //   if(blurinput.value == ''){
+    //     alert('对不起，请输入内容');
+    //   }
+    //
+    // }
+
+    blurinput.onchange = function(){
+
+        console.log('值发生了改变');
+
+    }
+    blurinput.onfocus = function(){
+
+        console.log('世界为你聚焦');
+
+    }
+    sex.onchange = function(){
+
+        console.log(sex.value);
+
+        console.log('发生了改变');
+
+    }
+
+    blurinput.onkeydown = function(e){
+
+      console.log(e.keyCode);
+      // if( e.keyCode == 65 ){
+      //
+      //   console.log('向左走');
+      //
+      // }
+
+    }
+
+
+}
+</script>

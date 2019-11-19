@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+  class SingleObjecct {
+
+    // 不适宜在 constructor 执行函数内进行提示，因为它只在实例化时执行，而这个模式只有一次实例化
+    // constructor() {
+    //   console.info('....login');
+    // }
+
+    login() {
+      console.info('....login');
+    }
+
+  }
+
+  // 错误示例
+  // SingleObjecct.getInstance = function(){
+  //     let instance = null;
+  //     if(!instance){
+  //         instance = new SingleObjecct();
+  //     }
+  //     return instance;
+  // }
+
+  SingleObjecct.getInstance = (function () {
+    let instance = null;
+    return function () {
+      if (!instance) {
+        instance = new SingleObjecct();
+      }
+      return instance;
+    }
+  })()
+
+
+  let single1 = SingleObjecct.getInstance(); // 调用自执行函数，返回实例化的 SingleObjecct
+  console.log(single1);
+  single1.login();
+
+  console.log("--------------------");
+
+  let single2 = SingleObjecct.getInstance(); // 调用自执行函数，返回实例化的 SingleObjecct
+  console.log(single2);
+  single2.login();
+
+  console.info('single1 === single2', single1 === single2)
+</script>

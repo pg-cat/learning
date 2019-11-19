@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<!-- 生产环境版本，优化了尺寸和速度 -->
+		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+		<!-- vue的ajax异步加载的库 -->
+		<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+	</head>
+	<body>
+		<div id="wrap">
+			<button v-on:click="get">点击发送请求</button>
+			<ul>
+				<li v-for="item in dataarr">
+
+					<!-- {{item.content}} -->
+
+					<div v-html="item.content"></div>
+					
+				</li>
+			</ul>
+		</div>
+	</body>
+</html>
+<script type="text/javascript">
+	
+	// 用vue和页面上的wrap联通
+	var app = new Vue({
+
+		el:"#wrap",
+
+		data:{
+
+			dataarr:[]
+
+		},
+		methods:{
+			// 如果写微信小程序，app，或者各种单页面应用，以下操作是常态
+			get:function(){
+				this.$http.get('https://cnodejs.org/api/v1/topics').then(function(res){
+
+					console.log(res.body.data);
+
+					this.dataarr = res.body.data;
+                       
+                },function(){
+
+                   
+                });
+			}
+		}
+
+	})
+
+</script>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>多图同屏滚动幻灯片</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      background: none;
+      border: none;
+      outline: none;
+      box-sizing: border-box;
+      transition: left 0.5s;
+    }
+
+    .banner {
+      width: 1100px;
+      height: 200px;
+      overflow: hidden;
+      margin: 100px auto;
+    }
+
+    .banner .over {
+      width: 1000px;
+      height: 200px;
+      overflow: hidden;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .banner .over .imgs {
+      height: 200px;
+      overflow: hidden;
+      display: flex;
+      justify-content: flex-start;
+      position: absolute;
+      top: 0;
+    }
+
+    .banner .over .imgs a {
+      width: 250px;
+      height: 200px;
+      border: pink 3px solid;
+    }
+
+    .banner .over .imgs a img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .banner .btns {
+      width: 100%;
+      height: 1px;
+      font-size: 50px;
+      position: relative;
+    }
+
+    .banner .btns div {
+      width: 50px;
+      height: 200px;
+      color: #fff;
+      text-align: center;
+      line-height: 200px;
+      background: #ccc;
+      cursor: pointer;
+      position: absolute;
+      top: -200px;
+    }
+
+    .banner .btns .left {
+      left: 0;
+    }
+
+    .banner .btns .right {
+      right: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="banner">
+    <div class="over">
+      <div class="imgs">
+        <a href=""><img src="./img/00.jpg" alt=""></a>
+        <a href=""><img src="./img/01.jpg" alt=""></a>
+        <a href=""><img src="./img/02.jpg" alt=""></a>
+        <a href=""><img src="./img/03.jpg" alt=""></a>
+        <a href=""><img src="./img/04.jpg" alt=""></a>
+        <a href=""><img src="./img/05.jpg" alt=""></a>
+        <a href=""><img src="./img/06.jpg" alt=""></a>
+        <a href=""><img src="./img/07.jpg" alt=""></a>
+        <a href=""><img src="./img/08.jpg" alt=""></a>
+        <a href=""><img src="./img/09.jpg" alt=""></a>
+      </div>
+      <div class="imgs">
+        <a href=""><img src="./img/00.jpg" alt=""></a>
+        <a href=""><img src="./img/01.jpg" alt=""></a>
+        <a href=""><img src="./img/02.jpg" alt=""></a>
+        <a href=""><img src="./img/03.jpg" alt=""></a>
+        <a href=""><img src="./img/04.jpg" alt=""></a>
+        <a href=""><img src="./img/05.jpg" alt=""></a>
+        <a href=""><img src="./img/06.jpg" alt=""></a>
+        <a href=""><img src="./img/07.jpg" alt=""></a>
+        <a href=""><img src="./img/08.jpg" alt=""></a>
+        <a href=""><img src="./img/09.jpg" alt=""></a>
+      </div>
+    </div>
+    <div class="btns">
+      <div class="left">◀</div>
+      <div class="right">▶</div>
+    </div>
+  </div>
+</body>
+
+</html>
+<script>
+  // 获取图片区域节点
+  let imgsArr = document.getElementsByClassName("imgs");
+  let imgsOne = imgsArr[0];
+  let imgsTwo = imgsArr[1];
+  // 获取左右按钮节点
+  let leftBtn = document.getElementsByClassName("left")[0];
+  let rightBtn = document.getElementsByClassName("right")[0];
+  // 图片总数
+  let imgs = 10;
+  // 每页图片数量
+  let img = 4;
+  // 每张图片的宽度
+  let imgW = 250;
+  // 当前 imgsOne 的位置
+  let imgsOneLen = -10;
+  imgsOne.style.left = imgsOneLen * imgW + "px";
+  // 当前 imgsTwo 的位置
+  let imgsTwoLen = 0;
+  imgsTwo.style.left = imgsTwoLen * imgW + "px";
+
+  // 给按钮绑定函数
+  leftBtn.addEventListener("click", left);
+  rightBtn.addEventListener("click", right);
+
+  // 点击左边按钮
+  function left() {
+    imgsOneLen += 4;
+    imgsOne.style.left = imgsOneLen * imgW + "px";
+    imgsTwoLen += 4;
+    imgsTwo.style.left = imgsTwoLen * imgW + "px";
+    if (imgsOneLen > -4 && imgsOneLen <= 0) {
+      console.log(imgsOneLen, "+++++++imgsOneLen");
+      imgsOne.style.zIndex = 100;
+      imgsTwo.style.zIndex = 99;
+      imgsTwoLen = -Math.abs(imgsOneLen) - 10;
+      imgsTwo.style.left = imgsTwoLen * imgW + "px";
+    }
+    if (imgsTwoLen > -4 && imgsTwoLen <= 0) {
+      console.log(imgsTwoLen, "+++++++imgsTwoLen");
+      imgsOne.style.zIndex = 99;
+      imgsTwo.style.zIndex = 100;
+      imgsOneLen = -Math.abs(imgsTwoLen) - 10;
+      imgsOne.style.left = imgsOneLen * imgW + "px";
+    }
+    console.log(imgsOneLen, "+imgsOneLen");
+    console.log(imgsTwoLen, "+imgsTwoLen");
+  }
+  // 点击右边按钮
+  function right() {
+    imgsOneLen -= 4;
+    imgsOne.style.left = imgsOneLen * imgW + "px";
+    imgsTwoLen -= 4;
+    imgsTwo.style.left = imgsTwoLen * imgW + "px";
+    if (imgsOneLen <= -4 && imgsOneLen >= -8) {
+      console.log(imgsOneLen, "+++++++imgsOneLen");
+      imgsOne.style.zIndex = 100;
+      imgsTwo.style.zIndex = 99;
+      imgsTwoLen = 10 - Math.abs(imgsOneLen);
+      imgsTwo.style.left = imgsTwoLen * imgW + "px";
+    }
+    if (imgsTwoLen <= -4 && imgsTwoLen >= -8) {
+      console.log(imgsTwoLen, "+++++++imgsTwoLen");
+      imgsOne.style.zIndex = 99;
+      imgsTwo.style.zIndex = 100;
+      imgsOneLen = 10 - Math.abs(imgsTwoLen);
+      imgsOne.style.left = imgsOneLen * imgW + "px";
+    }
+    console.log(imgsOneLen, "+imgsOneLen");
+    console.log(imgsTwoLen, "+imgsTwoLen");
+  }
+
+  // setInterval(right, 2000);
+</script>

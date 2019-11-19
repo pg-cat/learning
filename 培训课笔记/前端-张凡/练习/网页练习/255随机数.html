@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <button>点击取0～255的整数</button>
+    <div></div>
+</body>
+
+</html>
+<script>
+
+    var div = document.getElementsByTagName('div')[0];
+    var button = document.getElementsByTagName('button')[0];
+
+    button.onclick = function () {
+
+        var color01 = Math.floor(Math.random()*255);
+        var color02 = Math.floor(Math.random()*255);
+        var color03 = Math.floor(Math.random()*255);
+        // div.innerHTML = color;
+        console.log('rgba('+color01+','+color02+','+color03+','+Math.random()+')')
+        button.style.backgroundColor = 'rgb('+color01+','+color02+','+color03+','+Math.random()+')';
+
+    }
+
+</script>

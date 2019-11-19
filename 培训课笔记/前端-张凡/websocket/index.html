@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <style media="screen">
+    #content {
+      width: 600px;
+      height: 600px;
+      border: 1px solid black;
+      margin: 0px auto;
+    }
+
+    #inputs {
+      width: 600px;
+      margin: 0px auto;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="content">
+    <div id="msg">
+
+    </div>
+  </div>
+  <div id="inputs">
+    <input type="text" name="name" id="name">
+    <button id="button" type="button" name="button">发送</button>
+  </div>
+</body>
+
+</html>
+<script type="text/javascript">
+  var name = prompt('你的昵称是什么'); // 弹出以参数为标题并带有输入框的小窗口
+
+  console.log(name);
+
+  // 连接ws
+  var sock = new WebSocket('ws://127.0.0.1:3000');
+
+  // 发送数据，看服务器是否能够收到
+  // 刚开始建立连接的时候，给服务器一定的信息
+  sock.onopen = (params) => {
+
+    // 向后台发送昵称
+    sock.send(JSON.stringify({
+      type: 'name',
+      data: name
+    }));
+
+    console.log('连接成功');
+    // console.log(params);
+
+  }
+
+  // 接收数据
+  sock.onmessage = function (ms) {
+
+    var json = JSON.parse(ms.data);
+    // 后台传过来的数据，带有别人的名字，别人的时间和别人的信息
+    msg.innerHTML += `${json.name} <${json.time}> <br> ${json.data} <br>`
+
+  }
+
+  // 发送数据
+  document.getElementById('button').onclick = function () {
+
+    var text = document.getElementById('name').value;
+
+    var date = new Date();
+
+    h = date.getHours() + ':';
+
+    m = date.getMinutes() + ':';
+
+    s = date.getSeconds();
+
+    sock.send(JSON.stringify({
+      type: 'message',
+      data: text,
+      time: h + m + s
+    }));
+
+    msg.innerHTML += `自己 <${ h+m+s  }> <br> ${text} <br>`;
+
+    document.getElementById('name').value = '';
+  }
+
+  sock.onerror = (error) => {
+    console.log('连接失败');
+    console.log(error);
+  }
+</script>

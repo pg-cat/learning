@@ -1,0 +1,35 @@
+.App {
+  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
+}
+
+p {
+  width: 100%;
+  overflow: hidden;
+  font-size: 100px;
+  background: #ccc;
+}
+
+.btns{
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+h4 {
+  width: 100%;
+  overflow: hidden;
+  padding: 30;
+  display: inline-block;
+  font-size: 66px;
+  border: #ccc 0.1rem solid;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

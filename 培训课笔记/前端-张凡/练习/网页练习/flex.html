@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+  body{
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+  div{
+    height: 500px;
+    overflow: hidden;
+    margin-bottom: 3px;
+  }
+  div.top{
+    width: 24%;
+    background: pink;
+  }
+  div.bottom{
+    width: 33%;
+    background: green;
+  }
+  @media screen and (max-width: 750px) {
+    div.top,
+    div.bottom{
+      width: 100%;
+    }
+  }
+  </style>
+</head>
+<body>
+  <div class="top">1</div>
+  <div class="top">2</div>
+  <div class="top">3</div>
+  <div class="top">4</div>
+  <div class="bottom">5</div>
+  <div class="bottom">6</div>
+  <div class="bottom">7</div>
+</body>
+</html>

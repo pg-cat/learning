@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script type="text/javascript">
+
+  var Singleton = function (name) {
+    this.name = name;
+    // 该单例为空
+    this.ins = null;
+  }
+
+  //  获取实例对象
+  Singleton.getInstance = function (name) {
+    if (!this.instance) {
+      this.instance = new Singleton(name);
+    }
+    return this.instance;
+  }
+
+  var a = Singleton.getInstance('aa');
+
+  var b = Singleton.getInstance('bb');
+
+  console.log(JSON.stringify(a));
+  console.log(b);
+
+// 单例模式：
+// 同时只存在一个实例，多次实例化也只会得到第一个实例
+// 若此实例被销毁，则重新实例化且成为第一个实例
+</script>

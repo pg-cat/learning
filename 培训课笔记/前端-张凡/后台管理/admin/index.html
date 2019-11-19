@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<!-- 引入bootstrap的css代码 -->
+	<link rel="stylesheet" type="text/css" href="./css/bootstrap.css">
+	<!-- 引入jquery -->
+	<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js">
+	</script>
+	<!-- 引入bootstrap的主题文件 -->
+	<script src="./js/bootstrap.js"></script>
+	<!-- 开发环境版本，包含了有帮助的命令行警告 -->
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+	<style type="text/css">
+		h1,
+		h2 {
+			text-align: center;
+		}
+
+		.hezi {
+			width: 1400px;
+			margin: 0px auto;
+		}
+
+		img {
+			width: 100%;
+		}
+
+		td {
+			width: 233px;
+		}
+
+		.model {
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.3);
+			position: absolute;
+			left: 0px;
+			top: 0px;
+		}
+
+		.model-content {
+			width: 400px;
+			height: 260px;
+			padding: 20px;
+			border: 2px solid skyblue;
+			background: white;
+			margin: 250px auto;
+			border-radius: 8px;
+		}
+
+		.model-content>div {
+			height: 40px;
+			text-align: center;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>后台管理页面</h1>
+	<div class="hezi" id="app">
+		<div class="panel panel-default">
+			<!-- Default panel contents -->
+			<div class="panel-heading">轮播图部分</div>
+			<div class="panel-body">
+				<p>可以通过这一部分，进行对于轮播图部分的图片内容以及跳转链接的替换</p>
+			</div>
+
+			<!-- Table -->
+			<table class="table">
+				<tr>
+					<td>轮播序号</td>
+					<td>图片标题</td>
+					<td>图片连接</td>
+					<td>图片展示</td>
+					<td>图片跳转</td>
+					<td>操作</td>
+				</tr>
+				<tr v-for="item in tablearr">
+					<td>{{item.id}}</td>
+					<td>{{item.imgTitle}}</td>
+					<td>{{item.imgurl}}</td>
+					<td>
+						<img :src="item.imgurl">
+					</td>
+					<td>
+						{{item.ahref}}
+					</td>
+					<td>
+						<button class="btn btn-danger" v-on:click="removeData(item.id)">删除</button>
+						<button class="btn btn-success" v-on:click="updateData(item.id)">修改</button>
+					</td>
+				</tr>
+
+			</table>
+
+		</div>
+		<button class="btn btn-info" v-on:click="showModel">添加</button>
+		<button class="btn btn-info" v-on:click="getData">点击获取数据</button>
+
+		<div class="model" v-show="isShow">
+			<div class="model-content">
+				<div>
+					序号： <input type="" name="" v-model="id">
+				</div>
+				<div>
+					图标标题： <input type="" name="" v-model="imgTitle">
+				</div>
+				<div>
+					图标连接： <input type="" name="" v-model="imgurl">
+				</div>
+
+				<div>
+					跳转链接： <input type="" name="" v-model="ahref">
+				</div>
+				<div>
+					<button class="btn btn-success" v-if="add" v-on:click="addData">确定</button>
+					<button class="btn btn-info" v-on:click="changeMsg" v-else>修改</button>
+					<button class="btn btn-danger" v-on:click="hiddenModel">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>
+
+<script type="text/javascript">
+	var app = new Vue({
+		el: "#app",
+		data: {
+			tablearr: [],
+			isShow: false,
+			id: 0,
+			imgTitle: '',
+			imgurl: '',
+			ahref: '',
+			add: true,
+			changeDate: {}
+		},
+		methods: {
+			getData: function () {
+
+				this.$http.get('http://127.0.0.1:3000/getMsg').then(function (res) {
+					this.tablearr = res.body
+					// console.log(res.body);  
+				}, function () {
+					console.log('请求失败处理');
+				});
+
+			},
+			showModel: function () {
+
+				this.isShow = true;
+
+				this.add = true;
+
+			},
+			hiddenModel: function () {
+
+				this.isShow = false
+
+			},
+			addData: function () {
+
+				// 没有判断输入框内为空
+				// id存储为number类型，如果有字符比如abc进去，会报错
+
+				let imgmsg = {
+					id: this.id,
+					imgTitle: this.imgTitle,
+					imgurl: this.imgurl,
+					ahref: this.ahref,
+				}
+
+				console.log(imgmsg);
+
+				this.$http.post('http://127.0.0.1:3000/addMsg', imgmsg, {
+					// vue-resource发送的不是json
+					emulateJSON: true
+				}).then(function (res) {
+					console.log(res);
+					this.isShow = false;
+					this.getData();
+				}, function (res) {
+					console.log(res);
+				});
+
+			},
+			removeData: function (msg) {
+
+				this.$http.get('http://127.0.0.1:3000/removeMsg', {
+					params: {
+						id: msg
+					}
+				}).then(function (res) {
+					this.getData();
+				}, function () {
+					console.log('请求失败处理');
+				});
+
+			},
+			updateData: function (msg) {
+
+				this.isShow = true;
+
+				this.add = false;
+
+				this.$http.get('http://127.0.0.1:3000/findMsg', {
+					params: {
+						id: msg
+					}
+				}).then(function (res) {
+					console.log(res.body[0]);
+					this.id = res.body[0].id;
+					this.imgTitle = res.body[0].imgTitle;
+					this.imgurl = res.body[0].imgurl;
+					this.ahref = res.body[0].ahref;
+
+					this.changeDate = {
+						id: res.body[0].id,
+						imgTitle: res.body[0].imgTitle,
+						imgurl: res.body[0].imgurl,
+						ahref: res.body[0].ahref
+					}
+				}, function () {
+					console.log('请求失败处理');
+				});
+
+			},
+			changeMsg: function () {
+
+				let imgmsg = {
+					id: this.id,
+					imgTitle: this.imgTitle,
+					imgurl: this.imgurl,
+					ahref: this.ahref,
+				}
+
+				console.log(imgmsg);
+
+				this.$http.post('http://127.0.0.1:3000/updateMsg', {
+					imgmsg,
+					changeDate: this.changeDate
+				}, {
+					// vue-resource发送的不是json
+					emulateJSON: true
+				}).then(function (res) {
+					console.log(res);
+					this.isShow = false;
+					this.getData();
+				}, function (res) {
+					console.log(res);
+				});
+
+			}
+
+		}
+	});
+</script>

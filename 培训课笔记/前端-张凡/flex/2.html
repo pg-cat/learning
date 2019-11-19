@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<!-- 生产环境版本，优化了尺寸和速度 -->
+		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+		<style type="text/css">
+			.ball{
+				border-radius:50%;
+			}
+			img{
+				/*过渡效果*/
+				transition:all 1s linear 0s;
+			}
+			.qiu{
+				width:100px;
+				height: 100px;
+				background:red;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="wrap">
+			<!-- {{username}}
+			<button v-on:click="changename">点击改变</button> -->
+
+			<!-- <h1 v-if="isShow" v-on:click = "xianshi">欢迎来到武汉最大的同性交流IT公司--兄弟会</h1> -->
+<!-- 
+			<img v-bind:src="imgurl" v-bind:class="classname" v-on:click="xianshi">
+
+			<div v-bind:class="{ qiu:isActive }" v-if="isShow"></div>
+			<div v-bind:style="[styleObject,styleObj]" v-else></div> -->
+
+			<ul>
+				<li v-for="item in  list">
+					姓名:{{item.name}}
+					年龄:{{item.age}}
+					工作:{{item.work}}
+				</li>
+			</ul>
+		</div>
+	</body>
+</html>
+<script type="text/javascript">
+	
+	// 用vue和页面上的wrap联通
+	var app = new Vue({
+
+		el:"#wrap",
+
+		data:{
+
+			// 双向绑定
+			username:"张凡",
+
+			isShow:false,
+
+			imgurl:'./1.jpg',
+
+			classname:"",
+
+			isActive:true,
+
+			styleObject:{
+
+				width:'150px',
+
+				height:'200px',
+
+				background:'yellow'
+
+			},
+			styleObj:{
+
+				border:'10px solid black'
+
+			},
+			list:[
+				{
+					name:'zhangfan',
+
+					age:27,
+
+					work:'程序猿'
+				},
+				{
+					name:'zhangshun',
+
+					age:28,
+
+					work:'解压师'
+				},
+				{
+					name:'zhaojin',
+
+					age:19,
+
+					work:'管他呢'
+				},
+			]
+
+		},
+		methods:{
+
+			changename:function(){
+
+				this.username = '张顺'
+
+			},
+			xianshi:function(){
+
+				// this.isShow = false
+
+				this.imgurl = './2.jpg';
+
+				this.classname = 'ball';
+
+				this.isActive = false;
+
+			}
+
+		}
+
+	})
+
+</script>

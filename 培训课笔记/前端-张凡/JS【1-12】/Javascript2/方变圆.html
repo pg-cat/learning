@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>
+      body{
+        height:800px;
+      }
+      div{
+        width:100px;
+        height:100px;
+        background:pink;
+        margin:20px;
+        float:left;
+      }
+    </style>
+  </head>
+  <body>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+  </body>
+  <script>
+    var div = document.getElementsByTagName('div');
+    console.log(div);
+    for( i = 0 ; i < 10 ; i ++ ){
+
+        div[i].onclick = function(){
+
+          this.style.borderRadius = '50%';
+
+          console.log(this);
+
+        }
+
+    }
+
+    var body = document.getElementsByTagName('body')[0];
+
+    body.onclick = function(){
+      console.log(this);
+    }
+
+  </script>
+</html>

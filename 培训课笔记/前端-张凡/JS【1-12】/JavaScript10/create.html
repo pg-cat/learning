@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+      <div class="container"></div>
+      <input type="file" name="" value="">
+  </body>
+</html>
+<script type="text/javascript">
+
+  var data = [{
+    name:'电饭锅',
+    price:69,
+    imgsrc:'./img/1.jpg'
+  },{
+    name:'电磁炉',
+    price:169,
+    imgsrc:'./img/2.jpg'
+  },{
+    name:'电视机',
+    price:1169,
+    imgsrc:'./img/3.jpg'
+  },{
+    name:'电脑',
+    price:11169,
+    imgsrc:'./img/4.jpg'
+  }]
+
+
+
+  AddElement('container',data);
+
+  // 调用函数的时候，传入container的class名称和需要的数组
+  function AddElement(classNames,arr){
+
+    var container = document.getElementsByClassName(classNames)[0];
+
+    for ( i = 0 ; i < arr.length ; i ++ ){
+      // 给container添加四个div
+      var div = createEle('div');
+
+      // 分别创建h2,p,img标签
+      var h2 = createEle('h2');
+
+      // 需要把name属性放进h2标签
+      h2.innerHTML = data[i].name;
+
+      var p = createEle('p');
+
+      // 把price放入p标签
+      p.innerHTML = data[i].price;
+
+      var img = createEle('img');
+
+      // 设置img的图片属性
+      img.src = data[i].imgsrc;
+
+      // 把他们三个添加到div里面
+      div.appendChild(h2);
+      div.appendChild(p);
+      div.appendChild(img);
+
+      console.log(div.__proto__);
+
+      // 把div添加到container里面
+      container.appendChild(div);
+    }
+
+  }
+
+  // 封装一个函数，用来处理创建元素比较多的问题
+  function createEle(strEle){
+
+      return document.createElement(strEle);
+
+  }
+
+// localStorage 用起来比较简单，但是涉及的整个思路需要扩展
+// 1. 当用户输入用户名密码的时候，你需要将他们存储到页面中
+// 2. 当用户的用户名密码改变的时候，你需要将上一次的存储删掉，并且建立新的存储
+// 3. 当用户进入页面的时候，需要判断是否本地存储了用户名密码，如果存储了，自动发送给后台，让服务器端
+//    返回内容，如果用户名密码正确，那么用户登录
+// 4. 如果超过一周，登录信息失效
+// 5. 如果本地没有用户名密码，那么需要跳转到登录窗口
+//
+// img转化成base64的用处
+// 每次加载页面，你需要把后台给你的所有url进行比对，如果图片的地址和你本地存储的地址一致，需要读取
+// 本地的图片，并且将本地存储的图片，但是服务器给你的地址里面没有的，去掉
+
+
+
+</script>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+
+</body>
+</html>
+<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js">
+</script>
+<script type="text/javascript">
+	$(function(){
+
+		$.post('http://127.0.0.1:5000/login',{
+			username : 'zhangfan',
+			password : '111',
+		},function(data){
+			console.log(data);
+		})
+
+	})
+</script>

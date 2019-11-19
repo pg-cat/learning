@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  
+</body>
+</html>
+<script>
+
+function zd(){
+  this.data = [];
+  // 添加
+  this.push = push;
+  // 删除
+  this.del = del;
+  // 查看所有
+  this.look = look;
+  // 查看长度
+  this.len = len;
+  // 清空
+  this.emt = emt;
+}
+
+// 添加
+function push(e,value){
+  this.data[e] = value;
+}
+// 删除
+function del(e){
+  delete this.data[Object.keys(this.data)[e-1]];
+}
+// 查看所有
+function look(){
+  return Object.entries(this.data).toString();
+}
+// 查看长度
+function len(){
+  // console.log(Object.keys(this.data).toString());
+  return Object.keys(this.data).length
+}
+// 清空
+function emt(){
+  this.data = []
+}
+
+let arr = new zd();
+
+// 添加
+// arr.push("1","abc");
+arr.push("b",3);
+arr.push("aa","aaa");
+arr.push("cc",44);
+// 删除
+arr.del(2);
+// 查看所有
+console.log(arr.look());
+// 查看长度
+console.log(arr.len())
+// 清空
+// arr.emt();
+
+console.log(arr.data);
+</script>

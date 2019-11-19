@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <style>
+    #block {
+      width: 100px;
+      height: 100px;
+      background: green;
+      position: absolute;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="block"></div>
+</body>
+
+</html>
+<script type="text/javascript">
+  var block = document.getElementById('block');
+
+  window.onmousemove = function (e) {
+
+    // console.log(e);
+
+    var clientMouseLeft = block.offsetWidth / 2;
+    var clientMouseRight = document.documentElement.clientWidth - block.offsetWidth / 2;
+    var clientMouseTop = block.offsetHeight / 2;
+    var clientMouseBottom = document.documentElement.clientHeight - block.offsetHeight / 2;
+
+    if (e.clientX <= clientMouseLeft) {
+      block.style.left = 0;
+    } else if (e.clientX >= clientMouseRight) {
+      block.style.left = clientMouseRight - clientMouseLeft + 'px';
+    } else {
+      block.style.left = (e.clientX - block.offsetWidth / 2) + 'px';
+    }
+
+    if (e.clientY <= clientMouseTop) {
+      block.style.top = 0;
+    } else if (e.clientY >= clientMouseBottom) {
+      block.style.top = clientMouseBottom - clientMouseTop + 'px';
+    } else {
+      block.style.top = (e.clientY - block.offsetHeight / 2) + 'px';
+    }
+
+  }
+
+  block.onclick = function () {
+
+    console.log('鼠标点击了');
+
+    window.close();
+
+  }
+</script>

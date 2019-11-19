@@ -1,0 +1,22 @@
+.img {
+    overflow: hidden;
+    padding: 30px;
+    border-bottom: #eee 1px solid;
+}
+
+.img a {
+    overflow: hidden;
+    padding: 10px 20px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    background: pink;
+    border: pink 1px solid;
+    border-radius: 7px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+}
+
+.img a:hover {
+    background: skyblue;
+    border: skyblue 1px solid;
+}

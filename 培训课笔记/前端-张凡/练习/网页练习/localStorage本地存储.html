@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script src="../jquery.js"></script>
+</head>
+
+<body>
+
+  用户名：<input type="text" placeholder="请输入用户名">
+  密码：<input type="password" placeholder="请输入密码">
+  <button>注册用户</button>
+  <hr>
+  <button>提取本地存储</button>
+  <div><br></div>
+  <hr>
+  <button>清除全部缓存</button>
+
+</body>
+
+</html>
+<script>
+  let user = [];
+
+  // 存储函数
+  let set = () => {
+    let userInfo = {
+      username: $('input').eq(0).val(),
+      password: $('input').eq(1).val()
+    }
+    user.push(userInfo);
+    localStorage.setItem('user', JSON.stringify(user));
+  }
+
+  // 提取函数
+  let get = (callback) => {
+    let getUser = JSON.parse(localStorage.getItem('user'));
+    callback(getUser);
+  }
+
+  $('button').eq(0).click(set);
+
+  $('button').eq(1).click(() => [
+    get((getUser) => {
+      $('div').empty();
+      $('div').append(JSON.stringify(getUser));
+      console.log(JSON.stringify(getUser), '-getUser');
+    })
+  ]);
+
+  $('button').eq(2).click(() => {
+    $('div').empty();
+    $('div').append('<br>');
+    window.localStorage.clear();
+  })
+</script>

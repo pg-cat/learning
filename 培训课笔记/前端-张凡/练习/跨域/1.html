@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js">
+</script>
+  </head>
+  <body>
+
+  </body>
+</html>
+<script type="text/javascript">
+
+  // var xmlhttp;
+  // if (window.XMLHttpRequest)
+  // {
+  //     //  IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码
+  //     xmlhttp=new XMLHttpRequest();
+  // }
+  // else
+  // {
+  //     // IE6, IE5 浏览器执行代码
+  //     xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+  // }
+  // xmlhttp.open("GET","http://localhost:3000/users/",true);
+  // xmlhttp.send();
+  // xmlhttp.onreadystatechange=function(){
+  //     if (xmlhttp.readyState==4 && xmlhttp.status==200)
+  //     {
+  //         console.log(xmlhttp.responseText);
+  //     }
+  // }
+
+  fetch('http://localhost:3000/users/',{
+    method:'POST',
+  }).then(res => res.json()).then(res => console.log(res))
+
+
+</script>
