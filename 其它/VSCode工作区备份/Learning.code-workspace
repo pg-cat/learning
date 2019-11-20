@@ -5,6 +5,7 @@
     "settings": {
         "editor.fontSize": 17,
         "editor.fontFamily": "'Source Code Pro', 'Courier New', monospace",
-        "files.trimTrailingWhitespace": true
+        "files.trimTrailingWhitespace": true,
+        "files.eol": "\n"
     }
 }
