@@ -1,7 +1,12 @@
 {
-    "folders": [{
-        "path": "E:\\learning"
-    }],
+    "folders": [
+        {
+            "path": "E:\\learning"
+        },
+        {
+            "path": "E:\\web_wordpress"
+        }
+    ],
     "settings": {
         "editor.fontSize": 17,
         "editor.fontFamily": "'Source Code Pro', 'Courier New', monospace",
