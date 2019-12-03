@@ -231,83 +231,149 @@ PATH="$PATH:/usr/local/bin/python"
 
 #### 在 Windows 设置环境变量
 
+> 在环境变量中添加 Python 目录
 
+在命令提示框中( cmd )执行以下命令：
 
+```
+path=%path%;C:\Python
+```
 
+> 注意: `C:\Python` 是 Python 的安装目录
 
+也可以通过以下方式设置：
 
+- 右键点击 【计算机】，然后点击 【属性】
 
+- 然后点击 【高级系统设置】
 
+- 选择 【系统变量】 窗口下面的 【 `Path` 】，双击即可！
 
+- 然后在【 `Path` 】行，添加  安装路径即可(我的 `D:\Python32` )，所以在后面，添加该路径即可(记住，路径直接用分号 `；` 隔开！)
 
+- 最后设置成功以后，在 cmd 命令行，输入命令 `python` ，就可以有相关显示
 
+![图片](https://www.runoob.com/wp-content/uploads/2013/11/201209201707594792.png)
 
+### Python 环境变量
 
+下面几个重要的环境变量，它应用于Python ：
 
+变量名|描述
+-|-
+PYTHONPATH|PYTHONPATH 是 Python 搜索路径，默认我们 import 的模块都会从 PYTHONPATH 里面寻找
+PYTHONSTARTUP|Python 启动后，先寻找 PYTHONSTARTUP 环境变量，然后执行此变量指定的文件中的代码
+PYTHONCASEOK|加入 PYTHONCASEOK 的环境变量, 就会使 python 导入模块的时候不区分大小写
+PYTHONHOME|另一种模块搜索路径，它通常内嵌于的 PYTHONSTARTUP 或 PYTHONPATH 目录中，使得两个模块库更容易切换
 
+### 运行 Python
 
+有三种方式可以运行 Python ：
 
+#### 交互式解释器
 
+你可以通过命令行窗口进入 python 并开在交互式解释器中开始编写 Python 代码
 
+- 你可以在 Unix ，DOS 或任何其他提供了命令行或者 shell 的系统进行 python 编码工作
 
+```python
+$ python # Unix/Linux
 
+# 或者
 
+C:>python # Windows/DOS
+```
 
+以下为 Python 命令行参数：
 
+选项|描述
+-|-
+-d|在解析时显示调试信息
+-O|生成优化代码 ( `.pyo` 文件 )
+-S|启动时不引入查找Python路径的位置
+-V|输出Python版本号
+-X|从 1.6 版本之后基于内建的异常（仅仅用于字符串）已过时
+-c cmd|执行 Python 脚本，并将运行结果作为 cmd 字符串
+file|在给定的 python 文件执行 python 脚本
 
+#### 命令行脚本
 
+在你的应用程序中通过引入解释器可以在命令行中执行 Python 脚本，如下所示：
 
+```python
+$ python script.py # Unix/Linux
 
+# 或者
 
+C:>python script.py # Windows/DOS
+```
 
+> 注意：在执行脚本时，请检查脚本是否有可执行权限
 
+#### 集成开发环境 PyCharm
 
+PyCharm 是由 JetBrains 打造的一款 Python IDE ，支持 macOS 、Windows 、Linux 系统
 
+- 功能：调试、语法高亮、Project 管理、代码跳转、智能提示、自动完成、单元测试、版本控制……
 
+- PyCharm 下载地址：https://www.jetbrains.com/pycharm/download/
 
+- PyCharm 安装地址：http://www.runoob.com/w3cnote/pycharm-windows-install.html
 
+![图片](https://www.runoob.com/wp-content/uploads/2014/06/pycharm_ui_darcula.png)
 
+## 中文编码
 
+> 前面我们已经学会了如何用 Python 输出 `Hello, World!` ，英文没有问题，但是如果你输出中文字符 **`你好，世界`** 就有可能会碰到中文编码问题
 
+Python 文件中如果未指定编码，在执行过程会出现报错：
 
+```python
+#!/usr/bin/python
 
+print ("你好，世界")
+```
 
+以上程序执行输出结果为：
 
+```
+  File "test.py", line 2
+SyntaxError: Non-ASCII character '\xe4' in file test.py on line 2, but no encoding declared; see http://www.python.org/peps/pep-0263.html for details
+```
 
+> 这是因为 Python 中默认的编码格式是 ASCII 格式，在没修改编码格式时无法正确打印汉字，所以在读取中文时会报错
+>> 解决方法为只要在文件开头加入 `# -*- coding: UTF-8 -*-` 或者 `# coding=utf-8` 就行了
+>> - 注意：`# coding=utf-8` 的 `=` 号两边不要空格
 
+```python
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
 
+print "你好，世界";
+```
 
+输出结果为：
 
+```
+你好，世界
+```
 
+> 所以如果在代码中包含中文，就需要在头部指定编码
 
+> 注意
+> - `Python3.X` 源码文件默认使用 `utf-8` 编码，所以可以正常解析中文，无需指定 UTF-8 编码
+>> 如果你使用编辑器，同时需要设置 `py` 文件存储的格式为 `UTF-8` ，否则会出现类似以下错误信息：
 
+```
+SyntaxError: (unicode error) ‘utf-8’ codec can’t decode byte 0xc4 in position 0:
+invalid continuation byte
+```
 
+> Pycharm 设置 `utf-8` 步骤：
+> - 进入 `file` > `Settings` ，在输入框搜索 `encoding`
+> - 找到 `Editor` > `File encodings` ，将 `IDE Encoding` 和 `Project Encoding` 设置为 `utf-8`
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+![图片](https://www.runoob.com/wp-content/uploads/2014/12/pycharm-utf8.jpg)
 
 
 
