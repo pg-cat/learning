@@ -195,25 +195,41 @@ MAC 系统一般都自带有 Python2.x 版本的环境，你也可以在链接 h
 
 ### 环境变量配置
 
+> 程序和可执行文件可以在许多目录，而这些路径很可能不在操作系统提供可执行文件的搜索路径中
 
+**`path(路径)`** 存储在环境变量中，这是由操作系统维护的一个命名的字符串
 
+- 这些变量包含可用的命令行解释器和其他程序的信息
 
+- Unix 或 Windows 中路径变量为 PATH ( UNIX 区分大小写，Windows 不区分大小写)
 
+- 在 Mac OS 中，安装程序过程中改变了 python 的安装路径
 
+  如果你需要在其他目录引用 Python ，你必须在 path 中添加 Python 目录
 
+#### 在 Unix / Linux 设置环境变量
 
+- 在 `csh shell:` 执行以下代码
 
+```
+setenv PATH "$PATH:/usr/local/bin/python"
+```
 
+- 在 `bash shell (Linux):` 执行以下代码
 
+```
+export PATH="$PATH:/usr/local/bin/python"
+```
 
+- 在 `sh` 或者 `ksh shell:` 执行以下代码
 
+```
+PATH="$PATH:/usr/local/bin/python"
+```
 
+> 注意: `/usr/local/bin/python` 是 Python 的安装目录
 
-
-
-
-
-
+#### 在 Windows 设置环境变量
 
 
 
