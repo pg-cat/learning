@@ -1,0 +1,42 @@
+/* 页码 */
+.page {
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.page h2 {
+  margin-right: 10px;
+  color: #666;
+  font-size: 16px;
+}
+
+.page a {
+  margin: 0 5px;
+  padding: 5px 10px;
+  font-size: 16px;
+  font-weight: bold;
+  border: #eee 1px solid;
+  border-radius: 7px;
+}
+
+.page a:hover,
+.page a.active {
+  color: white;
+  background: skyblue;
+  border: white 1px solid;
+}
+
+.page span {
+  overflow: hidden;
+}
+
+.page input {
+  width: 39px;
+  height: 33px;
+  margin: 0 10px;
+  padding: 0 5px;
+  border: #eee 1px solid;
+  border-radius: 7px;
+}

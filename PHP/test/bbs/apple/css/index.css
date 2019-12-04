@@ -1,0 +1,58 @@
+/* 帖子列表 */
+ul {
+  width: 999px;
+  overflow: hidden;
+  margin: 20px auto;
+  padding: 20px 0;
+}
+
+ul li {
+  overflow: hidden;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: #eee 1px solid;
+}
+
+ul li:hover {
+  border-bottom: skyblue 1px solid;
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.05);
+}
+
+ul li a {
+  max-width: 333px;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: bold;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+ul li:hover a {
+  color: skyblue;
+}
+
+ul li span {
+  color: #ccc;
+}
+
+ul li span .like {
+  color: skyblue;
+  cursor: pointer;
+}
+
+/* 报错漂浮层 */
+#err {
+  width: 500px;
+  overflow: hidden;
+  margin-left: -250px;
+  padding: 13px 23px;
+  color: red;
+  letter-spacing: 1px;
+  background: #eee;
+  border-radius: 0 0 7px 7px;
+  position: fixed;
+  left: 50%;
+  top: -100px;
+}

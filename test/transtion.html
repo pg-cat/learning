@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    div {
+      width: 500px;
+      height: 500px;
+      background: red;
+      opacity: 1;
+      transition: all 30s;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+
+    div.abc {
+      display: none;
+      background: #000;
+    }
+  </style>
+</head>
+
+<body>
+  <div></div>
+  <div class="abc"></div>
+</body>
+
+</html>
+<script>
+  let div = document.getElementsByTagName('div')[0];
+  let div2 = document.getElementsByTagName('div')[1];
+  div.onclick = () => {
+    div2.style.display = 'block';
+    div2.style.opacity = 1;
+  }
+</script>

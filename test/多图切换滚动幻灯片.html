@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>多图切换滚动幻灯片</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      background: none;
+      border: none;
+      outline: none;
+      box-sizing: border-box;
+      transition: all 0.5s;
+    }
+
+    .over {
+      width: 1100px;
+      height: 400px;
+      margin: 100px auto;
+    }
+
+    .over .lens {
+      height: 400px;
+      overflow: hidden;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .over .lens .imgNull {
+      display: none;
+    }
+
+    .over .lens img {
+      width: 450px;
+      height: 350px;
+      margin: 25px 0;
+      flex-shrink: 0;
+    }
+
+    .over .lens .imgL {
+      margin-left: -225px;
+    }
+
+    .over .lens .img {
+      width: 550px;
+      height: 400px;
+      margin: 0 50px;
+    }
+
+    .over .btns {
+      width: 100%;
+      height: 1px;
+      font-size: 50px;
+      position: relative;
+    }
+
+    .over .btns .leftBg,
+    .over .btns .rightBg {
+      width: 225px;
+      height: 400px;
+      position: absolute;
+      bottom: 0px;
+    }
+
+    .over .btns .leftBg {
+      left: 0;
+      background: linear-gradient(to right, rgba(255, 255, 255, 1), transparent);
+    }
+
+    .over .btns .rightBg {
+      right: 0;
+      background: linear-gradient(to left, rgba(255, 255, 255, 1), transparent);
+    }
+
+    .over .btns ul {
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      position: absolute;
+      left: 0;
+      top: 13px;
+    }
+
+    .over .btns ul li {
+      width: 10px;
+      height: 10px;
+      margin: 0 5px;
+      background: #333;
+      border: #fff 1px solid;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .over .btns ul li.active {
+      background: #fff;
+      border: #333 1px solid;
+    }
+
+    .over .btns .left,
+    .over .btns .right {
+      width: 50px;
+      height: 100px;
+      color: #fff;
+      text-align: center;
+      line-height: 100px;
+      background: #000;
+      cursor: pointer;
+      opacity: 0.3;
+      position: absolute;
+      top: -250px;
+    }
+
+    .over .btns .left:hover,
+    .over .btns .right:hover {
+      opacity: 0.7;
+    }
+
+    .over .btns .left {
+      left: 0;
+    }
+
+    .over .btns .right {
+      right: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="over">
+    <div class="lens">
+      <img src="./img/00.jpg" alt="">
+      <img src="./img/01.jpg" alt="">
+      <img src="./img/02.jpg" alt="">
+      <img src="./img/03.jpg" alt="">
+      <img src="./img/04.jpg" alt="">
+      <img src="./img/05.jpg" alt="">
+      <img src="./img/06.jpg" alt="">
+      <img src="./img/07.jpg" alt="">
+      <img src="./img/08.jpg" alt="">
+      <img src="./img/09.jpg" alt="">
+    </div>
+    <div class="btns">
+      <div class="leftBg"></div>
+      <div class="rightBg"></div>
+      <ul>
+        <li onclick="lisClick(0)"></li>
+        <li onclick="lisClick(1)"></li>
+        <li onclick="lisClick(2)"></li>
+        <li onclick="lisClick(3)"></li>
+        <li onclick="lisClick(4)"></li>
+        <li onclick="lisClick(5)"></li>
+        <li onclick="lisClick(6)"></li>
+        <li onclick="lisClick(7)"></li>
+        <li onclick="lisClick(8)"></li>
+        <li onclick="lisClick(9)"></li>
+      </ul>
+      <div class="left">◀</div>
+      <div class="right">▶</div>
+    </div>
+  </div>
+</body>
+
+</html>
+<script>
+  // 获取图片外框节点
+  let lens = document.getElementsByClassName("lens")[0];
+  let lensChildrenLen = lens.children.length;
+  // 获取左右按钮节点
+  let leftBtn = document.getElementsByClassName("left")[0];
+  let rightBtn = document.getElementsByClassName("right")[0];
+  // 获取小圆点按钮节点
+  let lisBtn = document.getElementsByTagName("li");
+  let lisBtnLen = lisBtn.length;
+  // 记录当前显示的图片
+  let imgNow = 1;
+
+  // 显示前三张图片
+  go();
+  // 显示小圆点按钮当前状态
+  lisBtn[imgNow].className = "active";
+
+  // 给左右按钮绑定函数
+  leftBtn.addEventListener("click", left);
+  rightBtn.addEventListener("click", right);
+
+  // 点击左边按钮
+  function left() {
+    // 当前显示的第一张图片
+    imgNow--;
+    if (imgNow < 0) {
+      imgNow = 9
+    }
+
+    // 隐藏全部图片
+    allNull();
+
+    // 改变图片节点
+    lensBefore(1);
+
+    // 显示图片
+    go();
+
+    // 显示小圆点按钮的状态
+    lisBtnNull();
+    lisBtn[imgNow].className = "active";
+
+    console.log(imgNow);
+  }
+
+  // 点击右边按钮
+  function right() {
+    // 当前显示的第一张图片
+    imgNow++;
+    if (imgNow > 9) {
+      imgNow = 0
+    }
+
+    // 隐藏全部图片
+    allNull();
+
+    // 改变图片节点
+    lensAfter(1);
+
+    // 显示图片
+    go();
+
+    // 显示小圆点按钮的状态
+    lisBtnNull();
+    lisBtn[imgNow].className = "active";
+
+    console.log(imgNow);
+  }
+
+  // 点击小圆点按钮
+  function lisClick(n) {
+    // 隐藏全部图片
+    allNull();
+
+    // 改变图片节点
+    if (n == imgNow) {
+      return;
+    } else if (n > imgNow) {
+      lensAfter(n - imgNow);
+      imgNow = n;
+    } else {
+      lensBefore(imgNow - n);
+      imgNow = n;
+    }
+
+    // 显示图片
+    go();
+
+    // 显示小圆点按钮的状态
+    lisBtnNull();
+    lisBtn[n].className = "active";
+
+    console.log(imgNow);
+  }
+
+  // 向后循环改变 lens 图片节点
+  function lensAfter(n) {
+    for (let i = 0; i < n; i++) {
+      lens.appendChild(lens.children[0])
+    }
+  }
+
+  // 向前循环改变 lens 图片节点
+  function lensBefore(n) {
+    for (let i = 0; i < n; i++) {
+      lens.insertBefore(lens.children[lensChildrenLen - 1], lens.firstElementChild)
+    }
+  }
+
+  // 隐藏全部图片
+  function allNull() {
+    for (let i = 0; i < lensChildrenLen; i++) {
+      lens.children[i].className = "imgNull";
+    }
+  }
+
+  // 显示三张图片
+  function go() {
+    lens.children[0].className = "imgL";
+    lens.children[1].className = "img";
+    lens.children[2].className = "imgR";
+  }
+
+  // 清空小圆点按钮的样式
+  function lisBtnNull() {
+    for (let i = 0; i < lisBtnLen; i++) {
+      lisBtn[i].className = ""
+    }
+  }
+
+</script>
