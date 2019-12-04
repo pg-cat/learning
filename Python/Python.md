@@ -686,16 +686,20 @@ print 默认输出是换行的，如果要实现不换行需要在变量末尾�
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
-x="a"
-y="b"
+x='a'
+y='b'
+
 # 换行输出
 print x
 print y
 
-print '---------'
+print '--------------'
+
 # 不换行输出
 print x,
-print y,
+print y
+
+print '--------------'
 
 # 不换行输出
 print x,y
@@ -706,36 +710,56 @@ print x,y
 ```
 a
 b
----------
-a b a b
+--------------
+a b
+--------------
+a b
 ```
 
 ### 多个语句构成代码组
 
+缩进相同的一组语句构成一个代码块，我们称之代码组
 
+- 像 `if` 、`while` 、`def` 和 `class` 这样的复合语句，首行以关键字开始，以冒号 `:` 结束，该行之后的一行或多行代码构成代码组
 
+- 我们将首行及后面的代码组称为一个子句(`clause` )
 
+```python
+if expression :
+   suite
+elif expression :
+   suite
+else :
+   suite
+```
 
+### 命令行参数
 
+很多程序可以执行一些操作来查看一些基本信息，Python 可以使用 -h 参数查看各参数帮助信息：
 
+```
+$ python -h
+usage: python [option] ... [-c cmd | -m mod | file | -] [arg] ...
+Options and arguments (and corresponding environment variables):
+-c cmd : program passed in as string (terminates option list)
+-d     : debug output from parser (also PYTHONDEBUG=x)
+-E     : ignore environment variables (such as PYTHONPATH)
+-h     : print this help message and exit
 
+[ etc. ]
+```
 
+> 我们在使用脚本形式执行 Python 时，可以接收命令行输入的参数，具体使用可以参照[【 Python 命令行参数】](https://www.runoob.com/python/python-command-line-arguments.html)
 
+## 变量类型
 
+变量存储在内存中的值，这就意味着在创建变量时会在内存中开辟一个空间
 
+- 基于变量的数据类型，解释器会分配指定内存，并决定什么数据可以被存储在内存中
 
+- 因此，变量可以指定不同的数据类型，这些变量可以存储整数，小数或字符
 
-
-
-
-
-
-
-
-
-
-
-
+### 变量赋值
 
 
 
