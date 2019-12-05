@@ -950,44 +950,103 @@ Python 列表截取可以接收第三个参数，参数作用是截取的步长
 
 - 以下实例在索引 `1` 到索引 `4` 的位置并设置为步长为 `2` (间隔一个位置)来截取字符串：
 
+![图片](https://www.runoob.com/wp-content/uploads/2013/11/python_list_slice_2.png)
 
+### 列表
 
+`List` (列表)是 Python 中使用最频繁的数据类型
 
+- 列表可以完成大多数集合类的数据结构实现
 
+  - 它支持字符，数字，字符串甚至可以包含列表(即嵌套)
 
+- 列表用 `[ ]` 标识，是 Python 最通用的复合数据类型
 
+- 列表中值的切割也可以用到变量 **`[头下标:尾下标]`** ，就可以截取相应的列表
 
+  - 从左到右索引默认 `0` 开始，从右到左索引默认 `-1` 开始，下标可以为空表示取到头或尾
 
+![图片](https://www.runoob.com/wp-content/uploads/2013/11/list_slicing1.png)
 
+加号 `+` 是列表连接运算符，星号 `*` 是重复操作，实例( `Python 2.0+` )：
 
+```python
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
 
+list = [ 'runoob', 786 , 2.23, 'john', 70.2 ]
+tinylist = [123, 'john']
 
+print list               # 输出完整列表
+print list[0]            # 输出列表的第一个元素
+print list[1:3]          # 输出第二个至第三个元素
+print list[2:]           # 输出从第三个开始至列表末尾的所有元素
+print tinylist * 2       # 输出列表两次
+print list + tinylist    # 打印组合的列表
+```
 
+- 以上实例输出结果：
 
+```
+['runoob', 786, 2.23, 'john', 70.2]
+runoob
+[786, 2.23]
+[2.23, 'john', 70.2]
+[123, 'john', 123, 'john']
+['runoob', 786, 2.23, 'john', 70.2, 123, 'john']
+```
 
+### 元组
 
+元组是另一个数据类型，类似于 `List` (列表)，实例( `Python 2.0+` )：
 
+- 元组用 `()` 标识
 
+- 内部元素用逗号隔开
 
+> 元组不能二次赋值，相当于只读列表
 
+```python
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
 
+tuple = ( 'runoob', 786 , 2.23, 'john', 70.2 )
+tinytuple = (123, 'john')
 
+print tuple               # 输出完整元组
+print tuple[0]            # 输出元组的第一个元素
+print tuple[1:3]          # 输出第二个至第四个（不包含）的元素
+print tuple[2:]           # 输出从第三个开始至列表末尾的所有元素
+print tinytuple * 2       # 输出元组两次
+print tuple + tinytuple   # 打印组合的元组
+```
 
+- 以上实例输出结果：
 
+```
+('runoob', 786, 2.23, 'john', 70.2)
+runoob
+(786, 2.23)
+(2.23, 'john', 70.2)
+(123, 'john', 123, 'john')
+('runoob', 786, 2.23, 'john', 70.2, 123, 'john')
+```
 
+以下是元组无效的，因为元组是不允许更新的，实例( `Python 2.0+` )：
 
+> 而列表是允许更新的
 
+```python
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
 
+tuple = ( 'runoob', 786 , 2.23, 'john', 70.2 )
+list = [ 'runoob', 786 , 2.23, 'john', 70.2 ]
+tuple[2] = 1000    # 元组中是非法应用
+list[2] = 1000     # 列表中是合法应用
+```
 
-
-
-
-
-
-
-
-
-
+### 字典
 
 
 
