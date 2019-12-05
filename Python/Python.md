@@ -771,7 +771,7 @@ Python 中的变量赋值不需要类型声明
 
 - 等号 `=` 运算符左边是一个变量名，等号 `=` 运算符右边是存储在变量中的值
 
-实例( Python 2.0+ )
+实例( `Python 2.0+` )
 
 ```python
 #!/usr/bin/python
@@ -915,19 +915,40 @@ Python 的字串列表有 `2` 种取值顺序：
 
 当使用以冒号分隔的字符串，Python 返回一个新的对象，结果包含了以这对偏移标识的连续的内容，左边的开始是包含了下边界
 
+- 上面的结果包含了 `s[1]` 的值 `b` ，而取到的最大范围不包括尾下标，就是 `s[5]` 的值 `f`
 
+![图片](https://www.runoob.com/wp-content/uploads/2013/11/o99aU.png)
 
+加号 `+` 是字符串连接运算符，星号 `*` 是重复操作，实例( `Python 2.0+` )：
 
+```python
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
 
+str = 'Hello World!'
 
+print str           # 输出完整字符串
+print str[0]        # 输出字符串中的第一个字符
+print str[2:5]      # 输出字符串中第三个至第六个之间的字符串
+print str[2:]       # 输出从第三个字符开始的字符串
+print str * 2       # 输出字符串两次
+print str + "TEST"  # 输出连接的字符串
+```
 
+- 以上实例输出结果：
 
+```python
+Hello World!
+H
+llo
+llo World!
+Hello World!Hello World!
+Hello World!TEST
+```
 
+Python 列表截取可以接收第三个参数，参数作用是截取的步长
 
-
-
-
-
+- 以下实例在索引 `1` 到索引 `4` 的位置并设置为步长为 `2` (间隔一个位置)来截取字符串：
 
 
 
