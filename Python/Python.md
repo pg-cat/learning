@@ -998,13 +998,15 @@ runoob
 
 ### 元组
 
-元组是另一个数据类型，类似于 `List` (列表)，实例( `Python 2.0+` )：
+元组是另一个数据类型，类似于 `List` (列表)
 
 - 元组用 `()` 标识
 
 - 内部元素用逗号隔开
 
 > 元组不能二次赋值，相当于只读列表
+
+- 实例( `Python 2.0+` )：
 
 ```python
 #!/usr/bin/python
@@ -1058,7 +1060,7 @@ list[2] = 1000     # 列表中是合法应用
 
   字典由索引( `key` )和它对应的值 `value` 组成
 
-实例( `Python 2.0+` )：
+- 实例( `Python 2.0+` )：
 
 ```python
 #!/usr/bin/python
@@ -1104,19 +1106,19 @@ float(x)|将x转换到一个浮点数
 complex(real [,imag])|创建一个复数
 str(x)|将对象 x 转换为字符串
 repr(x)|将对象 x 转换为表达式字符串
-eval(str)|用来计算在字符串中的有效Python表达式,并返回一个对象
+eval(str)|用来计算在字符串中的有效 Python 表达式，并返回一个对象
 tuple(s)|将序列 s 转换为一个元组
 list(s)|将序列 s 转换为一个列表
 set(s)|转换为可变集合
-dict(d)|创建一个字典；d 必须是一个序列 (key,value)元组
+dict(d)|创建一个字典；d 必须是一个序列 (key,value) 元组
 frozenset(s)|转换为不可变集合
 chr(x)|将一个整数转换为一个字符
-unichr(x)|将一个整数转换为Unicode字符
+unichr(x)|将一个整数转换为 Unicode 字符
 ord(x)|将一个字符转换为它的整数值
 hex(x)|将一个整数转换为一个十六进制字符串
 oct(x)|将一个整数转换为一个八进制字符串
 
-> 详细案例可自行了解，或[【点击查看此网页底部 **`Python 数据类型转换`** 表格】](https://www.runoob.com/python/python-variable-types.html)
+> 详细案例可自行了解，或[【点击查看此链接网页底部 **`Python 数据类型转换`** 表格】](https://www.runoob.com/python/python-variable-types.html)
 
 ## 运算符
 
