@@ -1116,7 +1116,7 @@ ord(x)|将一个字符转换为它的整数值
 hex(x)|将一个整数转换为一个十六进制字符串
 oct(x)|将一个整数转换为一个八进制字符串
 
-> 详细案例可自行了解，或[【点击查看此网页底部】](https://www.runoob.com/python/python-variable-types.html)
+> 详细案例可自行了解，或[【点击查看此网页底部 **`Python 数据类型转换`** 表格】](https://www.runoob.com/python/python-variable-types.html)
 
 ## 运算符
 
