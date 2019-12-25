@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+    var o = {
+        "A": {
+            "a1": 1,
+            "a2": 2
+        },
+        "B": {
+            "b": 3
+        }
+    };
+    console.log(Object.keys(o));
+    var comType = ['object', 'array'];
+
+    function plat(o, prekey, resobj) {
+        prekey = prekey ? prekey + '.' : '';
+        var keys = Object.keys(o);
+        keys.forEach(function (item) {
+            var v = o[item];
+            var type = typeof v;
+            if (v && comType.indexOf(type) != -1) {
+                plat(v, prekey + item, resobj);
+            } else {
+                resobj[prekey + item] = v;
+            }
+        })
+    }
+    var result = {};
+    plat(o, '', result);
+    console.log(result);
+
+
+    for(item in o){
+        console.log(o[item]);
+    }
+</script>
