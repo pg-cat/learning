@@ -104,6 +104,11 @@ Python 是由 Guido van Rossum 在八十年代末和九十年代初，在荷兰�
 
 ## 环境搭建
 
+> 这里我们推荐使用：`Anaconda3` —— 它可以用来管理不同版本的Python环境，自带很多常用软件包以及科学计算包
+>> 相关安装方式可自行查找及了解
+
+下面仅介绍直接安装 Python 方式，但并不推荐：
+
 > Python 可应用于多平台包括 Linux 和 Mac OS X
 
 你可以通过终端窗口输入 `python` 命令来查看本地是否已经安装 Python 以及 Python 的安装版本
