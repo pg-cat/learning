@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="jquery.js" charset="utf-8"></script>
+  </head>
+  <body>
+    用户名:<input type="text" id="username" /><br>
+    密码:<input type="text" id="password" name="" value=""><br>
+    <button type="button" name="button">点击提交</button>
+  </body>
+</html>
+<script type="text/javascript">
+
+  $(()=>{
+
+    var rg = /\W/;
+
+    var usernameBoolean = false;
+    var passwordBoolean = false;
+
+    var passfunc = function(){}
+
+    var userfunc = function(){}
+
+    $('#username').change(userfunc = ()=>{
+
+      console.log('用户名进来了'+$('#username').val());
+
+      if(rg.test($('#username').val())){
+
+          console.log('用户名/密码不符合规范');
+
+          return;
+
+      }
+
+      if($('#password').val() != ''){
+
+        passfunc();
+
+      }
+
+      console.log('用户名为true，可以进行跳转'+$('#username').val());
+
+      usernameBoolean = true;
+
+      tiaozhuan()
+
+    });
+    $('#password').change( passfunc=()=>{
+
+      console.log('密码进来了'+$('#password').val());
+
+      if(rg.test($('#password').val())){
+
+          console.log('用户名/密码不符合规范');
+
+          return;
+
+      }
+
+      passwordBoolean = true;
+
+      tiaozhuan()
+
+    });
+
+    function tiaozhuan(){
+
+      console.log('触发了跳转函数');
+
+      if(passwordBoolean && usernameBoolean){
+
+        // 和直接页面跳转不同，这是由函数驱动的，浏览器会认为是打开了一个新的页面
+        // 一般不需要特别重视，因为在后台框架下，我们用路由进行跳转
+        window.location.href="regular.html";
+
+      }
+    }
+
+  });
+
+// webpack 的配置文件的写法
+// webpack-sever-dev   webpack-ejs-static(若果没有的话就不要看了)
+// express的app.local的对象的用法
+
+</script>

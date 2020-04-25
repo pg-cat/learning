@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>
+      div{
+        width:200px;
+        height:200px;
+        background:pink;
+        float:left;
+        margin:20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="one"></div>
+    <div id="two"></div>
+    <div id="three"></div>
+  </body>
+</html>
+<script>
+
+  var divs = document.getElementsByTagName('div');
+
+  console.log(divs);
+
+  for( i = 0 ; i < divs.length ; i ++ ){
+
+      divs[i].onclick = function(){
+
+        for( y = 0 ; y < divs.length ; y ++ ){
+
+          divs[y].style.borderRadius = '0%';
+
+        }
+
+        this.style.borderRadius = '50%';
+
+      }
+
+  }
+
+</script>

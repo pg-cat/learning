@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="./jquery.js" charset="utf-8"></script>
+  </head>
+  <body>
+    <ul>
+      <li>三国演义</li>
+      <li>水浒传</li>
+      <li>红楼梦</li>
+      <li>西游记</li>
+    </ul>
+
+  </body>
+</html>
+<script>
+
+    $(function(){
+      $('ul').append('<li>西厢记</li>');
+      $('ul').prepend('<li>金瓶梅</li>');
+
+      $('li:eq(2)').after('<li>聊斋志异</li>');
+      $('li:eq(2)').before('<li>初刻拍案惊奇</li>');
+    })
+
+
+
+
+
+</script>

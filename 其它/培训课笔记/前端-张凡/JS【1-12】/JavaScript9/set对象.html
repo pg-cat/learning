@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+  </body>
+</html>
+<script type="text/javascript">
+
+  // 实例化一个set对象
+
+  // let sunday = new Set([1,2,3]);
+  //
+  // sunday.add(4);
+  //
+  // console.log(sunday);
+
+  let one = {
+
+    getNumber(){
+
+        return '1';
+
+    }
+
+  }
+
+  let two = {
+
+    __proto__:one,
+
+    getNumber(){
+
+        // 跨页面调值
+        // 指代的是原型
+        return super.getNumber() + '2';
+
+    }
+
+  }
+
+  console.log(two.getNumber());
+
+
+
+</script>

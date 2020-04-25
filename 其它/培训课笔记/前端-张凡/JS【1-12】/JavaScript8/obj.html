@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+  </body>
+</html>
+<script type="text/javascript">
+
+  // 写一个构造函数，用来产生一个对象
+  // const lunch = () => {
+  //   return {
+  //     drink : '🍺',
+  //     fruit : '🍌',
+  //     dessert : '🍫'
+  //   }
+  // }
+  // // 将对象拆开，称之为对象的解构
+  // // let {drink : drink , dessert : dessert , fruit : fruit} = lunch();
+  //
+  // let {drink,dessert,fruit} = lunch();
+  //
+  // console.log(drink);
+  // console.log(dessert);
+  // console.log(fruit);
+
+  const lunch = () => {
+    return ['🍺','🍌','🍫'];
+  }
+
+  // var arr = lunch();
+  //
+  // dessert = arr[2];
+  // fruit = arr[1];
+  // drink = arr[0];
+
+  let [drink,fruit,dessert] = lunch();
+
+  // console.log(dessert);
+  // console.log(fruit);
+  // console.log(drink);
+
+  let wufan = '今天吃的是'+dessert+'作为甜点,喝的是'+drink+'解渴';
+
+  // let wanfan = kitchen `今天吃的是${fruit}作为甜点，没喝酒,我想吃${dessert}作为甜点`;
+
+  // function kitchen(str,...value){
+  //
+  //   console.log(str); // 纯字符串
+  //   console.log(value);  // 变量字符串
+  //
+  // }
+
+  console.log(wufan.startsWith('范德萨发'));
+  console.log(wufan.endsWith('解渴'));
+  console.log(wufan.includes('甜点'));
+
+  function add(a=3,b=4){
+    return a+b
+  }
+  add();
+</script>

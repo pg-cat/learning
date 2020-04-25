@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>
+      #kuai{
+        width:300px;
+        height:300px;
+        background:orange;
+        position:absolute;
+        left:0px;
+        top:0px;
+      }
+      #btn{
+        position:absolute;
+        left:500px;
+        top:300px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="kuai">
+    </div>
+    <button id="btn">开始/停止</button>
+  </body>
+  <script>
+
+    //获取页面上的元素
+    var kuai = document.getElementById('kuai');
+    var btn = document.getElementById('btn');
+
+    // 声明一个变量，用来存放true/false
+    var Change = false;
+
+    //计时变量
+    var timer = null;
+
+    var addtop = 5;
+
+    var addleft = 5;
+
+    //true 代表div开始变色，false  代表div停止变色
+    btn.onclick = function(){
+
+      if(Change == true){
+
+        Change = !Change;
+
+        clearInterval(timer);
+
+        timer = null;
+
+      }else{
+
+        Change = !Change;
+
+        //计时器，控制该函数自动执行
+        timer = setInterval(changeBg,20);
+
+      }
+
+    }
+
+    //div取随机背景颜色
+    function changeBg(){
+
+      kuai.style.left = kuai.offsetLeft + addleft + 'px';
+
+      kuai.style.top = kuai.offsetTop + addtop + 'px';
+
+      //判断div是否到达边界了
+      if(kuai.offsetTop >= (document.documentElement.clientHeight-300)  || kuai.offsetTop < 0){
+
+        addtop = - addtop;
+
+        changeColor();
+
+      }
+      if(kuai.offsetLeft >= (document.documentElement.clientWidth-300)  || kuai.offsetLeft < 0){
+
+        addleft = - addleft;
+
+        changeColor();
+
+      }
+    }
+
+    //页面中div如果碰到浏览器的边界，自动弹回来
+    function changeColor(){
+
+      //randomr randomg randomb
+      var randomr = (Math.floor(Math.random()*1000000)%256);
+      var randomg = (Math.floor(Math.random()*1000000)%256);
+      var randomb = (Math.floor(Math.random()*1000000)%256);
+
+      kuai.style.background = 'rgba('+randomr+','+randomg+','+randomb+',1)';
+
+    }
+
+  </script>
+</html>

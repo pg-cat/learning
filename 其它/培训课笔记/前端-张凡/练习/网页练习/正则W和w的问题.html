@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script src="../jquery.js"></script>
+</head>
+
+<body>
+  <input type="text">
+  <div></div>
+</body>
+
+</html>
+<script>
+  let rg = /\W/g;
+  let str = null;
+
+  $('input').blur(() => {
+    str = $('input').val();
+    console.log(str);
+    console.log(rg.test(str));
+  });
+
+  // 未解决
+</script>

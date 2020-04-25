@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+  </body>
+</html>
+<script type="text/javascript">
+
+  let lunch = {
+    getFood() {
+      return '今天中午吃便当';
+    }
+  }
+
+  let dinner = {
+    getFood(){
+      return '今天晚上吃面条';
+    }
+  }
+
+  let breakfast = {
+
+    __proto__  : dinner
+
+  }
+
+  console.log(breakfast.getFood());
+  // 需要获取某个对象的原型是谁
+  console.log(Object.getPrototypeOf(breakfast) == dinner);
+
+  var time = new String();
+
+  console.log(time);
+
+
+</script>

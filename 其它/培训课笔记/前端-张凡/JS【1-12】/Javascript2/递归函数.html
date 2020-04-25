@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+
+
+  <script>
+    shuchu(3);
+    function shuchu(n){
+      if(n>0){
+      console.log(n);
+          shuchu(n-1);
+      }else{
+        console.log('-----------------------');
+        return;
+      }
+      console.log(n);
+    }
+
+
+      // console.log(2);     输出2------------------2
+      //
+      //   shuchu1开始
+      //   console.log(1);   输出1-----------------1
+      //
+      //     shuchu0开始
+      //     console.log(0); 输出0-----------------0
+      //
+      //       console.log('-----------------------');------
+      //
+      //
+      //     console.log(0); 输出0-----------------0
+      //     shuchu0结束
+      //
+      //
+      //   console.log(1);------------------------1
+      //   shuchu1结束
+      //
+      // console.log(2);---------------------------2
+
+  </script>
+
+
+
+  <body>
+
+  </body>
+
+</html>

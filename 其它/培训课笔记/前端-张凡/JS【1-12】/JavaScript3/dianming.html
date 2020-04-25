@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <input type="text" id="inp" placeholder = "请输入新来的同学">
+    <button id="btn">点击签到</button>
+    <div id="num">目前已到0人</div>
+    <div id="stu">已签到的同学：</div>
+  </body>
+  <script>
+
+      // 获取页面元素
+      //
+      var inp = document.getElementById('inp');
+      var btn = document.getElementById('btn');
+      var num = document.getElementById('num');
+      var stu = document.getElementById('stu');
+
+      //需要声明一个空数组，用来存放已经签到的同学
+      var arr = ['zhangfan','zhangchuan','ashun'];
+
+      btn.onclick = function(){
+
+          if(inp.value == ''){
+
+            return;
+
+          }
+
+          // 通过循环或者其他途径，把数组中的所有元素都挨个过一遍，这叫做遍历
+          //
+          // for( i = 0 ; i < arr.length ; i ++ ){
+          //
+          //   if( inp.value == arr[i] ){
+          //
+          //     alert('有重复元素');
+          //
+          //     return;
+          //
+          //   }
+          //
+          // }
+
+          // for   in循环
+          //
+          for ( var index in arr ){
+
+              if( arr[index] == inp.value ){
+
+                alert('你已经签到过了');
+
+                return;
+
+              }
+
+          }
+
+          arr.push(inp.value);
+
+          console.log(arr);
+
+          // 如果元素添加成功，需要修改目前签到的人数
+          //
+          num.innerHTML = '目前签到人数：' + arr.length;
+
+          // 通过字符串的形式，将已经签到的人显示在页面上
+
+          var str = arr.join(',');
+
+          stu.innerHTML = '已经到了的同学: ' + str;
+
+      }
+
+  </script>
+</html>

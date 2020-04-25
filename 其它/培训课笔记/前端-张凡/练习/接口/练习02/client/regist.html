@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>注册</title>
+  <script src="./js/jquery.js"></script>
+</head>
+
+<body>
+
+  用户名：
+  <br>
+  <input type="text" id="userName">
+  <br>
+  密码：
+  <br>
+  <input type="password" id="passWord">
+  <br>
+  年龄：
+  <br>
+  <input type="number" id="age">
+  <hr>
+  <button>注册</button>
+  <br>
+  <div></div>
+</body>
+
+</html>
+<script>
+  $('button').click(() => {
+    console.log({
+      userName: $('#userName').val(),
+      passWord: $('#passWord').val(),
+      age: Number($('#age').val())
+    })
+    $.post('http://localhost:3000/regist', {
+      userName: $('#userName').val(),
+      passWord: $('#passWord').val(),
+      age: Number($('#age').val())
+    }, (data) => {
+      console.log(data);
+      if(data==100){
+        $('div').html('注册成功')
+      }else if(data==99){
+        $('div').html('用户名已被注册')
+      }else if(data==101){
+        $('div').html('用户名不存在')
+      }else if(data==200){
+        $('div').html('登录成功')
+      }else if(data==201){
+        $('div').html('密码输入错误')
+      }
+    })
+  })
+</script>

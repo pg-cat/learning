@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="./jquery.min.js" charset="utf-8"></script>
+    <style>
+      div{
+        width:300px;
+        height:300px;
+        background:pink;
+        position:absolute;
+      }
+    </style>
+  </head>
+  <body>
+    <button type="button" name="button">点我</button>
+    <div class="">
+
+    </div>
+  </body>
+</html>
+<script type="text/javascript">
+  $(function(){
+
+      $('div').click(function(){
+        $('div').animate({
+          'top':'500px',
+          'left':'1400px'
+        },3000,function(){
+          console.log('动画执行完毕');
+        });
+        $('div').animate({
+          'top':'0px',
+          'left':'0px'
+        },3000);
+      })
+
+      $('button').click(function(){
+        $('div').stop();
+      },function(){
+        console.log('被点击了');
+      });
+
+  })
+</script>
