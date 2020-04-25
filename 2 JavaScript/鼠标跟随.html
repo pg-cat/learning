@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<style type="text/css">
+	.pp{
+		position: absolute;
+	}
+</style>
+
+</head>
+<body>
+
+<input type="text" name="" value="输入一点东西试试？">
+<button>点击开始</button>
+
+</body>
+</html>
+
+<script type="text/javascript">
+	var input = document.getElementsByTagName('input')[0];
+	var button = document.getElementsByTagName('button')[0];
+	button.onclick = function(){
+		var arr = [];
+		var pps = [];
+		var left = [];
+		var top = [];
+
+		// 取出文字给数组 arr
+		for(var i = 0; i < input.value.length; i++){
+			arr.push(input.value[i]);
+		};
+
+		// 取出存放每个字的标签给数组 pps
+		for(var i = 0; i < arr.length; i++){
+			pps[i] = document.createElement('p');
+			document.body.appendChild(pps[i]);
+			pps[i].className = 'pp';
+			pps[i].innerHTML = arr[i];
+		};
+
+		// 存储鼠标位置并逐个释放给文字
+		window.onmousemove = function(e){
+			e = e || window.event;
+			var x = e.clientX;
+			var y = e.clientY;
+			left.push(x);
+			left.reverse();
+			top.push(y);
+			top.reverse();
+			for(var i = 0; i<pps.length; i++){
+				pps[i].style.left = left[i] + 'px';
+				pps[i].style.top = top[i] + 'px';
+			};
+		};
+	}
+
+	
+</script>
