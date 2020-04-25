@@ -1,0 +1,55 @@
+body {
+  background: url("../img/bg.png");
+}
+
+article {
+  width: 100%;
+  max-width: 1200px;
+  overflow: hidden;
+  margin: 15px auto;
+  display: flex;
+  justify-content: space-between;
+}
+
+article .left {
+  width: 300px;
+  overflow: hidden;
+}
+
+article .left .honor {
+  overflow: hidden;
+  padding: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  background: white;
+}
+
+article .left .honor h2 {
+  width: 100%;
+  overflow: hidden;
+}
+
+article .left .honor h2 span {
+  color: #D92E2E;
+}
+
+article .left .honor div {
+  width: 50px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+article .left .honor div img {
+  width: 100%;
+  overflow: hidden;
+}
+
+
+
+article .right {
+  width: 890px;
+  overflow: hidden;
+}

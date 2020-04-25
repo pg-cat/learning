@@ -1,0 +1,20 @@
+.star{
+  overflow: hidden;
+  display: flex;
+  justify-content: left;
+}
+.star div{
+  width: 0.6rem;
+  height: 0.6rem;
+  margin-left: 0.2rem;
+  background-size: cover;
+}
+.star0{
+  background: url('/img/star0.png') no-repeat;
+}
+.star1{
+  background: url('/img/star1.png') no-repeat;
+}
+.star2{
+  background: url('/img/star2.png') no-repeat;
+}

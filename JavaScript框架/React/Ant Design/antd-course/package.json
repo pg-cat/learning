@@ -1,0 +1,20 @@
+{
+  "name": "pg",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "umi dev",
+    "build": "umi build"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "umi": "^2.6.1",
+    "umi-plugin-react": "^1.6.0"
+  },
+  "dependencies": {
+    "@antv/g2": "^3.4.10",
+    "react-intl": "^2.8.0"
+  }
+}
