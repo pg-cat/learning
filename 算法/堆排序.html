@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>堆排序</title>
+</head>
+
+<body>
+    <h1>堆排序</h1>
+    <p>堆排序（Heapsort）是指利用堆这种数据结构所设计的一种排序算法。堆积是一个近似完全二叉树的结构，并同时满足堆积的性质：即子结点的键值或索引总是小于（或者大于）它的父节点。</p>
+    <p>堆排序可以说是一种利用堆的概念来排序的选择排序。分为两种方法：</p>
+    <ol>
+        <li>大顶堆：每个节点的值都大于或等于其子节点的值，在堆排序算法中用于升序排列；</li>
+        <li>小顶堆：每个节点的值都小于或等于其子节点的值，在堆排序算法中用于降序排列；</li>
+    </ol>
+    <p>堆排序的平均时间复杂度为 Ο(nlogn)。</p>
+    <h2>1. 算法步骤</h2>
+    <ol>
+        <li>创建一个堆 H[0……n-1]；</li>
+        <li>把堆首（最大值）和堆尾互换；</li>
+        <li>把堆的尺寸缩小 1，并调用 shift_down(0)，目的是把新的数组顶端数据调整到相应位置；</li>
+        <li>重复步骤 2，直到堆的尺寸为 1。</li>
+        <li style="list-style: none;">图例：</li>
+    </ol>
+    <img src="https://images2015.cnblogs.com/blog/1024555/201612/1024555-20161217182750011-675658660.png"
+        style="width: 77%;" />
+    <img src="https://images2015.cnblogs.com/blog/1024555/201612/1024555-20161217182857323-2092264199.png"
+        style="width: 77%;" />
+    <h2>2. 动图演示</h2>
+    <img src="https://www.runoob.com/wp-content/uploads/2019/03/heapSort.gif" />
+    <br />
+    <img src="https://www.runoob.com/wp-content/uploads/2019/03/Sorting_heapsort_anim.gif" />
+    <h2>3.代码实现</h2>
+    <p>示例：[3,11,3,2,15,66,9,13,22,51,11,33,199,99,10]</p>
+    <h3>排序中……</h3>
+    <div>结果：</div>
+    <hr>
+    <a href="https://www.runoob.com/w3cnote/heap-sort.html" style="color: black;">更多了解可点击前往[菜鸟教程]</a>
+    <br />
+    <a href="https://www.cnblogs.com/chengxiao/p/6129630.html" style="color: black;">图解排序算法(三)之堆排序</a>
+</body>
+
+</html>
+<script>
+
+    // 堆排序方法
+    function heapSort(arr) {
+        // 第一次排序
+        buildMaxHeap(arr);
+        // 经过以上排序，此时堆的各节点已是大小有序
+
+        for (var i = arr.length - 1; i > 0; i--) {
+            swap(arr, 0, i);
+
+            // 去掉末尾最大值再与其他节点对比的机会
+            len--;
+
+            // 改变第一层的位置会打破之前 各节点已是大小有序 的状态，触发 堆调整
+            heapify(arr, 0);
+        }
+
+        return arr;
+    }
+
+    // 因为声明的多个函数都需要数据长度，所以把len设置成为全局变量
+    var len;
+
+    // 建立大顶堆
+    function buildMaxHeap(arr) {
+        len = arr.length;
+        for (var i = Math.floor(len / 2); i >= 0; i--) {
+            console.log('+ii',i)
+            heapify(arr, i);
+        }
+    }
+
+    // 堆调整
+    function heapify(arr, i) {
+        console.log(arr,' +i',i);
+        var left = 2 * i + 1,
+            right = 2 * i + 2,
+            largest = i;
+
+        if (left < len && arr[left] > arr[largest]) {
+            largest = left;
+        }
+
+        if (right < len && arr[right] > arr[largest]) {
+            largest = right;
+        }
+
+        if (largest != i) {
+            swap(arr, i, largest);
+            heapify(arr, largest);
+        }
+    }
+
+    // 切换首尾元素
+    function swap(arr, i, j) {
+        var temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+
+    // 获取节点
+    let div = document.getElementsByTagName('div')[0];
+    // 示例值
+    let arr = [3, 11, 3, 2, 15, 66, 9, 13, 22, 51, 11, 33, 199, 99, 10];
+
+    // 排序中
+    arr = heapSort(arr);
+
+    // 把值传到页面
+    div.innerHTML += JSON.stringify(arr);
+
+</script>

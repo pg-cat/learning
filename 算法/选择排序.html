@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选择排序</title>
+</head>
+
+<body>
+    <h1>选择排序</h1>
+    <p>选择排序是一种简单直观的排序算法，无论什么数据进去都是 O(n²) 的时间复杂度。所以用到它的时候，数据规模越小越好。唯一的好处可能就是不占用额外的内存空间了吧。</p>
+    <h2>1. 算法步骤</h2>
+    <p>首先在未排序序列中找到最小（大）元素，存放到排序序列的起始位置。</p>
+    <p>再从剩余未排序元素中继续寻找最小（大）元素，然后放到已排序序列的末尾。</p>
+    <p>重复第二步，直到所有元素均排序完毕。</p>
+    <h2>2. 动图演示</h2>
+    <img src="https://www.runoob.com/wp-content/uploads/2019/03/selectionSort.gif" />
+    <h2>3.代码实现</h2>
+    <p>示例：[3,11,3,2,15,66,9,13,22,51,1]</p>
+    <h3>排序中……</h3>
+    <div>结果：</div>
+    <hr>
+    <a href="https://www.runoob.com/w3cnote/selection-sort.html" style="color: black;">更多了解可点击前往[菜鸟教程]</a>
+</body>
+
+</html>
+<script>
+
+    // 选择排序方法
+    function selectionSort(arr) {
+        var len = arr.length;
+        var minIndex, temp;
+        for (var i = 0; i < len - 1; i++) {
+            minIndex = i;
+            for (var j = i + 1; j < len; j++) {
+                if (arr[j] < arr[minIndex]) {     // 寻找最小的数
+                    minIndex = j;                 // 将最小数的索引保存
+                }
+            }
+            temp = arr[i];
+            arr[i] = arr[minIndex];
+            arr[minIndex] = temp;
+        }
+        return arr;
+    }
+
+    // 获取节点
+    let div = document.getElementsByTagName('div')[0];
+    // 示例值
+    let arr = [3, 11, 3, 2, 15, 66, 9, 13, 22, 51, 1];
+
+    // 排序中
+    arr = selectionSort(arr);
+
+    // 把值传到页面
+    div.innerHTML += JSON.stringify(arr);
+
+</script>
