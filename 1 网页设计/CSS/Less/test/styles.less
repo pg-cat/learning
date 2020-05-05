@@ -1,6 +1,12 @@
 @width: 333px;
 @height: @width - 100px;
 
+@bg: #eee;
+
+#font(){
+  color: #000;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -15,7 +21,8 @@
 #header {
   width: @width;
   height: @height;
-  background: #ccc;
+  color: #font[color];
+  background: @bg;
 
   .border();
 
