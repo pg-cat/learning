@@ -1,8 +1,26 @@
-@width: 100px;
-@height: @width + 100px;
+@width: 333px;
+@height: @width - 100px;
+
+* {
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+  list-style: none;
+}
+
+.border {
+  border: 1px red solid;
+}
 
 #header {
   width: @width;
   height: @height;
   background: #ccc;
+
+  .border();
+
+  h2{
+    color: blue;
+  }
 }
+
