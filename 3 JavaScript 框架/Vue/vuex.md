@@ -14,7 +14,7 @@ vuex 就是来解决以上两个问题的:
 
 在普通的 vue 项目中不包含 vuex ，需要进行 `npm install vuex --save-dev`
 
-- 然后在的 main.js 中进行引入:
+- 然后在的 main.js 中进行引入
 
 - 或者单独拿出来一个文件夹，然后引入 vuex 之后，再在 main.js 中引入
 
