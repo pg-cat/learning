@@ -1096,35 +1096,69 @@ Mustache 语法不能作用在 HTML attribute 上，遇到这种情况应该使�
 
 在 DOM 中使用模板时(直接在一个 HTML 文件里撰写模板)，还需要避免使用大写字符来命名键名，因为浏览器会把 attribute 名全部强制转为小写：
 
+```html
+<!--
+在 DOM 中使用模板时这段代码会被转换为 `v-bind:[someattr]`。
+除非在实例中有一个名为“someattr”的 property，否则代码不会工作。
+-->
+<a v-bind:[someAttr]="value"> ... </a>
+```
 
+#### 修饰符
 
+修饰符 (modifier) 是以半角句号 `.` 指明的特殊后缀，用于指出一个指令应该以特殊方式绑定，例如
 
+* `.prevent` 修饰符告诉 `v-on` 指令对于触发的事件调用 `event.preventDefault()`
 
+```html
+<form v-on:submit.prevent="onSubmit">...</form>
+```
 
+### 缩写
 
+`v-` 前缀作为一种视觉提示，用来识别模板中 Vue 特定的 attribute
 
+当你在使用 Vue.js 为现有标签添加动态行为 (dynamic behavior) 时，`v-` 前缀很有帮助
 
+* 然而，对于一些频繁用到的指令来说，就会感到使用繁琐
 
+* 同时，在构建由 Vue 管理所有模板的[【单页面应用程序 (SPA - single page application) 】](https://en.wikipedia.org/wiki/Single-page_application)时，`v-` 前缀也变得没那么重要了
 
+因此，Vue 为 `v-bind` 和 `v-on` 这两个最常用的指令，提供了特定简写：
 
+* `v-bind` 缩写
 
+```html
+<!-- 完整语法 -->
+<a v-bind:href="url">...</a>
 
+<!-- 缩写 -->
+<a :href="url">...</a>
 
+<!-- 动态参数的缩写 (2.6.0+) -->
+<a :[key]="url"> ... </a>
+```
 
+* `v-on` 缩写
 
+```html
+<!-- 完整语法 -->
+<a v-on:click="doSomething">...</a>
 
+<!-- 缩写 -->
+<a @click="doSomething">...</a>
 
+<!-- 动态参数的缩写 (2.6.0+) -->
+<a @[event]="doSomething"> ... </a>
+```
 
+它们看起来可能与普通的 HTML 略有不同，但 `:` 与 `@` 对于 attribute 名来说都是合法字符，在所有支持 Vue 的浏览器都能被正确地解析
 
+* 而且，它们不会出现在最终渲染的标记中
 
+* 缩写语法是完全可选的，但随着你更深入地了解它们的作用，你会庆幸拥有它们
 
-
-
-
-
-
-
-
+## 计算属性和侦听器
 
 
 
