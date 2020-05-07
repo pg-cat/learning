@@ -104,7 +104,7 @@ Vue 提供了一个[【官方的 CLI 】](https://github.com/vuejs/vue-cli)，�
 
 > [【在 Vue Mastery 观看视频讲解】](https://www.vuemastery.com/courses/real-world-vue-js/vue-cli)
 
-### 对不同构建版本的解释
+#### 对不同构建版本的解释
 
 在[【 NPM 包的 `dist/` 目录】](https://cdn.jsdelivr.net/npm/vue/dist/)你将会找到很多不同的 Vue.js 构建版本
 
@@ -119,30 +119,240 @@ Vue 提供了一个[【官方的 CLI 】](https://github.com/vuejs/vue-cli)，�
 
 #### 术语
 
-* 完整版：同时包含编译器和运行时的版本。
+* 完整版
 
-编译器：用来将模板字符串编译成为 JavaScript 渲染函数的代码。
+  同时包含编译器和运行时的版本
 
-运行时：用来创建 Vue 实例、渲染并处理虚拟 DOM 等的代码。基本上就是除去编译器的其它一切
+* 编译器
 
+  用来将模板字符串编译成为 JavaScript 渲染函数的代码
 
+* 运行时
 
+  用来创建 Vue 实例、渲染并处理虚拟 DOM 等的代码
 
+  基本上就是除去编译器的其它一切
 
+* [【 `UMD` 】](https://github.com/umdjs/umd)
 
+  UMD 版本可以通过 `<script>` 标签直接用在浏览器中
 
+  jsDelivr CDN 的[【 https://cdn.jsdelivr.net/npm/vue 】](https://cdn.jsdelivr.net/npm/vue)默认文件就是运行时 + 编译器的 UMD 版本( `vue.js` )
 
+* [【 `CommonJS` 】](http://wiki.commonjs.org/wiki/Modules/1.1)
 
+  CommonJS 版本用来配合老的打包工具比如[【 `Browserify` 】](http://browserify.org/)或[【 `webpack 1` 】](https://webpack.github.io/)
 
+  这些打包工具的默认文件( `pkg.main` )是只包含运行时的 CommonJS 版本( `vue.runtime.common.js` )
 
+* [【 `ES Module` 】](http://exploringjs.com/es6/ch_modules.html)
 
+  从 `2.6` 开始 Vue 会提供两个 `ES Modules` (ESM) 构建文件：
 
+  * 为打包工具提供的 ESM ：
 
+    为诸如[【 `webpack 2` 】](https://webpack.js.org/)或[【 `Rollup` 】](https://rollupjs.org/)提供的现代打包工具
 
+    ESM 格式被设计为可以被静态分析，所以打包工具可以利用这一点来进行 `tree-shaking` 并将用不到的代码排除出最终的包
 
+    为这些打包工具提供的默认文件( `pkg.module` )是只有运行时的 ES Module 构建( `vue.runtime.esm.js` )
 
+  * 为浏览器提供的 ESM ( `2.6+` ) ：
 
+    用于在现代浏览器中通过 `<script type="module">` 直接导入
 
+#### 运行时 + 编译器 vs. 只包含运行时
+
+如果你需要在客户端编译模板 (比如传入一个字符串给 `template` 选项，或挂载到一个元素上并以其 DOM 内部的 HTML 作为模板)，就将需要加上编译器，即完整版：
+
+```js
+// 需要编译器
+new Vue({
+  template: '<div>{{ hi }}</div>'
+})
+
+// 不需要编译器
+new Vue({
+  render (h) {
+    return h('div', this.hi)
+  }
+})
+```
+
+当使用 `vue-loader` 或 `vueify` 的时候，`*.vue` 文件内部的模板会在构建时预编译成 JavaScript
+
+* 你在最终打好的包里实际上是不需要编译器的，所以只用运行时版本即可
+
+* 因为运行时版本相比完整版体积要小大约 30%，所以应该尽可能使用这个版本
+
+如果你仍然希望使用完整版，则需要在打包工具里配置一个别名：
+
+* `webpack`
+
+```js
+module.exports = {
+  // ...
+  resolve: {
+    alias: {
+      'vue$': 'vue/dist/vue.esm.js' // 用 webpack 1 时需用 'vue/dist/vue.common.js'
+    }
+  }
+}
+```
+
+* `Rollup`
+
+```js
+const alias = require('rollup-plugin-alias')
+
+rollup({
+  // ...
+  plugins: [
+    alias({
+      'vue': require.resolve('vue/dist/vue.esm.js')
+    })
+  ]
+})
+```
+
+* `Browserify`
+
+  添加到你项目的 `package.json` ：
+
+```js
+{
+  // ...
+  "browser": {
+    "vue": "vue/dist/vue.common.js"
+  }
+}
+```
+
+* `Parcel`
+
+  添加到你项目的 `package.json` ：
+
+```js
+{
+  // ...
+  "alias": {
+    "vue" : "./node_modules/vue/dist/vue.common.js"
+  }
+}
+```
+
+#### 开发环境 vs. 生产环境模式
+
+对于 UMD 版本来说，**`开发环境 / 生产环境`** 模式是硬编码好的：
+
+* 开发环境下用未压缩的代码
+
+* 生产环境下使用压缩后的代码
+
+`CommonJS` 和 `ES Module` 版本是用于打包工具的，因此我们不提供压缩后的版本
+
+> 你需要自行将最终的包进行压缩
+
+`CommonJS` 和 `ES Module` 版本同时保留原始的 `process.env.NODE_ENV` 检测，以决定它们应该运行在什么模式下
+
+* 你应该使用适当的打包工具配置来替换这些环境变量以便控制 Vue 所运行的模式
+
+* 把 `process.env.NODE_ENV` 替换为字符串字面量
+
+  同时可以让 `UglifyJS` 之类的压缩工具完全丢掉仅供开发环境的代码块，以减少最终的文件尺寸
+
+`webpack`
+
+在 `webpack 4+` 中，你可以使用 mode 选项：
+
+```js
+module.exports = {
+  mode: 'production'
+}
+```
+
+但是在 `webpack 3` 及其更低版本中，你需要使用[【 `DefinePlugin` 】](https://webpack.js.org/plugins/define-plugin/)：
+
+```js
+var webpack = require('webpack')
+
+module.exports = {
+  // ...
+  plugins: [
+    // ...
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify('production')
+      }
+    })
+  ]
+}
+```
+
+`Rollup`
+
+使用[【 `rollup-plugin-replace` 】](https://github.com/rollup/rollup-plugin-replace)：
+
+```js
+const replace = require('rollup-plugin-replace')
+
+rollup({
+  // ...
+  plugins: [
+    replace({
+      'process.env.NODE_ENV': JSON.stringify('production')
+    })
+  ]
+}).then(...)
+```
+
+`Browserify`
+
+为你的包应用一次全局的[【 `envify` 】](https://github.com/hughsk/envify)转换
+
+```shell
+NODE_ENV=production browserify -g envify -e main.js | uglifyjs -c -m > build.js
+```
+
+> 也可以移步[【生产环境部署】](https://cn.vuejs.org/v2/guide/deployment.html)
+
+#### CSP 环境
+
+有些环境，如 `Google Chrome Apps` ，会强制应用内容安全策略(CSP)，不能使用 `new Function()` 对表达式求值
+
+* 这时可以用 CSP 兼容版本
+
+* 完整版本依赖于该功能来编译模板，所以无法在这些环境下使用
+
+另一方面，运行时版本则是完全兼容 CSP 的
+
+* 当通过[【 `webpack + vue-loader` 】](https://github.com/vuejs-templates/webpack-simple)或者[【 `Browserify + vueify` 】](https://github.com/vuejs-templates/browserify-simple)构建时，模板将被预编译为 `render` 函数，可以在 CSP 环境中完美运行
+
+### 开发版本
+
+> 重要：GitHub 仓库的 `/dist` 文件夹只有在新版本发布时才会提交
+
+如果想要使用 GitHub 上 Vue 最新的源码，你需要自己构建！
+
+```shell
+git clone https://github.com/vuejs/vue.git node_modules/vue
+cd node_modules/vue
+npm install
+npm run build
+```
+
+### Bower
+
+Bower 只提供 UMD 版本
+
+```shell
+# 最新稳定版本
+$ bower install vue
+```
+
+### AMD 模块加载器
+
+所有 UMD 版本都可以直接用作 AMD 模块
 
 ## 介绍
 
@@ -518,67 +728,153 @@ var app7 = new Vue({
 
 * `Vue CLI` 也支持将 Vue 组件构建成为原生的自定义元素
 
+## 实例
 
+### 创建一个 Vue 实例
 
+> [【观看本节视频讲解】](https://learning.dcloud.io/#/?vid=2)
 
+每个 Vue 应用都是通过用 Vue 函数创建一个新的 Vue 实例开始的：
 
+```js
+var vm = new Vue({
+  // 选项
+})
+```
 
+虽然没有完全遵循[【 MVVM 模型】](https://zh.wikipedia.org/wiki/MVVM)，但是 Vue 的设计也受到了它的启发
 
+* 因此在文档中经常会使用 vm ( `ViewModel` 的缩写) 这个变量名表示 Vue 实例
 
+> 当创建一个 Vue 实例时，你可以传入一个选项对象
+> * 这篇教程主要描述的就是如何使用这些选项来创建你想要的行为
+> * 作为参考，你也可以在[【 API 文档】](https://cn.vuejs.org/v2/api/#选项-数据)中浏览完整的选项列表
 
+一个 Vue 应用由一个通过 `new Vue` 创建的根 Vue 实例，以及可选的嵌套的、可复用的组件树组成
 
+* 举个例子，一个 todo 应用的组件树可以是这样的
 
+```
+根实例
+└─ TodoList
+   ├─ TodoItem
+   │  ├─ DeleteTodoButton
+   │  └─ EditTodoButton
+   └─ TodoListFooter
+      ├─ ClearTodosButton
+      └─ TodoListStatistics
+```
 
+现在，你只需要明白所有的 Vue 组件都是 Vue 实例，并且接受相同的选项对象(一些根实例特有的选项除外)
 
+### 数据与方法
 
+> [【观看本节视频讲解】](https://learning.dcloud.io/#/?vid=3)
 
+当一个 Vue 实例被创建时，它将 `data` 对象中的所有的 property 加入到 Vue 的响应式系统中
 
+* 当这些 property 的值发生改变时，视图将会产生 **`响应`** ，即匹配更新为新的值
 
+```js
+// 我们的数据对象
+var data = { a: 1 }
 
+// 该对象被加入到一个 Vue 实例中
+var vm = new Vue({
+  data: data
+})
 
+// 获得这个实例上的 property
+// 返回源数据中对应的字段
+vm.a == data.a // => true
 
+// 设置 property 也会影响到原始数据
+vm.a = 2
+data.a // => 2
 
+// ……反之亦然
+data.a = 3
+vm.a // => 3
+```
 
+当这些数据改变时，视图会进行重渲染
 
+> 值得注意的是只有当实例被创建时就已经存在于 `data` 中的 property 才是 **`响应式`** 的
 
+也就是说如果你添加一个新的 property ，比如：
 
+```js
+vm.b = 'hi'
+```
 
+那么对 `b` 的改动将不会触发任何视图的更新
 
+如果你知道你会在晚些时候需要一个 property ，但是一开始它为空或不存在，那么你仅需要设置一些初始值
 
+```js
+data: {
+  newTodoText: '',
+  visitCount: 0,
+  hideCompletedTodos: false,
+  todos: [],
+  error: null
+}
+```
 
+这里唯一的例外是使用 `Object.freeze()` ，这会阻止修改现有的 property，也意味着响应系统无法再追踪变化
 
+```js
+var obj = {
+  foo: 'bar'
+}
 
+Object.freeze(obj)
 
+new Vue({
+  el: '#app',
+  data: obj
+})
+```
 
+```html
+<div id="app">
+  <p>{{ foo }}</p>
+  <!-- 这里的 `foo` 不会更新！ -->
+  <button v-on:click="foo = 'baz'">Change it</button>
+</div>
+```
 
+除了数据 property ，Vue 实例还暴露了一些有用的实例 property 与方法
 
+* 它们都有前缀 `$` ，以便与用户定义的 property 区分开来
 
+```js
+var data = { a: 1 }
+var vm = new Vue({
+  el: '#example',
+  data: data
+})
 
+vm.$data === data // => true
+vm.$el === document.getElementById('example') // => true
 
+// $watch 是一个实例方法
+vm.$watch('a', function (newValue, oldValue) {
+  // 这个回调将在 `vm.a` 改变后调用
+})
+```
 
+> 以后你可以在[【 API 参考】](https://cn.vuejs.org/v2/api/#实例-property)中查阅到完整的实例 property 和方法的列表
 
+### 实例生命周期钩子
 
+> [【观看本节视频讲解】](https://learning.dcloud.io/#/?vid=4)
 
+每个 Vue 实例在被创建时都要经过一系列的初始化过程
 
+* 例如，需要设置数据监听、编译模板、将实例挂载到 DOM 并在数据变化时更新 DOM 等
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+* 同时在这个过程中也会运行一些叫做生命周期钩子的函数，这给了用户在不同阶段添加自己的代码的机会
 
 
 
