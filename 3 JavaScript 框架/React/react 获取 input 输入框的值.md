@@ -1,4 +1,4 @@
-## react 获取input 输入框的值
+## React 获取 input 输入框的值
 
 > [【转载地址】](https://blog.csdn.net/Shuiercc/article/details/81383679)
 
