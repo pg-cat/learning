@@ -4,15 +4,19 @@
 
 - 并且在前后台分离的页面中，利用变量的状态来控制页面的显示层次
 
-> vuex 就是来解决以上两个问题的:
-> - 统一管理所有变量状态
-> - 其次可以方便的进行页面传值
+vuex 就是来解决以上两个问题的:
+
+- 统一管理所有变量状态
+
+- 其次可以方便的进行页面传值
 
 ## vuex 的安装
 
-> 在普通的 vue 项目中不包含 vuex ，需要进行 `npm install vuex --save-dev`
->> 然后在的 main.js 中进行引入:
->> - 或者单独拿出来一个文件夹，然后引入 vuex 之后，再在 main.js 中引入
+在普通的 vue 项目中不包含 vuex ，需要进行 `npm install vuex --save-dev`
+
+- 然后在的 main.js 中进行引入:
+
+- 或者单独拿出来一个文件夹，然后引入 vuex 之后，再在 main.js 中引入
 
 一般情况下，放置 vuex 的文件夹叫做 store
 
@@ -22,7 +26,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-// 使用vuex
+// 使用 vuex
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
