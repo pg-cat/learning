@@ -1605,120 +1605,217 @@ HTML 将被渲染为：
 
 `v-bind:style` 的对象语法十分直观——看着非常像 CSS ，但其实是一个 JavaScript 对象
 
+* CSS property 名可以用驼峰式 (camelCase) 或短横线分隔 (kebab-case，记得用引号括起来) 来命名：
 
+```html
+<div v-bind:style="{ color: activeColor, fontSize: fontSize + 'px' }"></div>
+```
 
+```js
+data: {
+  activeColor: 'red',
+  fontSize: 30
+}
+```
 
+直接绑定到一个样式对象通常更好，这会让模板更清晰：
 
+```html
+<div v-bind:style="styleObject"></div>
+```
 
+```js
+data: {
+  styleObject: {
+    color: 'red',
+    fontSize: '13px'
+  }
+}
+```
 
+同样的，对象语法常常结合返回对象的计算属性使用
 
+#### 数组语法
 
+`v-bind:style` 的数组语法可以将多个样式对象应用到同一个元素上：
 
+```html
+<div v-bind:style="[baseStyles, overridingStyles]"></div>
+```
 
+#### 自动添加前缀
 
+当 `v-bind:style` 使用需要添加[【浏览器引擎前缀】](https://developer.mozilla.org/zh-CN/docs/Glossary/Vendor_Prefix)的 CSS property 时，如 `transform` ，Vue.js 会自动侦测并添加相应的前缀
 
+#### 多重值
 
+> `2.3.0+`
 
+从 `2.3.0` 起你可以为 `style` 绑定中的 property 提供一个包含多个值的数组，常用于提供多个带前缀的值，例如：
 
+```html
+<div :style="{ display: ['-webkit-box', '-ms-flexbox', 'flex'] }"></div>
+```
 
+这样写只会渲染数组中最后一个被浏览器支持的值
 
+* 在本例中，如果浏览器支持不带浏览器前缀的 `flexbox` ，那么就只会渲染 `display: flex`
 
+## 条件渲染
 
+### v-if
 
+> [【观看本节视频讲解】](https://learning.dcloud.io/#/?vid=8)
 
+`v-if` 指令用于条件性地渲染一块内容
 
+* 这块内容只会在指令的表达式返回 truthy 值的时候被渲染
 
+```html
+<h1 v-if="awesome">Vue is awesome!</h1>
+```
 
+也可以用 `v-else` 添加一个 **`else 块`** ：
 
+```html
+<h1 v-if="awesome">Vue is awesome!</h1>
+<h1 v-else>Oh no 😢</h1>
+```
 
+#### 在 `<template>` 元素上使用 `v-if` 条件渲染分组
 
+因为 `v-if` 是一个指令，所以必须将它添加到一个元素上
 
+但是如果想切换多个元素呢？
 
+* 此时可以把一个 `<template>` 元素当做不可见的包裹元素，并在上面使用 `v-if`
 
+* 最终的渲染结果将不包含 `<template>` 元素
 
+```html
+<template v-if="ok">
+  <h1>Title</h1>
+  <p>Paragraph 1</p>
+  <p>Paragraph 2</p>
+</template>
+```
 
+#### v-else
 
+你可以使用 `v-else` 指令来表示 `v-if` 的 **`else 块`** ：
 
+```html
+<div v-if="Math.random() > 0.5">
+  Now you see me
+</div>
+<div v-else>
+  Now you don't
+</div>
+```
 
+> `v-else` 元素必须紧跟在带 `v-if` 或者 `v-else-if` 的元素的后面，否则它将不会被识别
 
+#### v-else-if
 
+> `2.1.0` 新增
 
+`v-else-if` ，顾名思义，充当 `v-if` 的 **`else-if 块`** ，可以连续使用：
 
+```html
+<div v-if="type === 'A'">
+  A
+</div>
+<div v-else-if="type === 'B'">
+  B
+</div>
+<div v-else-if="type === 'C'">
+  C
+</div>
+<div v-else>
+  Not A/B/C
+</div>
+```
 
+> 类似于 `v-else` ，`v-else-if` 也必须紧跟在带 `v-if` 或者 `v-else-if` 的元素之后
 
+#### 用 key 管理可复用的元素
 
+Vue 会尽可能高效地渲染元素，通常会复用已有元素而不是从头开始渲染
 
+* 这么做除了使 Vue 变得非常快之外，还有其它一些好处
 
+* 例如，如果你允许用户在不同的登录方式之间切换
 
+```html
+<template v-if="loginType === 'username'">
+  <label>Username</label>
+  <input placeholder="Enter your username">
+</template>
+<template v-else>
+  <label>Email</label>
+  <input placeholder="Enter your email address">
+</template>
+```
 
+那么在上面的代码中切换 `loginType` 将不会清除用户已经输入的内容
 
+* 因为两个模板使用了相同的元素，`<input>` 不会被替换掉——仅仅是替换了它的 `placeholder`
 
+* 这样也不总是符合实际需求，所以 Vue 为你提供了一种方式来表达 **`这两个元素是完全独立的，不要复用它们`**
 
+  只需添加一个具有唯一值的 `key` attribute 即可
 
+```html
+<template v-if="loginType === 'username'">
+  <label>Username</label>
+  <input placeholder="Enter your username" key="username-input">
+</template>
+<template v-else>
+  <label>Email</label>
+  <input placeholder="Enter your email address" key="email-input">
+</template>
+```
 
+现在，每次切换时，输入框都将被重新渲染
 
+> 注意，`<label>` 元素仍然会被高效地复用，因为它们没有添加 key attribute
 
+### v-show
 
+另一个用于根据条件展示元素的选项是 `v-show` 指令
 
+```html
+<h1 v-show="ok">Hello!</h1>
+```
 
+不同的是带有 `v-show` 的元素始终会被渲染并保留在 DOM 中
 
+* `v-show` 只是简单地切换元素的 CSS property `display`
 
+> 注意：`v-show` 不支持 `<template>` 元素，也不支持 `v-else`
 
+### `v-if` vs `v-show`
 
+* `v-if` 是 **`真正`** 的条件渲染，因为它会确保在切换过程中条件块内的事件监听器和子组件适当地被销毁和重建
 
+* `v-if` 也是惰性的：如果在初始渲染时条件为假，则什么也不做——直到条件第一次变为真时，才会开始渲染条件块
 
+* 相比之下，`v-show` 就简单得多——不管初始条件是什么，元素总是会被渲染，并且只是简单地基于 CSS 进行切换
 
+一般来说，`v-if` 有更高的切换开销，而 `v-show` 有更高的初始渲染开销
 
+因此，如果需要非常频繁地切换，则使用 `v-show` 较好；如果在运行时条件很少改变，则使用 `v-if` 较好
 
+### `v-if` 与 `v-for` 一起使用
 
+> 不推荐同时使用 `v-if` 和 `v-for`
+> * 请查阅[【风格指南】](https://cn.vuejs.org/v2/style-guide/#避免-v-if-和-v-for-用在一起-必要)以获取更多信息
 
+当 `v-if` 与 `v-for` 一起使用时，`v-for` 具有比 `v-if` 更高的优先级
 
+* 请查阅[【列表渲染指南】](https://cn.vuejs.org/v2/guide/list.html#v-for-with-v-if)以获取详细信息
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+## 列表渲染
 
 
 
