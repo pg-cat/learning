@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选项卡</title>
+    <script src="vue.js"></script>
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!-- 标签按钮 -->
+        <tab-button
+            v-for="(tab,index) in tabs"
+
+        ></tab-button>
+
+        <!-- 内容区域 -->
+        <tab-p
+            is="tab-" + tab
+        ></tab-p>
+    </div>
+</body>
+
+</html>
+<script>
+    // 主页 组件
+    Vue.commponent('tab-index',{
+        template:'<p>这是 主页 部分<p>'
+    })
+
+    // 列表 组件
+    Vue.commponent('tab-list',{
+        template:'<p>这是 列表 部分<p>'
+    })
+
+    // 个人中心 组件
+    Vue.commponent('tab-me',{
+        template:'<p>这是 个人中心 部分<p>'
+    })
+
+    // 标签按钮 组件
+    Vue.commponent('tab-button',{
+        data: function(){
+            return {
+                tab : ''
+            }
+        },
+        template: '<button>{{tab}}</button>'
+    })
+
+    var app = new Vue({
+        el: "#app",
+        data: {
+            numNow: 0,
+            tabs: {
+                index: "主页",
+                list: "列表",
+                me: "个人中心"
+            }
+        },
+        methods: {
+            chickButton: function () {
+                this.message = "你点击了按钮"
+            }
+        }
+    })
+</script>
