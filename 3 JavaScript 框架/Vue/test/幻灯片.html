@@ -6,15 +6,43 @@
     <title>幻灯片</title>
     <script src="vue.js"></script>
     <style>
-
+        #app{
+            width: 700px;
+            height: 300px;
+            display: flex;
+        }
+        #app div{
+            width: 100px;
+            height: 300px;
+            text-align: center;
+            line-height: 300px;
+            background: #eee;
+            cursor: pointer;
+            user-select: none;
+        }
+        #app img{
+            width: 500px;
+            height: 300px;
+        }
     </style>
 </head>
 <body>
     <div id="app">
-
+        <div>上一张</div>
+        <img v-bind:src="'img/' + imgSrc + '.jpg'" alt="">
+        <div>下一张</div>
     </div>
 </body>
 </html>
 <script>
+    new Vue({
+        el: "#app",
+        data: {
+            imgSrc: "ping.jpg",
+            imgs:["bai","hei","huang","hui","ping"]
+        },
+        computed: {
 
+        }
+    })
 </script>
