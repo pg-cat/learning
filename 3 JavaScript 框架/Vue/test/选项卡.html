@@ -7,65 +7,61 @@
     <title>选项卡</title>
     <script src="vue.js"></script>
     <style>
-
+        .active {
+            color: red;
+        }
     </style>
 </head>
 
 <body>
     <div id="app">
         <!-- 标签按钮 -->
-        <tab-button
-            v-for="(tab,index) in tabs"
-
-        ></tab-button>
+        <button
+            v-for="(tab,name) in tabs"
+            v-bind:key="name"
+            v-bind:class="tabNow === name ? 'active' : ''"
+            v-on:click="tabNow = name"
+        >{{tab}}</button>
 
         <!-- 内容区域 -->
-        <tab-p
-            is="tab-" + tab
-        ></tab-p>
+        <p
+            v-bind:is="changeTab"
+
+        ></p>
+
     </div>
 </body>
 
 </html>
 <script>
     // 主页 组件
-    Vue.commponent('tab-index',{
-        template:'<p>这是 主页 部分<p>'
+    Vue.component('tab-index', {
+        template: '<p>这是 主页 部分</p>'
     })
 
     // 列表 组件
-    Vue.commponent('tab-list',{
-        template:'<p>这是 列表 部分<p>'
+    Vue.component('tab-list', {
+        template: '<p>这是 列表 部分</p>'
     })
 
     // 个人中心 组件
-    Vue.commponent('tab-me',{
-        template:'<p>这是 个人中心 部分<p>'
-    })
-
-    // 标签按钮 组件
-    Vue.commponent('tab-button',{
-        data: function(){
-            return {
-                tab : ''
-            }
-        },
-        template: '<button>{{tab}}</button>'
+    Vue.component('tab-me', {
+        template: '<p>这是 个人中心 部分</p>'
     })
 
     var app = new Vue({
         el: "#app",
         data: {
-            numNow: 0,
+            tabNow: "index",
             tabs: {
                 index: "主页",
                 list: "列表",
                 me: "个人中心"
             }
         },
-        methods: {
-            chickButton: function () {
-                this.message = "你点击了按钮"
+        computed: {
+            changeTab: function () {
+                return "tab-" + this.tabNow
             }
         }
     })
