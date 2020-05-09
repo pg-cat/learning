@@ -28,9 +28,9 @@
 </head>
 <body>
     <div id="app">
-        <div>上一张</div>
-        <img v-bind:src="'img/' + imgSrc + '.jpg'" alt="">
-        <div>下一张</div>
+        <div v-on:click="before">上一张</div>
+        <img v-bind:src="'img/' + imgs[numNow] + '.jpg'" alt="">
+        <div v-on:click="after">下一张</div>
     </div>
 </body>
 </html>
@@ -38,11 +38,22 @@
     new Vue({
         el: "#app",
         data: {
-            imgSrc: "ping.jpg",
+            numNow: 0,
             imgs:["bai","hei","huang","hui","ping"]
         },
-        computed: {
-
+        methods: {
+            before:function(){
+                this.numNow--;
+                if(this.numNow<0){
+                    this.numNow = 4
+                }
+            },
+            after:function(){
+                this.numNow++;
+                if(this.numNow>4){
+                    this.numNow = 0
+                }
+            }
         }
     })
 </script>
