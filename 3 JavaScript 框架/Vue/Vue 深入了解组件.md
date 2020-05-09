@@ -149,46 +149,132 @@ export default {
 
 ### 模块系统
 
+如果你通过 `import` / `require` 使用一个模块系统，那么我们会为你提供一些特殊的使用说明和注意事项
 
+#### 在模块系统中局部注册
 
+如果你使用了诸如 `Babel` 和 `webpack` 的模块系统
 
+* 在这些情况下，我们推荐创建一个 `components` 目录，并将每个组件放置在其各自的文件中
 
+* 然后你需要在局部注册之前导入每个你想使用的组件
 
+例如，在一个假设的 `ComponentB.js` 或 `ComponentB.vue` 文件中：
 
+```js
+import ComponentA from './ComponentA'
+import ComponentC from './ComponentC'
 
+export default {
+  components: {
+    ComponentA,
+    ComponentC
+  },
+  // ...
+}
+```
 
+现在 `ComponentA` 和 `ComponentC` 都可以在 `ComponentB` 的模板中使用了
 
+#### 础组件的自动化全局注册
 
+可能你的许多组件只是包裹了一个输入框或按钮之类的元素，是相对通用的
 
+* 我们有时候会把它们称为[【基础组件】](https://cn.vuejs.org/v2/style-guide/#基础组件名-强烈推荐)，它们会在各个组件中被频繁的用到
 
+* 所以会导致很多组件里都会有一个包含基础组件的长列表
 
+```js
+import BaseButton from './BaseButton.vue'
+import BaseIcon from './BaseIcon.vue'
+import BaseInput from './BaseInput.vue'
 
+export default {
+  components: {
+    BaseButton,
+    BaseIcon,
+    BaseInput
+  }
+}
+```
 
+而只是用于模板中的一小部分：
 
+```html
+<BaseInput
+  v-model="searchText"
+  @keydown.enter="search"
+/>
+<BaseButton @click="search">
+  <BaseIcon name="search"/>
+</BaseButton>
+```
 
+如果你恰好使用了 webpack (或在内部使用了 webpack 的[【 `Vue CLI 3+` 】](https://github.com/vuejs/vue-cli))，那么就可以使用 `require.context` 只全局注册这些非常通用的基础组件
 
+这里有一份可以让你在应用入口文件 (比如 `src/main.js` ) 中全局导入基础组件的示例代码：
 
+```js
+import Vue from 'vue'
+import upperFirst from 'lodash/upperFirst'
+import camelCase from 'lodash/camelCase'
 
+const requireComponent = require.context(
+  // 其组件目录的相对路径
+  './components',
+  // 是否查询其子目录
+  false,
+  // 匹配基础组件文件名的正则表达式
+  /Base[A-Z]\w+\.(vue|js)$/
+)
 
+requireComponent.keys().forEach(fileName => {
+  // 获取组件配置
+  const componentConfig = requireComponent(fileName)
 
+  // 获取组件的 PascalCase 命名
+  const componentName = upperFirst(
+    camelCase(
+      // 获取和目录深度无关的文件名
+      fileName
+        .split('/')
+        .pop()
+        .replace(/\.\w+$/, '')
+    )
+  )
 
+  // 全局注册组件
+  Vue.component(
+    componentName,
+    // 如果这个组件选项是通过 `export default` 导出的，那么就会优先使用 `.default`，否则回退到使用模块的根
+    componentConfig.default || componentConfig
+  )
+})
+```
 
+> 记住 **`全局注册的行为必须在根 Vue 实例 (通过 `new Vue` ) 创建之前发生`**
+>> [【这里有一个真实项目情景下的示例】](https://github.com/chrisvfritz/vue-enterprise-boilerplate/blob/master/src/components/_globals.js)
 
+## Prop
 
+### Prop 的大小写 (camelCase vs kebab-case)
 
+HTML 中的 attribute 名是大小写不敏感的，所以浏览器会把所有大写字符解释为小写字符
 
+* 这意味着当你使用 DOM 中的模板时，camelCase (驼峰命名法) 的 prop 名需要使用其等价的 kebab-case (短横线分隔命名) 命名
 
+```js
+Vue.component('blog-post', {
+  // 在 JavaScript 中是 camelCase 的
+  props: ['postTitle'],
+  template: '<h3>{{ postTitle }}</h3>'
+})
+```
 
-
-
-
-
-
-
-
-
-
-
+```html
+<!-- 在 HTML 中是 kebab-case 的 -->
+<blog-post post-title="hello!"></blog-post>
+```
 
 
 
