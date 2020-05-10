@@ -878,9 +878,27 @@ Vue 实现了一套内容分发的 API，这套 API 的设计灵感源自[【 We
 </navigation-link>
 ```
 
+甚至其它的组件：
 
+```html
+<navigation-link url="/profile">
+  <!-- 添加一个图标的组件 -->
+  <font-awesome-icon name="user"></font-awesome-icon>
+  Your Profile
+</navigation-link>
+```
 
+如果 `<navigation-link>` 没有包含一个 `<slot>` 元素，则该组件起始标签和结束标签之间的任何内容都会被抛弃
 
+### 编译作用域
+
+当你想在一个插槽中使用数据时，例如：
+
+```html
+<navigation-link url="/profile">
+  Logged in as {{ user.name }}
+</navigation-link>
+```
 
 
 
