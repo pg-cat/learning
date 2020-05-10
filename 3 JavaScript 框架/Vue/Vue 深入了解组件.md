@@ -1872,7 +1872,7 @@ methods: {
 
 > 注意：Vue 的事件系统不同于浏览器的[【 EventTarget API 】](https://developer.mozilla.org/zh-CN/docs/Web/API/EventTarget)
 >> 尽管它们工作起来是相似的
-> * 但是 `$emit` 、`$on` 、`$off` 并不是 `dispatchEvent` 、`addEventListener` 、`removeEventListener` 的别名
+>>> 但是 `$emit` 、`$on` 、`$off` 并不是 `dispatchEvent` 、`addEventListener` 、`removeEventListener` 的别名
 
 ### 循环引用
 
