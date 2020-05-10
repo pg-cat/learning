@@ -1174,119 +1174,320 @@ function (slotProps) {
 }
 ```
 
+这意味着 `v-slot` 的值实际上可以是任何能够作为函数定义中的参数的 JavaScript 表达式
 
+* 所以在支持的环境下 ([【单文件组件】](https://cn.vuejs.org/v2/guide/single-file-components.html)或[【现代浏览器】](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment#浏览器兼容))，你也可以使用[【 `ES2015` 解构】](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment#解构对象)来传入具体的插槽 prop
 
+```html
+<current-user v-slot="{ user }">
+  {{ user.firstName }}
+</current-user>
+```
 
+这样可以使模板更简洁，尤其是在该插槽提供了多个 prop 的时候
 
+* 它同样开启了 prop 重命名等其它可能
 
+  例如将 `user` 重命名为 `person`
 
+```html
+<current-user v-slot="{ user: person }">
+  {{ person.firstName }}
+</current-user>
+```
+
+你甚至可以定义后备内容，用于插槽 prop 是 `undefined` 的情形：
 
+```html
+<current-user v-slot="{ user = { firstName: 'Guest' } }">
+  {{ user.firstName }}
+</current-user>
+```
+
+### 动态插槽名
+
+> `2.6.0` 新增
+
+[【动态指令参数】](https://cn.vuejs.org/v2/guide/syntax.html#动态参数)也可以用在 `v-slot` 上，来定义动态的插槽名：
+
+```html
+<base-layout>
+  <template v-slot:[dynamicSlotName]>
+    ...
+  </template>
+</base-layout>
+```
+
+### 具名插槽的缩写
+
+> `2.6.0` 新增
 
+跟 `v-on` 和 `v-bind` 一样，`v-slot` 也有缩写，即把参数之前的所有内容 ( `v-slot:` ) 替换为字符 `#`
+
+例如 `v-slot:header` 可以被重写为 `#header` ：
 
+```html
+<base-layout>
+  <template #header>
+    <h1>Here might be a page title</h1>
+  </template>
+
+  <p>A paragraph for the main content.</p>
+  <p>And another one.</p>
 
+  <template #footer>
+    <p>Here's some contact info</p>
+  </template>
+</base-layout>
+```
+
+然而，和其它指令一样，该缩写只在其有参数的时候才可用
 
+* 这意味着以下语法是无效的：
 
+```html
+<!-- 这样会触发一个警告 -->
+<current-user #="{ user }">
+  {{ user.firstName }}
+</current-user>
+```
 
+* 如果你希望使用缩写的话，你必须始终以明确插槽名取而代之：
 
+```html
+<current-user #default="{ user }">
+  {{ user.firstName }}
+</current-user>
+```
 
+### 其它示例
 
+> 插槽 prop 允许我们将插槽转换为可复用的模板，这些模板可以基于输入的 prop 渲染出不同的内容
+>> 这在设计封装数据逻辑同时允许父级组件自定义部分布局的可复用组件时是最有用的
 
+例如，我们要实现一个 `<todo-list>` 组件，它是一个列表且包含布局和过滤逻辑：
 
+```html
+<ul>
+  <li
+    v-for="todo in filteredTodos"
+    v-bind:key="todo.id"
+  >
+    {{ todo.text }}
+  </li>
+</ul>
+```
+
+我们可以将每个 `todo` 作为父级组件的插槽，以此通过父级组件对其进行控制，然后将 `todo` 作为一个插槽 prop 进行绑定：
+
+```html
+<ul>
+  <li
+    v-for="todo in filteredTodos"
+    v-bind:key="todo.id"
+  >
+    <!--
+    我们为每个 todo 准备了一个插槽，将 `todo` 对象作为一个插槽的 prop 传入
+    -->
+    <slot name="todo" v-bind:todo="todo">
+      <!-- 后备内容 -->
+      {{ todo.text }}
+    </slot>
+  </li>
+</ul>
+```
+
+现在当我们使用 `<todo-list>` 组件的时候，我们可以选择为 `todo` 定义一个不一样的 `<template>` 作为替代方案，并且可以从子组件获取数据：
+
+```html
+<todo-list v-bind:todos="todos">
+  <template v-slot:todo="{ todo }">
+    <span v-if="todo.isComplete">✓</span>
+    {{ todo.text }}
+  </template>
+</todo-list>
+```
+
+> 想了解更多现实生活中的作用域插槽的用法，我们推荐浏览诸如
+> * [【 Vue Virtual Scroller 】](https://github.com/Akryum/vue-virtual-scroller)
+> * [【 Vue Promised 】](https://github.com/posva/vue-promised)
+> * [【 Portal Vue 】](https://github.com/LinusBorg/portal-vue) 等库
+
+### 废弃了的语法
+
+> `v-slot` 指令自 `Vue 2.6.0` 起被引入，提供更好的支持 `slot` 和 `slot-scope` attribute 的 API 替代方案
+>> `v-slot` 完整的由来参见这份[【 RFC 】](https://github.com/vuejs/rfcs/blob/master/active-rfcs/0001-new-slot-syntax.md)
+> * 在接下来所有的 `2.x` 版本中 `slot` 和 `slot-scope` attribute 仍会被支持，但已经被官方废弃且不会出现在 `Vue 3` 中
+
+#### 带有 `slot` attribute 的具名插槽
+
+> 自 `2.6.0` 起被废弃
+>> 新推荐的语法请查阅[【这里】](https://cn.vuejs.org/v2/guide/components-slots.html#具名插槽)
+
+在 `<template>` 上使用特殊的 `slot` attribute，可以将内容从父级传给具名插槽 (把[【这里】](https://cn.vuejs.org/v2/guide/components-slots.html#具名插槽)提到过的 `<base-layout>` 组件作为示例)：
+
+```html
+<base-layout>
+  <template slot="header">
+    <h1>Here might be a page title</h1>
+  </template>
+
+  <p>A paragraph for the main content.</p>
+  <p>And another one.</p>
+
+  <template slot="footer">
+    <p>Here's some contact info</p>
+  </template>
+</base-layout>
+```
+
+或者直接把 `slot` attribute 用在一个普通元素上：
+
+```html
+<base-layout>
+  <h1 slot="header">Here might be a page title</h1>
+
+  <p>A paragraph for the main content.</p>
+  <p>And another one.</p>
+
+  <p slot="footer">Here's some contact info</p>
+</base-layout>
+```
+
+这里其实还有一个未命名插槽，也就是 **`默认插槽`** ，捕获所有未被匹配的内容
+
+上述两个示例的 HTML 渲染结果均为：
 
+```html
+<div class="container">
+  <header>
+    <h1>Here might be a page title</h1>
+  </header>
+  <main>
+    <p>A paragraph for the main content.</p>
+    <p>And another one.</p>
+  </main>
+  <footer>
+    <p>Here's some contact info</p>
+  </footer>
+</div>
+```
 
+#### 带有 `slot-scope` attribute 的作用域插槽
 
+> 自 `2.6.0` 起被废弃
+>> 新推荐的语法请查阅[【这里】](https://cn.vuejs.org/v2/guide/components-slots.html#作用域插槽)
 
+在 `<template>` 上使用特殊的 `slot-scope` attribute，可以接收传递给插槽的 prop (把[【这里】](https://cn.vuejs.org/v2/guide/components-slots.html#作用域插槽)提到过的 `<slot-example>` 组件作为示例)：
 
+```html
+<slot-example>
+  <template slot="default" slot-scope="slotProps">
+    {{ slotProps.msg }}
+  </template>
+</slot-example>
+```
 
+这里的 `slot-scope` 声明了被接收的 prop 对象会作为 `slotProps` 变量存在于 `<template>` 作用域中
 
+* 你可以像命名 JavaScript 函数参数一样随意命名 `slotProps`
 
+这里的 `slot="default"` 可以被忽略为隐性写法：
 
+```html
+<slot-example>
+  <template slot-scope="slotProps">
+    {{ slotProps.msg }}
+  </template>
+</slot-example>
+```
 
+`slot-scope` attribute 也可以直接用于非 `<template>` 元素 (包括组件)：
 
+```html
+<slot-example>
+  <span slot-scope="slotProps">
+    {{ slotProps.msg }}
+  </span>
+</slot-example>
+```
 
+`slot-scope` 的值可以接收任何有效的可以出现在函数定义的参数位置上的 JavaScript 表达式
 
+* 这意味着在支持的环境下 ([【单文件组件}](https://cn.vuejs.org/v2/guide/single-file-components.html)或[【现代浏览器】](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment#浏览器兼容))，你也可以在表达式中使用[【 `ES2015` 解构】](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment#解构对象)
 
+```html
+<slot-example>
+  <span slot-scope="{ msg }">
+    {{ msg }}
+  </span>
+</slot-example>
+```
 
+使用[【这里】](https://cn.vuejs.org/v2/guide/components-slots.html#其它示例)描述过的 `<todo-list>` 作为示例，与它等价的使用 `slot-scope` 的代码是：
 
+```html
+<todo-list v-bind:todos="todos">
+  <template slot="todo" slot-scope="{ todo }">
+    <span v-if="todo.isComplete">✓</span>
+    {{ todo.text }}
+  </template>
+</todo-list>
+```
 
+## 动态组件 & 异步组件
 
+### 在动态组件上使用 `keep-alive`
 
+我们之前曾经在一个多标签的界面中使用 `is` attribute 来切换不同的组件：
 
+```html
+<component v-bind:is="currentTabComponent"></component>
+```
 
+当在这些组件之间切换的时候，你有时会想保持这些组件的状态，以避免反复重渲染导致的性能问题
 
+例如我们来展开说一说这个多标签界面：
 
+[【示例效果在此处查看】](https://cn.vuejs.org/v2/guide/components-dynamic-async.html#在动态组件上使用-keep-alive)
 
+你会注意到：
 
+* 如果你选择了一篇文章，切换到 `Archive` 标签
 
+* 然后再切换回 `Posts` ，是不会继续展示你之前选择的文章的
 
+* 这是因为你每次切换新标签的时候，Vue 都创建了一个新的 `currentTabComponent` 实例
 
+重新创建动态组件的行为通常是非常有用的
 
+* 但是在这个案例中，我们更希望那些标签的组件实例能够被在它们第一次被创建的时候缓存下来
 
+* 为了解决这个问题，我们可以用一个 `<keep-alive>` 元素将其动态组件包裹起来
 
+```html
+<!-- 失活的组件将会被缓存！-->
+<keep-alive>
+  <component v-bind:is="currentTabComponent"></component>
+</keep-alive>
+```
 
+来看看修改后的结果：
 
+[【示例效果在此处查看】](https://cn.vuejs.org/v2/guide/components-dynamic-async.html#在动态组件上使用-keep-alive)
 
+现在这个 `Posts` 标签保持了它的状态 (被选中的文章) 甚至当它未被渲染时也是如此
 
+* 你可以[【在这个示例查阅到完整的代码】](https://codesandbox.io/s/github/vuejs/vuejs.org/tree/master/src/v2/examples/vue-20-keep-alive-with-dynamic-components)
 
+> 注意：这个 `<keep-alive>` 要求被切换到的组件都有自己的名字，不论是通过组件的 `name` 选项还是局部/全局注册
+>> 你可以在[【 API 参考文档】](https://cn.vuejs.org/v2/api/#keep-alive)查阅更多关于 `<keep-alive>` 的细节
 
+### 异步组件
 
+> [【观看 Vue 学校的免费视频课程】](https://vueschool.io/lessons/dynamically-load-components?friend=vuejs)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+在大型应用中，我们可能需要将应用分割成小一些的代码块，并且只在需要的时候才从服务器加载一个模块
 
 
 
