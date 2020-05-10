@@ -1647,112 +1647,236 @@ this.$root.baz()
 </google-map>
 ```
 
+这个 `<google-map>` 组件可以定义一个 `map` property，所有的子组件都需要访问它
 
+* 在这种情况下 `<google-map-markers>` 可能想要通过类似 `this.$parent.getMap` 的方式访问那个地图，以便为其添加一组标记
 
+* 你可以在[【这里】](https://codesandbox.io/s/github/vuejs/vuejs.org/tree/master/src/v2/examples/vue-20-accessing-parent-component-instance)查阅这种模式
 
+> 请注意：尽管如此，通过这种模式构建出来的那个组件的内部仍然是容易出现问题的
 
+比如，设想一下我们添加一个新的 `<google-map-region>` 组件，当 `<google-map-markers>` 在其内部出现的时候，只会渲染那个区域内的标记：
 
+```html
+<google-map>
+  <google-map-region v-bind:shape="cityBoundaries">
+    <google-map-markers v-bind:places="iceCreamShops"></google-map-markers>
+  </google-map-region>
+</google-map>
+```
 
+那么在 `<google-map-markers>` 内部你可能发现自己需要一些类似这样的 hack：
 
+```js
+var map = this.$parent.map || this.$parent.$parent.map
+```
 
+很快它就会失控
 
+这也是我们针对需要向任意更深层级的组件提供上下文信息时推荐[【依赖注入】](https://cn.vuejs.org/v2/guide/components-edge-cases.html#依赖注入)的原因
 
+#### 访问子组件实例或子元素
 
+尽管存在 prop 和事件，有的时候你仍可能需要在 JavaScript 里直接访问一个子组件
 
+为了达到这个目的，你可以通过 `ref` 这个 attribute 为子组件赋予一个 `ID` 引用
 
+```html
+<base-input ref="usernameInput"></base-input>
+```
 
+现在在你已经定义了这个 `ref` 的组件里，你可以使用：
 
+```js
+this.$refs.usernameInput
+```
 
+来访问这个 `<base-input>` 实例，以便不时之需
 
+* 比如程序化地从一个父级组件聚焦这个输入框
 
+在刚才那个例子中，该 `<base-input>` 组件也可以使用一个类似的 `ref` 提供对内部这个指定元素的访问，例如：
 
+```html
+<input ref="input">
+```
 
+甚至可以通过其父级组件定义方法：
 
+```js
+methods: {
+  // 用来从父级组件聚焦输入框
+  focus: function () {
+    this.$refs.input.focus()
+  }
+}
+```
 
+这样就允许父级组件通过下面的代码聚焦 `<base-input>` 里的输入框：
 
+```js
+this.$refs.usernameInput.focus()
+```
 
+当 `ref` 和 `v-for` 一起使用的时候，你得到的 `ref` 将会是一个包含了对应数据源的这些子组件的数组
 
+> `$refs` 只会在组件渲染完成之后生效，并且它们不是响应式的
+>> 这仅作为一个用于直接操作子组件的 **`逃生舱`**
+> * 你应该避免在模板或计算属性中访问 `$refs`
 
+#### 依赖注入
 
+在此之前，在我们描述[【访问父级组件实例】](https://cn.vuejs.org/v2/guide/components-edge-cases.html#访问父级组件实例)的时候，展示过一个类似这样的例子：
 
+```html
+<google-map>
+  <google-map-region v-bind:shape="cityBoundaries">
+    <google-map-markers v-bind:places="iceCreamShops"></google-map-markers>
+  </google-map-region>
+</google-map>
+```
 
+这个组件里，所有 `<google-map>` 的后代都需要访问一个 `getMap` 方法，以便知道要跟哪个地图进行交互
 
+* 不幸的是，使用 `$parent` property 无法很好的扩展到更深层级的嵌套组件上
 
+* 这也是依赖注入的用武之地，它用到了两个新的实例选项：
 
+  * `provide`
+  * `inject`
 
+`provide` 选项允许我们指定我们想要 **`提供`** 给后代组件的数据/方法
 
+在这个例子中，就是 `<google-map>` 内部的 `getMap` 方法：
 
+```js
+provide: function () {
+  return {
+    getMap: this.getMap
+  }
+}
+```
 
+然后在任何后代组件里，我们都可以使用 `inject` 选项来接收指定的我们想要添加在这个实例上的 property ：
 
+```js
+inject: ['getMap']
+```
 
+> 你可以[【在这里看到完整的示例】](https://codesandbox.io/s/github/vuejs/vuejs.org/tree/master/src/v2/examples/vue-20-dependency-injection)
 
+相比 `$parent` 来说，这个用法可以让我们在任意后代组件中访问 `getMap` ，而不需要暴露整个 `<google-map>` 实例
 
+* 这允许我们更好的持续研发该组件，而不需要担心我们可能会改变/移除一些子组件依赖的东西
 
+* 同时这些组件之间的接口是始终明确定义的，就和 `props` 一样
 
+实际上，你可以把依赖注入看作一部分 **`大范围有效的 prop `** ，除了：
 
+* 祖先组件不需要知道哪些后代组件使用它提供的 property
 
+* 后代组件不需要知道被注入的 property 来自哪里
 
+> 然而，依赖注入还是有负面影响的
+> * 它将你应用程序中的组件与它们当前的组织方式耦合起来，使重构变得更加困难
+> * 同时所提供的 property 是非响应式的
+>> 这是出于设计的考虑，因为使用它们来创建一个中心化规模化的数据跟[【使用 `$root` 】](https://cn.vuejs.org/v2/guide/components-edge-cases.html#访问根实例)做这件事都是不够好的
+>>> 如果你想要共享的这个 property 是你的应用特有的，而不是通用化的，或者如果你想在祖先组件中更新所提供的数据，那么这意味着你可能需要换用一个像[【 Vuex 】](https://github.com/vuejs/vuex)这样真正的状态管理方案了
 
+> 你可以在[【 API 参考文档】](https://cn.vuejs.org/v2/api/#provide-inject)学习更多关于依赖注入的知识
 
+### 程序化的事件侦听器
 
+现在，你已经知道了 `$emit` 的用法，它可以被 `v-on` 侦听，但是 Vue 实例同时在其事件接口中提供了其它的方法
 
+我们可以：
 
+* 通过 `$on(eventName, eventHandler)` 侦听一个事件
 
+* 通过 `$once(eventName, eventHandler)` 一次性侦听一个事件
 
+* 通过 `$off(eventName, eventHandler)` 停止侦听一个事件
 
+你通常不会用到这些，但是当你需要在一个组件实例上手动侦听事件时，它们是派得上用场的
 
+* 它们也可以用于代码组织工具
 
+* 例如，你可能经常看到这种集成一个第三方库的模式
 
+```js
+// 一次性将这个日期选择器附加到一个输入框上
+// 它会被挂载到 DOM 上
+mounted: function () {
+  // Pikaday 是一个第三方日期选择器的库
+  this.picker = new Pikaday({
+    field: this.$refs.input,
+    format: 'YYYY-MM-DD'
+  })
+},
+// 在组件被销毁之前，也销毁这个日期选择器
+beforeDestroy: function () {
+  this.picker.destroy()
+}
+```
 
+这里有两个潜在的问题：
 
+* 它需要在这个组件实例中保存这个 `picker` ，如果可以的话最好只有生命周期钩子可以访问到它
 
+  这并不算严重的问题，但是它可以被视为杂物
 
+* 我们的建立代码独立于我们的清理代码，这使得我们比较难于程序化地清理我们建立的所有东西
 
+你应该通过一个程序化的侦听器解决这两个问题：
 
+```js
+mounted: function () {
+  var picker = new Pikaday({
+    field: this.$refs.input,
+    format: 'YYYY-MM-DD'
+  })
 
+  this.$once('hook:beforeDestroy', function () {
+    picker.destroy()
+  })
+}
+```
 
+使用了这个策略，我甚至可以让多个输入框元素同时使用不同的 `Pikaday` ，每个新的实例都程序化地在后期清理它自己：
 
+```js
+mounted: function () {
+  this.attachDatepicker('startDateInput')
+  this.attachDatepicker('endDateInput')
+},
+methods: {
+  attachDatepicker: function (refName) {
+    var picker = new Pikaday({
+      field: this.$refs[refName],
+      format: 'YYYY-MM-DD'
+    })
 
+    this.$once('hook:beforeDestroy', function () {
+      picker.destroy()
+    })
+  }
+}
+```
 
+> 查阅[【这个示例】](https://codesandbox.io/s/github/vuejs/vuejs.org/tree/master/src/v2/examples/vue-20-programmatic-event-listeners)可以了解到完整的代码
 
+> 注意：即便如此，如果你发现自己不得不在单个组件里做很多建立和清理的工作，最好的方式通常还是创建更多的模块化组件
+>> 在这个例子中，我们推荐创建一个可复用的 `<input-datepicker>` 组件
 
+> 想了解更多程序化侦听器的内容，请查阅[【实例方法/事件】](https://cn.vuejs.org/v2/api/#实例方法-事件)相关的 API
 
+> 注意：Vue 的事件系统不同于浏览器的[【 EventTarget API 】](https://developer.mozilla.org/zh-CN/docs/Web/API/EventTarget)
+>> 尽管它们工作起来是相似的
+> * 但是 `$emit` 、`$on` 、`$off` 并不是 `dispatchEvent` 、`addEventListener` 、`removeEventListener` 的别名
 
+### 循环引用
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#### 递归组件
 
 
 
