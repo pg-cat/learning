@@ -988,65 +988,191 @@ Vue 实现了一套内容分发的 API，这套 API 的设计灵感源自[【 We
 </div>
 ```
 
+对于这样的情况，`<slot>` 元素有一个特殊的 attribute：`name`
 
+* 这个 attribute 可以用来定义额外的插槽：
 
+```html
+<div class="container">
+  <header>
+    <slot name="header"></slot>
+  </header>
+  <main>
+    <slot></slot>
+  </main>
+  <footer>
+    <slot name="footer"></slot>
+  </footer>
+</div>
+```
 
+> 一个不带 `name` 的 `<slot>` 出口会带有隐含的名字 `default`
 
+在向具名插槽提供内容的时候，我们可以在一个 `<template>` 元素上使用 `v-slot` 指令，并以 `v-slot` 的参数的形式提供其名称：
 
+```html
+<base-layout>
+  <template v-slot:header>
+    <h1>Here might be a page title</h1>
+  </template>
 
+  <p>A paragraph for the main content.</p>
+  <p>And another one.</p>
 
+  <template v-slot:footer>
+    <p>Here's some contact info</p>
+  </template>
+</base-layout>
+```
 
+现在 `<template>` 元素中的所有内容都将会被传入相应的插槽
 
+* 任何没有被包裹在带有 `v-slot` 的 `<template>` 中的内容都会被视为默认插槽的内容
 
+* 然而，如果你希望更明确一些，仍然可以在一个 `<template>` 中包裹默认插槽的内容：
 
+```html
+<base-layout>
+  <template v-slot:header>
+    <h1>Here might be a page title</h1>
+  </template>
 
+  <template v-slot:default>
+    <p>A paragraph for the main content.</p>
+    <p>And another one.</p>
+  </template>
 
+  <template v-slot:footer>
+    <p>Here's some contact info</p>
+  </template>
+</base-layout>
+```
 
+任何一种写法都会渲染出：
 
+```html
+<div class="container">
+  <header>
+    <h1>Here might be a page title</h1>
+  </header>
+  <main>
+    <p>A paragraph for the main content.</p>
+    <p>And another one.</p>
+  </main>
+  <footer>
+    <p>Here's some contact info</p>
+  </footer>
+</div>
+```
 
+> 注意：`v-slot` 只能添加在 `<template>` 上 (只有[【一种例外情况】](https://cn.vuejs.org/v2/guide/components-slots.html#独占默认插槽的缩写语法))，这一点和已经废弃的[【 `slot` attribute 】](https://cn.vuejs.org/v2/guide/components-slots.html#废弃了的语法)不同
 
+### 作用域插槽
 
+> 自 `2.6.0` 起有所更新
+>> 已废弃的使用 `slot-scope` attribute 的语法在[【这里】](https://cn.vuejs.org/v2/guide/components-slots.html#废弃了的语法)
 
+有时让插槽内容能够访问子组件中才有的数据是很有用的
 
+例如，设想一个带有如下模板的 `<current-user>` 组件：
 
+```html
+<span>
+  <slot>{{ user.lastName }}</slot>
+</span>
+```
 
+我们可能想换掉备用内容，用名而非姓来显示
 
+```html
+<current-user>
+  {{ user.firstName }}
+</current-user>
+```
 
+然而上述代码不会正常工作，因为只有 `<current-user>` 组件可以访问到 `user` 而我们提供的内容是在父级渲染的
 
+为了让 `user` 在父级的插槽内容中可用，我们可以将 `user` 作为 `<slot>` 元素的一个 attribute 绑定上去：
 
+```html
+<span>
+  <slot v-bind:user="user">
+    {{ user.lastName }}
+  </slot>
+</span>
+```
 
+绑定在 `<slot>` 元素上的 attribute 被称为 **`插槽 prop`**
 
+* 现在在父级作用域中，我们可以使用带值的 `v-slot` 来定义我们提供的插槽 prop 的名字：
 
+```html
+<current-user>
+  <template v-slot:default="slotProps">
+    {{ slotProps.user.firstName }}
+  </template>
+</current-user>
+```
 
+在这个例子中，我们选择将包含所有插槽 prop 的对象命名为 `slotProps` ，但你也可以使用任意你喜欢的名字
 
+#### 独占默认插槽的缩写语法
 
+在上述情况下，当被提供的内容只有默认插槽时，组件的标签才可以被当作插槽的模板来使用
 
+* 这样我们就可以把 `v-slot` 直接用在组件上：
 
+```html
+<current-user v-slot:default="slotProps">
+  {{ slotProps.user.firstName }}
+</current-user>
+```
 
+这种写法还可以更简单
 
+就像假定未指明的内容对应默认插槽一样，不带参数的 `v-slot` 被假定对应默认插槽：
 
+```html
+<current-user v-slot="slotProps">
+  {{ slotProps.user.firstName }}
+</current-user>
+```
 
+> 注意：默认插槽的缩写语法 **`不能`** 和具名插槽混用，因为它会导致作用域不明确
 
+```html
+<!-- 无效，会导致警告 -->
+<current-user v-slot="slotProps">
+  {{ slotProps.user.firstName }}
+  <template v-slot:other="otherSlotProps">
+    slotProps is NOT available here
+  </template>
+</current-user>
+```
 
+只要出现多个插槽，请始终为所有的插槽使用完整的基于 `<template>` 的语法：
 
+```html
+<current-user>
+  <template v-slot:default="slotProps">
+    {{ slotProps.user.firstName }}
+  </template>
 
+  <template v-slot:other="otherSlotProps">
+    ...
+  </template>
+</current-user>
+```
 
+#### 解构插槽 Prop
 
+作用域插槽的内部工作原理是将你的插槽内容包括在一个传入单个参数的函数里：
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```js
+function (slotProps) {
+  // 插槽内容
+}
+```
 
 
 
