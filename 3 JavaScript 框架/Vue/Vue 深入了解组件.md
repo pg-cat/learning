@@ -1867,8 +1867,7 @@ methods: {
 
 > 注意：即便如此，如果你发现自己不得不在单个组件里做很多建立和清理的工作，最好的方式通常还是创建更多的模块化组件
 >> 在这个例子中，我们推荐创建一个可复用的 `<input-datepicker>` 组件
-
-> 想了解更多程序化侦听器的内容，请查阅[【实例方法/事件】](https://cn.vuejs.org/v2/api/#实例方法-事件)相关的 API
+>>> 想了解更多程序化侦听器的内容，请查阅[【实例方法/事件】](https://cn.vuejs.org/v2/api/#实例方法-事件)相关的 API
 
 > 注意：Vue 的事件系统不同于浏览器的[【 EventTarget API 】](https://developer.mozilla.org/zh-CN/docs/Web/API/EventTarget)
 >> 尽管它们工作起来是相似的
