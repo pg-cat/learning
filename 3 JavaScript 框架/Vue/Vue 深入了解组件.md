@@ -900,31 +900,93 @@ Vue 实现了一套内容分发的 API，这套 API 的设计灵感源自[【 We
 </navigation-link>
 ```
 
+该插槽跟模板的其它地方一样可以访问相同的实例 property (也就是相同的 **`作用域`** )，而不能访问 `<navigation-link>` 的作用域
 
+例如 `url` 是访问不到的：
 
+```html
+<navigation-link url="/profile">
+  Clicking here will send you to: {{ url }}
+  <!--
+  这里的 {{ url }} 会是 undefined ，因为其 (指该插槽的) 内容是传递给 <navigation-link> 的而不是在 <navigation-link> 组件 内部 定义的
+  -->
+</navigation-link>
+```
 
+> 作为一条规则，请记住：
+> * 父级模板里的所有内容都是在父级作用域中编译的
+> * 子模板里的所有内容都是在子作用域中编译的
 
+### 后备内容
 
+有时为一个插槽设置具体的后备 (也就是默认的) 内容是很有用的，它只会在没有提供内容的时候被渲染
 
+例如在一个 `<submit-button>` 组件中：
 
+```html
+<button type="submit">
+  <slot></slot>
+</button>
+```
 
+我们可能希望这个 `<button>` 内绝大多数情况下都渲染文本 `Submit`
 
+* 为了将 `Submit` 作为后备内容，我们可以将它放在 `<slot>` 标签内：
 
+```html
+<button type="submit">
+  <slot>Submit</slot>
+</button>
+```
 
+现在当我在一个父级组件中使用 `<submit-button>` 并且不提供任何插槽内容时：
 
+```html
+<submit-button></submit-button>
+```
 
+后备内容 `Submit` 将会被渲染：
 
+```html
+<button type="submit">
+  Submit
+</button>
+```
 
+但是如果我们提供内容：
 
+```html
+<submit-button>
+  Save
+</submit-button>
+```
 
+则这个提供的内容将会被渲染从而取代后备内容：
 
+```html
+<button type="submit">
+  Save
+</button>
+```
 
+### 具名插槽
 
+> 自 `2.6.0` 起有所更新
+>> 已废弃的使用 `slot` attribute 的语法在[【这里】](https://cn.vuejs.org/v2/guide/components-slots.html#废弃了的语法)
 
-
-
-
-
+```html
+<div class="container">
+  <header>
+    <!-- 我们希望把页头放这里 -->
+  </header>
+  <main>
+    <!-- 我们希望把主要内容放这里 -->
+  </main>
+  <footer>
+    <!-- 我们希望把页脚放这里 -->
+  </footer>
+</div>
+```
 
 
 
