@@ -3315,6 +3315,6 @@ Vue.component('alert-box', {
 > * [【单文件组件 ( `.vue` )】](https://cn.vuejs.org/v2/guide/single-file-components.html)
 > * [【 `<script type="text/x-template">` 】](https://cn.vuejs.org/v2/guide/components-edge-cases.html#X-Templates)
 
-到这里，你需要了解的解析 DOM 模板时的注意事项 —— 实际上也是 Vue 的全部必要内容，大概就是这些了
+到这里，你需要了解的解析 DOM 模板时的注意事项，而这实际上也是 Vue 的全部必要内容，大概就是这些了
 
 恭喜你！接下来还有很多东西要去学习，不过首先，我们推荐你先休息一下，试用一下 Vue ，自己随意做些好玩的东西
