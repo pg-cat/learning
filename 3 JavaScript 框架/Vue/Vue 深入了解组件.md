@@ -1877,8 +1877,13 @@ methods: {
 
 #### 递归组件
 
+组件是可以在它们自己的模板中调用自身的
 
+不过它们只能通过 `name` 选项来做这件事：
 
+```js
+name: 'unique-name-of-my-component'
+```
 
 
 
