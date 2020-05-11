@@ -1,7 +1,7 @@
 以下内容整理自[【 Vue.js 官方文档】【 2.x 】](https://cn.vuejs.org/v2/guide/installation.html)
 
 
-# Vue.js
+# Vue 深入了解组件
 
 ## 组件注册
 

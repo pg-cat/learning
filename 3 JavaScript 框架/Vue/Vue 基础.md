@@ -1,7 +1,7 @@
 以下内容整理自[【 Vue.js 官方文档】【 2.x 】](https://cn.vuejs.org/v2/guide/installation.html)
 
 
-# Vue.js
+# Vue 基础
 
 ## 安装
 
