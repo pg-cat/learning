@@ -37,10 +37,9 @@
 
 ![图片](https://cn.vuejs.org/images/vue-component.png)
 
-在 `index.vue` 中引用 `Hello.vue` ：
+在 `index.js` 中引用 `Hello.vue` ：
 
 ```js
-// index.vue
 import Vue from "vue";
 import App from "./Hello";
 
