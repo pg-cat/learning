@@ -580,7 +580,7 @@ computed: {
 
 [【示例效果请点击查看】](https://cn.vuejs.org/v2/guide/transitions.html#过渡模式)
 
-很酷!
+很酷！
 
 ### 多个组件的过渡
 
@@ -634,353 +634,679 @@ new Vue({
 
 那么怎么同时渲染整个列表，比如使用 `v-for` ？
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+在这种场景中，使用 `<transition-group>` 组件
+
+在我们深入例子之前，先了解关于这个组件的几个特点：
+
+* 不同于 `<transition>` ，它会以一个真实元素呈现：默认为一个 `<span>`
+
+  你也可以通过 `tag` attribute 更换为其他元素
+
+* [【过渡模式】](https://cn.vuejs.org/v2/guide/transitions.html#过渡模式)不可用，因为我们不再相互切换特有的元素
+
+* 内部元素 *`总是需要`* 提供唯一的 `key` attribute 值
+
+* CSS 过渡的类将会应用在内部的元素中，而不是这个组/容器本身
+
+#### 列表的进入/离开过渡
+
+现在让我们由一个简单的例子深入，进入和离开的过渡使用之前一样的 CSS 类名：
+
+```html
+<div id="list-demo" class="demo">
+  <button v-on:click="add">Add</button>
+  <button v-on:click="remove">Remove</button>
+  <transition-group name="list" tag="p">
+    <span v-for="item in items" v-bind:key="item" class="list-item">
+      {{ item }}
+    </span>
+  </transition-group>
+</div>
+```
+
+```js
+new Vue({
+  el: '#list-demo',
+  data: {
+    items: [1,2,3,4,5,6,7,8,9],
+    nextNum: 10
+  },
+  methods: {
+    randomIndex: function () {
+      return Math.floor(Math.random() * this.items.length)
+    },
+    add: function () {
+      this.items.splice(this.randomIndex(), 0, this.nextNum++)
+    },
+    remove: function () {
+      this.items.splice(this.randomIndex(), 1)
+    },
+  }
+})
+```
+
+```css
+.list-item {
+  display: inline-block;
+  margin-right: 10px;
+}
+.list-enter-active, .list-leave-active {
+  transition: all 1s;
+}
+.list-enter, .list-leave-to
+/* .list-leave-active for below version 2.1.8 */ {
+  opacity: 0;
+  transform: translateY(30px);
+```
+
+[【示例效果请点击查看】](https://cn.vuejs.org/v2/guide/transitions.html#列表的进入-离开过渡)
+
+这个例子有个问题，当添加和移除元素的时候，周围的元素会瞬间移动到他们的新布局的位置，而不是平滑的过渡，我们下面会解决这个问题
+
+#### 列表的排序过渡
+
+`<transition-group>` 组件还有一个特殊之处
+
+* 不仅可以进入和离开动画，还可以改变定位
+
+* 要使用这个新功能只需了解新增的 `v-move` class，它会在元素的改变定位的过程中应用
+
+* 像之前的类名一样，可以通过 `name` attribute 来自定义前缀，也可以通过 `move-class` attribute 手动设置
+
+`v-move` 对于设置过渡的切换时机和过渡曲线非常有用，你会看到如下的例子：
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.14.1/lodash.min.js"></script>
+
+<div id="flip-list-demo" class="demo">
+  <button v-on:click="shuffle">Shuffle</button>
+  <transition-group name="flip-list" tag="ul">
+    <li v-for="item in items" v-bind:key="item">
+      {{ item }}
+    </li>
+  </transition-group>
+</div>
+```
+
+```js
+new Vue({
+  el: '#flip-list-demo',
+  data: {
+    items: [1,2,3,4,5,6,7,8,9]
+  },
+  methods: {
+    shuffle: function () {
+      this.items = _.shuffle(this.items)
+    }
+  }
+})
+```
+
+```css
+.flip-list-move {
+  transition: transform 1s;
+}
+```
+
+[【示例效果请点击查看】](https://cn.vuejs.org/v2/guide/transitions.html#列表的排序过渡)
+
+这个看起来很神奇，内部的实现，Vue 使用了一个叫[【 `FLIP` 】](https://aerotwist.com/blog/flip-your-animations/)简单的动画队列
+
+* 使用 `transforms` 将元素从之前的位置平滑过渡新的位置
+
+我们将之前实现的例子和这个技术结合，使我们列表的一切变动都会有动画过渡：
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.14.1/lodash.min.js"></script>
+
+<div id="list-complete-demo" class="demo">
+  <button v-on:click="shuffle">Shuffle</button>
+  <button v-on:click="add">Add</button>
+  <button v-on:click="remove">Remove</button>
+  <transition-group name="list-complete" tag="p">
+    <span
+      v-for="item in items"
+      v-bind:key="item"
+      class="list-complete-item"
+    >
+      {{ item }}
+    </span>
+  </transition-group>
+</div>
+```
+
+```js
+new Vue({
+  el: '#list-complete-demo',
+  data: {
+    items: [1,2,3,4,5,6,7,8,9],
+    nextNum: 10
+  },
+  methods: {
+    randomIndex: function () {
+      return Math.floor(Math.random() * this.items.length)
+    },
+    add: function () {
+      this.items.splice(this.randomIndex(), 0, this.nextNum++)
+    },
+    remove: function () {
+      this.items.splice(this.randomIndex(), 1)
+    },
+    shuffle: function () {
+      this.items = _.shuffle(this.items)
+    }
+  }
+})
+```
+
+```css
+.list-complete-item {
+  transition: all 1s;
+  display: inline-block;
+  margin-right: 10px;
+}
+.list-complete-enter, .list-complete-leave-to
+/* .list-complete-leave-active for below version 2.1.8 */ {
+  opacity: 0;
+  transform: translateY(30px);
+}
+.list-complete-leave-active {
+  position: absolute;
+}
+```
+
+[【示例效果请点击查看】](https://cn.vuejs.org/v2/guide/transitions.html#列表的排序过渡)
+
+> 需要注意的是使用 FLIP 过渡的元素不能设置为 `display: inline`
+>> 作为替代方案，可以设置为 `display: inline-block` 或者放置于 `flex` 中
+
+FLIP 动画不仅可以实现单列过渡，多维网格也[【同样可以过渡】](https://codesandbox.io/s/github/vuejs/vuejs.org/tree/master/src/v2/examples/vue-20-list-move-transitions)：
+
+[【示例效果请点击查看】](https://cn.vuejs.org/v2/guide/transitions.html#列表的排序过渡)
+
+#### 列表的交错过渡
+
+通过 `data` attribute 与 JavaScript 通信，就可以实现列表的交错过渡：
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/velocity/1.2.3/velocity.min.js"></script>
+
+<div id="staggered-list-demo">
+  <input v-model="query">
+  <transition-group
+    name="staggered-fade"
+    tag="ul"
+    v-bind:css="false"
+    v-on:before-enter="beforeEnter"
+    v-on:enter="enter"
+    v-on:leave="leave"
+  >
+    <li
+      v-for="(item, index) in computedList"
+      v-bind:key="item.msg"
+      v-bind:data-index="index"
+    >{{ item.msg }}</li>
+  </transition-group>
+</div>
+```
+
+```js
+new Vue({
+  el: '#staggered-list-demo',
+  data: {
+    query: '',
+    list: [
+      { msg: 'Bruce Lee' },
+      { msg: 'Jackie Chan' },
+      { msg: 'Chuck Norris' },
+      { msg: 'Jet Li' },
+      { msg: 'Kung Fury' }
+    ]
+  },
+  computed: {
+    computedList: function () {
+      var vm = this
+      return this.list.filter(function (item) {
+        return item.msg.toLowerCase().indexOf(vm.query.toLowerCase()) !== -1
+      })
+    }
+  },
+  methods: {
+    beforeEnter: function (el) {
+      el.style.opacity = 0
+      el.style.height = 0
+    },
+    enter: function (el, done) {
+      var delay = el.dataset.index * 150
+      setTimeout(function () {
+        Velocity(
+          el,
+          { opacity: 1, height: '1.6em' },
+          { complete: done }
+        )
+      }, delay)
+    },
+    leave: function (el, done) {
+      var delay = el.dataset.index * 150
+      setTimeout(function () {
+        Velocity(
+          el,
+          { opacity: 0, height: 0 },
+          { complete: done }
+        )
+      }, delay)
+    }
+  }
+})
+```
+
+[【示例效果请点击查看】](https://cn.vuejs.org/v2/guide/transitions.html#列表的交错过渡)
+
+### 可复用的过渡
+
+过渡可以通过 Vue 的组件系统实现复用
+
+要创建一个可复用过渡组件，你需要做的就是将 `<transition>` 或者 `<transition-group>` 作为根组件，然后将任何子组件放置在其中就可以了
+
+使用 template 的简单例子：
+
+```js
+Vue.component('my-special-transition', {
+  template: '\
+    <transition\
+      name="very-special-transition"\
+      mode="out-in"\
+      v-on:before-enter="beforeEnter"\
+      v-on:after-enter="afterEnter"\
+    >\
+      <slot></slot>\
+    </transition>\
+  ',
+  methods: {
+    beforeEnter: function (el) {
+      // ...
+    },
+    afterEnter: function (el) {
+      // ...
+    }
+  }
+})
+```
+
+[【函数式组件】](https://cn.vuejs.org/v2/guide/render-function.html#函数式组件)更适合完成这个任务：
+
+```js
+Vue.component('my-special-transition', {
+  functional: true,
+  render: function (createElement, context) {
+    var data = {
+      props: {
+        name: 'very-special-transition',
+        mode: 'out-in'
+      },
+      on: {
+        beforeEnter: function (el) {
+          // ...
+        },
+        afterEnter: function (el) {
+          // ...
+        }
+      }
+    }
+    return createElement('transition', data, context.children)
+  }
+})
+```
+
+### 动态过渡
+
+在 Vue 中即使是过渡也是数据驱动的！
+
+动态过渡最基本的例子是通过 `name` attribute 来绑定动态值：
+
+```html
+<transition v-bind:name="transitionName">
+  <!-- ... -->
+</transition>
+```
+
+当你想用 Vue 的过渡系统来定义的 CSS 过渡/动画在不同过渡间切换会非常有用
+
+* 所有过渡 attribute 都可以动态绑定，但我们不仅仅只有 attribute 可以利用
+
+* 还可以通过事件钩子获取上下文中的所有数据，因为事件钩子都是方法
+
+* 这意味着，根据组件的状态不同，你的 JavaScript 过渡会有不同的表现
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/velocity/1.2.3/velocity.min.js"></script>
+
+<div id="dynamic-fade-demo" class="demo">
+  Fade In: <input type="range" v-model="fadeInDuration" min="0" v-bind:max="maxFadeDuration">
+  Fade Out: <input type="range" v-model="fadeOutDuration" min="0" v-bind:max="maxFadeDuration">
+  <transition
+    v-bind:css="false"
+    v-on:before-enter="beforeEnter"
+    v-on:enter="enter"
+    v-on:leave="leave"
+  >
+    <p v-if="show">hello</p>
+  </transition>
+  <button
+    v-if="stop"
+    v-on:click="stop = false; show = false"
+  >Start animating</button>
+  <button
+    v-else
+    v-on:click="stop = true"
+  >Stop it!</button>
+</div>
+```
+
+```js
+new Vue({
+  el: '#dynamic-fade-demo',
+  data: {
+    show: true,
+    fadeInDuration: 1000,
+    fadeOutDuration: 1000,
+    maxFadeDuration: 1500,
+    stop: true
+  },
+  mounted: function () {
+    this.show = false
+  },
+  methods: {
+    beforeEnter: function (el) {
+      el.style.opacity = 0
+    },
+    enter: function (el, done) {
+      var vm = this
+      Velocity(el,
+        { opacity: 1 },
+        {
+          duration: this.fadeInDuration,
+          complete: function () {
+            done()
+            if (!vm.stop) vm.show = false
+          }
+        }
+      )
+    },
+    leave: function (el, done) {
+      var vm = this
+      Velocity(el,
+        { opacity: 0 },
+        {
+          duration: this.fadeOutDuration,
+          complete: function () {
+            done()
+            vm.show = true
+          }
+        }
+      )
+    }
+  }
+})
+```
+
+[【示例效果请点击查看】](https://cn.vuejs.org/v2/guide/transitions.html#动态过渡)
+
+最后，创建动态过渡的最终方案是组件通过接受 props 来动态修改之前的过渡
+
+> 一句老话：唯一的限制是你的想象力
+
+## 状态过渡
+
+Vue 的过渡系统提供了非常多简单的方法设置进入、离开和列表的动效
+
+那么对于数据元素本身的动效呢，比如：
+
+* 数字和运算
+* 颜色的显示
+* SVG 节点的位置
+* 元素的大小和其他的 property
+
+这些数据要么本身就以数值形式存储，要么可以转换为数值
+
+有了这些数值后，我们就可以结合 Vue 的响应式和组件系统，使用第三方库来实现切换元素的过渡状态
+
+### 状态动画与侦听器
+
+通过侦听器我们能监听到任何数值 property 的数值更新
+
+可能听起来很抽象，所以让我们先来看看使用[【 GreenSock 】](https://greensock.com/)一个例子：
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.2.4/gsap.min.js"></script>
+
+<div id="animated-number-demo">
+  <input v-model.number="number" type="number" step="20">
+  <p>{{ animatedNumber }}</p>
+</div>
+```
+
+```js
+new Vue({
+  el: '#animated-number-demo',
+  data: {
+    number: 0,
+    tweenedNumber: 0
+  },
+  computed: {
+    animatedNumber: function() {
+      return this.tweenedNumber.toFixed(0);
+    }
+  },
+  watch: {
+    number: function(newValue) {
+      gsap.to(this.$data, { duration: 0.5, tweenedNumber: newValue });
+    }
+  }
+})
+```
+
+[【示例效果请点击查看】](https://cn.vuejs.org/v2/guide/transitioning-state.html#状态动画与侦听器)
+
+当你把数值更新时，就会触发动画
+
+这个是一个不错的演示，但是对于不能直接像数字一样存储的值，比如 CSS 中的 color 的值
+
+通过下面的例子我们来通过 `Tween.js` 和 `Color.js` 实现一个例子：
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/tween.js@16.3.4"></script>
+<script src="https://cdn.jsdelivr.net/npm/color-js@1.0.3"></script>
+
+<div id="example-7">
+  <input
+    v-model="colorQuery"
+    v-on:keyup.enter="updateColor"
+    placeholder="Enter a color"
+  >
+  <button v-on:click="updateColor">Update</button>
+  <p>Preview:</p>
+  <span
+    v-bind:style="{ backgroundColor: tweenedCSSColor }"
+    class="example-7-color-preview"
+  ></span>
+  <p>{{ tweenedCSSColor }}</p>
+</div>
+```
+
+```js
+var Color = net.brehaut.Color
+
+new Vue({
+  el: '#example-7',
+  data: {
+    colorQuery: '',
+    color: {
+      red: 0,
+      green: 0,
+      blue: 0,
+      alpha: 1
+    },
+    tweenedColor: {}
+  },
+  created: function () {
+    this.tweenedColor = Object.assign({}, this.color)
+  },
+  watch: {
+    color: function () {
+      function animate () {
+        if (TWEEN.update()) {
+          requestAnimationFrame(animate)
+        }
+      }
+
+      new TWEEN.Tween(this.tweenedColor)
+        .to(this.color, 750)
+        .start()
+
+      animate()
+    }
+  },
+  computed: {
+    tweenedCSSColor: function () {
+      return new Color({
+        red: this.tweenedColor.red,
+        green: this.tweenedColor.green,
+        blue: this.tweenedColor.blue,
+        alpha: this.tweenedColor.alpha
+      }).toCSS()
+    }
+  },
+  methods: {
+    updateColor: function () {
+      this.color = new Color(this.colorQuery).toRGB()
+      this.colorQuery = ''
+    }
+  }
+})
+```
+
+```css
+.example-7-color-preview {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+}
+```
+
+[【示例效果请点击查看】](https://cn.vuejs.org/v2/guide/transitioning-state.html#状态动画与侦听器)
+
+### 动态状态过渡
+
+就像 Vue 的过渡组件一样，数据背后状态过渡会实时更新，这对于原型设计十分有用
+
+* 当你修改一些变量，即使是一个简单的 SVG 多边形也可实现很多难以想象的效果
+
+[【示例效果请点击查看】](https://cn.vuejs.org/v2/guide/transitioning-state.html#动态状态过渡)
+
+> 上述 demo 背后的代码可以通过[【这个示例】](https://codesandbox.io/s/github/vuejs/vuejs.org/tree/master/src/v2/examples/vue-20-dynamic-state-transitions)进行详阅
+
+### 把过渡放到组件里
+
+管理太多的状态过渡会很快的增加 Vue 实例或者组件的复杂性，幸好很多的动画可以提取到专用的子组件
+
+我们来将之前的示例改写一下：
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/tween.js@16.3.4"></script>
+
+<div id="example-8">
+  <input v-model.number="firstNumber" type="number" step="20"> +
+  <input v-model.number="secondNumber" type="number" step="20"> =
+  {{ result }}
+  <p>
+    <animated-integer v-bind:value="firstNumber"></animated-integer> +
+    <animated-integer v-bind:value="secondNumber"></animated-integer> =
+    <animated-integer v-bind:value="result"></animated-integer>
+  </p>
+</div>
+```
+
+```js
+// 这种复杂的补间动画逻辑可以被复用
+// 任何整数都可以执行动画
+// 组件化使我们的界面十分清晰
+// 可以支持更多更复杂的动态过渡策略。
+Vue.component('animated-integer', {
+  template: '<span>{{ tweeningValue }}</span>',
+  props: {
+    value: {
+      type: Number,
+      required: true
+    }
+  },
+  data: function () {
+    return {
+      tweeningValue: 0
+    }
+  },
+  watch: {
+    value: function (newValue, oldValue) {
+      this.tween(oldValue, newValue)
+    }
+  },
+  mounted: function () {
+    this.tween(0, this.value)
+  },
+  methods: {
+    tween: function (startValue, endValue) {
+      var vm = this
+      function animate () {
+        if (TWEEN.update()) {
+          requestAnimationFrame(animate)
+        }
+      }
+
+      new TWEEN.Tween({ tweeningValue: startValue })
+        .to({ tweeningValue: endValue }, 500)
+        .onUpdate(function () {
+          vm.tweeningValue = this.tweeningValue.toFixed(0)
+        })
+        .start()
+
+      animate()
+    }
+  }
+})
+
+// 所有的复杂度都已经从 Vue 的主实例中移除！
+new Vue({
+  el: '#example-8',
+  data: {
+    firstNumber: 20,
+    secondNumber: 40
+  },
+  computed: {
+    result: function () {
+      return this.firstNumber + this.secondNumber
+    }
+  }
+})
+```
+
+[【示例效果请点击查看】](https://cn.vuejs.org/v2/guide/transitioning-state.html#把过渡放到组件里)
+
+我们能在组件中结合使用这一节讲到各种过渡策略和[【 Vue 内建的过渡系统】](https://cn.vuejs.org/v2/guide/transitions.html)
+
+### 赋予设计以生命赋予设计以生命
+
+只要一个动画，就可以带来生命
+
+* 不幸的是，当设计师创建图标、logo 和吉祥物的时候，他们交付的通常都是图片或静态的 SVG
+
+* 所以，虽然 GitHub 的章鱼猫、Twitter 的小鸟以及其它许多 logo 类似于生灵，它们看上去实际上并不是活着的
+
+Vue 可以帮到你
+
+* 因为 SVG 的本质是数据，我们只需要这些动物兴奋、思考或警戒的样例
+
+* 然后 Vue 就可以辅助完成这几种状态之间的过渡动画，来制作你的欢迎页面、加载指示、以及更加带有情感的提示
+
+Sarah Drasner 展示了下面这个 demo ，这个 demo 结合了时间和交互相关的状态改变：
+
+[【示例效果请点击查看】](https://cn.vuejs.org/v2/guide/transitioning-state.html#赋予设计以生命)
