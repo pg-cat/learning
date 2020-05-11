@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自定义指令</title>
+    <script src="vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <input-f></input-f>
+        <p>{{ he }}</p>
+    </div>
+</body>
+</html>
+<script>
+    Vue.component('input-f',{
+        template: '<input v-focus type="text" placeholder="请输入...">',
+        directives: {
+            focus: {
+                inserted: function (el) {
+                    el.focus()
+                }
+            }
+        }
+    })
+
+    new Vue({
+        el: "#app",
+        data: {
+            he: "呵"
+        }
+    })
+</script>
