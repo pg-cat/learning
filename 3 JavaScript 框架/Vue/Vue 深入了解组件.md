@@ -1885,251 +1885,165 @@ methods: {
 name: 'unique-name-of-my-component'
 ```
 
+当你使用 `Vue.component` 全局注册一个组件时，这个全局的 `ID` 会自动设置为该组件的 `name` 选项
 
+```js
+Vue.component('unique-name-of-my-component', {
+  // ...
+})
+```
 
+稍有不慎，递归组件就可能导致无限循环：
 
+```js
+name: 'stack-overflow',
+template: '<div><stack-overflow></stack-overflow></div>'
+```
 
+类似上述的组件将会导致 `max stack size exceeded` 错误，所以请确保递归调用是条件性的 (例如使用一个最终会得到 `false` 的 `v-if` )
 
+#### 组件之间的循环引用
 
+假设你需要构建一个文件目录树，像访达或资源管理器那样的
 
+你可能有一个 `<tree-folder>` 组件，模板是这样的：
 
+```html
+<p>
+  <span>{{ folder.name }}</span>
+  <tree-folder-contents :children="folder.children"/>
+</p>
+```
 
+还有一个 `<tree-folder-contents>` 组件，模板是这样的：
 
+```html
+<ul>
+  <li v-for="child in children">
+    <tree-folder v-if="child.children" :folder="child"/>
+    <span v-else>{{ child.name }}</span>
+  </li>
+</ul>
+```
 
+当你仔细观察的时候，你会发现这些组件在渲染树中 **`互为对方的后代和祖先`**
 
+* 这是一个悖论！
 
+* 当通过 `Vue.component` 全局注册组件的时候，这个悖论会被自动解开
 
+  如果你是这样做的，那么你可以跳过这里
 
+* 然而，如果你使用一个模块系统依赖/导入组件，例如通过 `webpack` 或 `Browserify` ，你会遇到一个错误：
 
+```
+Failed to mount component: template or render function not defined.
+```
 
+为了解释这里发生了什么，我们先把两个组件称为 A 和 B
 
+* 模块系统发现它需要 A ，但是首先 A 依赖 B ，但是 B 又依赖 A ，但是 A 又依赖 B ，如此往复
 
+* 这变成了一个循环，不知道如何不经过其中一个组件而完全解析出另一个组件
 
+* 为了解决这个问题，我们需要给模块系统一个点，那就是：
 
+  A 反正是需要 B 的，但是我们不需要先解析 B
 
+在我们的例子中，把 `<tree-folder>` 组件设为了那个点
 
+* 我们知道那个产生悖论的子组件是 `<tree-folder-contents>` 组件，所以我们会等到生命周期钩子 `beforeCreate` 时去注册它：
 
+```js
+beforeCreate: function () {
+  this.$options.components.TreeFolderContents = require('./tree-folder-contents.vue').default
+}
+```
 
+或者，在本地注册组件的时候，你可以使用 webpack 的异步 `import` ：
 
+```js
+components: {
+  TreeFolderContents: () => import('./tree-folder-contents.vue')
+}
+```
 
+这样问题就解决了！
 
+### 模板定义的替代品
 
+#### 内联模板
 
+当 `inline-template` 这个特殊的 attribute 出现在一个子组件上时，这个组件将会使用其里面的内容作为模板，而不是将其作为被分发的内容
 
+```html
+<my-component inline-template>
+  <div>
+    <p>These are compiled as the component's own template.</p>
+    <p>Not parent's transclusion content.</p>
+  </div>
+</my-component>
+```
 
+内联模板需要定义在 Vue 所属的 *DOM 元素内*
 
+> 不过，`inline-template` 会让模板的作用域变得更加难以理解
+>> 所以作为最佳实践，请在组件内优先选择 `template` 选项或 `.vue` 文件里的一个 `<template>` 元素来定义模板
 
+#### X-Template
 
+另一个定义模板的方式是在一个 `<script>` 元素中，并为其带上 `text/x-template` 的类型，然后通过一个 `id` 将模板引用过去
 
+```html
+<script type="text/x-template" id="hello-world-template">
+  <p>Hello hello hello</p>
+</script>
+```
 
+```js
+Vue.component('hello-world', {
+  template: '#hello-world-template'
+})
+```
 
+`x-template` 需要定义在 Vue 所属的 *DOM 元素外*
 
+> 这些可以用于模板特别大的 demo 或极小型的应用
+>> 但是其它情况下请避免使用，因为这会将模板和该组件的其它定义分离开
 
+### 控制更新
 
+感谢 Vue 的响应式系统，它始终知道何时进行更新 (如果你用对了的话)
 
+* 不过还是有一些边界情况，你想要强制更新，尽管表面上看响应式的数据没有发生改变
 
+* 也有一些情况是你想阻止不必要的更新
 
+#### 强制更新
 
+> 如果你发现你自己需要在 Vue 中做一次强制更新，`99.9%` 的情况，是你在某个地方做错了事
 
+你可能还没有留意到[【数组】](https://cn.vuejs.org/v2/guide/list.html#注意事项)或[【对象】](https://cn.vuejs.org/v2/guide/list.html#对象变更检测注意事项)的变更检测注意事项，或者你可能依赖了一个未被 Vue 的响应式系统追踪的状态
 
+然而，如果你已经做到了上述的事项仍然发现在极少数的情况下需要手动强制更新，那么你可以通过 `$forceUpdate` 来做这件事
 
+#### 通过 `v-once` 创建低开销的静态组件
 
+渲染普通的 HTML 元素在 Vue 中是非常快速的，但有的时候你可能有一个组件，这个组件包含了 *大量静态内容*
 
+在这种情况下，你可以在根元素上添加 `v-once` attribute 以确保这些内容只计算一次然后缓存起来，就像这样：
 
+```js
+Vue.component('terms-of-service', {
+  template: `
+    <div v-once>
+      <h1>Terms of Service</h1>
+      ... a lot of static content ...
+    </div>
+  `
+})
+```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+> 再说一次，试着不要过度使用这个模式
+>> 当你需要渲染大量静态内容时，极少数的情况下它会给你带来便利，除非你非常留意渲染变慢了，不然它完全是没有必要的——再加上它在后期会带来很多困惑
+>>> 例如，设想另一个开发者并不熟悉 `v-once` 或漏看了它在模板中，他们可能会花很多个小时去找出模板为什么无法正确更新
