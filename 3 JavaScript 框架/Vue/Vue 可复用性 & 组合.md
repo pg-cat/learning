@@ -869,10 +869,10 @@ render: function (createElement) {
 
 修饰符|前缀
 -|-
-.passive|&
-.capture|!
-.once|~
-.capture.once 或 .once.capture|~!
+`.passive`|`&`
+`.capture`|`!`
+`.once`|`~`
+`.capture.once` 或 `.once.capture`|`~!`
 
 ```js
 on: {
@@ -882,192 +882,528 @@ on: {
 }
 ```
 
+对于所有其它的修饰符，私有前缀都不是必须的，因为你可以在事件处理函数中使用事件方法：
+
+修饰符|处理函数中的等价操作
+-|-
+`.stop`|`event.stopPropagation()`
+`.prevent`|`event.preventDefault()`
+`.self`|`if (event.target !== event.currentTarget) return`
+按键：`.enter` , `.13`|`if (event.keyCode !== 13) return` (对于别的按键修饰符来说，可将 `13` 改为[【另一个按键码】](http://keycode.info/))
+修饰键：`.ctrl` , `.alt` , `.shift` , `.meta`|`if (!event.ctrlKey) return` (将 `ctrlKey` 分别修改为 `altKey` 、`shiftKey` 或者 `metaKey` )
+
+这里是一个使用所有修饰符的例子：
+
+```js
+on: {
+  keyup: function (event) {
+    // 如果触发事件的元素不是事件绑定的元素
+    // 则返回
+    if (event.target !== event.currentTarget) return
+    // 如果按下去的不是 enter 键或者
+    // 没有同时按下 shift 键
+    // 则返回
+    if (!event.shiftKey || event.keyCode !== 13) return
+    // 阻止 事件冒泡
+    event.stopPropagation()
+    // 阻止该元素默认的 keyup 事件
+    event.preventDefault()
+    // ...
+  }
+}
+```
+
+#### 插槽
+
+你可以通过 `this.$slots` 访问静态插槽的内容，每个插槽都是一个 VNode 数组：
+
+```js
+render: function (createElement) {
+  // `<div><slot></slot></div>`
+  return createElement('div', this.$slots.default)
+}
+```
+
+也可以通过[【 `this.$scopedSlots` 】](https://cn.vuejs.org/v2/api/#vm-scopedSlots)访问作用域插槽，每个作用域插槽都是一个返回若干 VNode 的函数：
+
+```js
+props: ['message'],
+render: function (createElement) {
+  // `<div><slot :text="message"></slot></div>`
+  return createElement('div', [
+    this.$scopedSlots.default({
+      text: this.message
+    })
+  ])
+}
+```
+
+如果要用渲染函数向子组件中传递作用域插槽，可以利用 VNode 数据对象中的 `scopedSlots` 字段：
+
+```js
+render: function (createElement) {
+  // `<div><child v-slot="props"><span>{{ props.text }}</span></child></div>`
+  return createElement('div', [
+    createElement('child', {
+      // 在数据对象中传递 `scopedSlots`
+      // 格式为 { name: props => VNode | Array<VNode> }
+      scopedSlots: {
+        default: function (props) {
+          return createElement('span', props.text)
+        }
+      }
+    })
+  ])
+}
+```
+
+### JSX
+
+如果你写了很多 `render` 函数，可能会觉得下面这样的代码写起来很痛苦：
+
+```js
+createElement(
+  'anchored-heading', {
+    props: {
+      level: 1
+    }
+  }, [
+    createElement('span', 'Hello'),
+    ' world!'
+  ]
+)
+```
+
+特别是对应的模板如此简单的情况下：
+
+```html
+<anchored-heading :level="1">
+  <span>Hello</span> world!
+</anchored-heading>
+```
+
+这就是为什么会有一个[【 Babel 插件】](https://github.com/vuejs/jsx)，用于在 Vue 中使用 JSX 语法，它可以让我们回到更接近于模板的语法上
 
+```js
+import AnchoredHeading from './AnchoredHeading.vue'
 
+new Vue({
+  el: '#demo',
+  render: function (h) {
+    return (
+      <AnchoredHeading level={1}>
+        <span>Hello</span> world!
+      </AnchoredHeading>
+    )
+  }
+})
+```
 
+> 将 `h` 作为 `createElement` 的别名是 Vue 生态系统中的一个通用惯例，实际上也是 JSX 所要求的
+> * 从 Vue 的 `Babel` 插件的[【 `3.4.0` 版本】](https://github.com/vuejs/babel-plugin-transform-vue-jsx#h-auto-injection)开始
+> * 我们会在以 `ES2015` 语法声明的含有 JSX 的任何方法和 `getter` 中 (不是函数或箭头函数中) 自动注入 `const h = this.$createElement`
+> * 这样你就可以去掉 ( `h` ) 参数了
+>> 对于更早版本的插件，如果 `h` 在当前作用域中不可用，应用会抛错
 
+> 要了解更多关于 JSX 如何映射到 JavaScript，请阅读[【使用文档】](要了解更多关于 JSX 如何映射到 JavaScript，请阅读使用文档)
 
+### 函数式组件
 
+之前创建的锚点标题组件是比较简单，没有管理任何状态，也没有监听任何传递给它的状态，也没有生命周期方法
 
+* 实际上，它只是一个接受一些 prop 的函数
 
+* 在这样的场景下，我们可以将组件标记为 `functional`
 
+  这意味它无状态 (没有[【响应式数据】](https://cn.vuejs.org/v2/api/#选项-数据))，也没有实例 (没有 `this` 上下文)
 
+一个函数式组件就像这样：
 
+```js
+Vue.component('my-component', {
+  functional: true,
+  // Props 是可选的
+  props: {
+    // ...
+  },
+  // 为了弥补缺少的实例提供第二个参数作为上下文
+  render: function (createElement, context) {
+    // ...
+  }
+})
+```
 
+> 注意：在 `2.3.0` 之前的版本中，如果一个函数式组件想要接收 `prop` ，则 `props` 选项是必须的
+>> 在 `2.3.0` 或以上的版本中，你可以省略 `props` 选项，所有组件上的 attribute 都会被自动隐式解析为 `prop`
+> * 当使用函数式组件时，该引用将会是 `HTMLElement` ，因为他们是无状态的也是无实例的
 
+在 `2.5.0` 及以上版本中，如果你使用了[【单文件组件】](https://cn.vuejs.org/v2/guide/single-file-components.html)，那么基于模板的函数式组件可以这样声明：
 
+```html
+<template functional>
+</template>
+```
 
+组件需要的一切都是通过 `context` 参数传递，它是一个包括如下字段的对象：
 
+* `props`
 
+  提供所有 prop 的对象
 
+* `children`
 
+  VNode 子节点的数组
 
+* `slots`
 
+  一个函数，返回了包含所有插槽的对象
 
+* `scopedSlots`
 
+  ( `2.6.0+` ) 一个暴露传入的作用域插槽的对象
 
+  也以函数形式暴露普通插槽
 
+* `data`
 
+  传递给组件的整个[【数据对象】](https://cn.vuejs.org/v2/guide/render-function.html#深入数据对象)，作为 `createElement` 的第二个参数传入组件
 
+* `parent`
 
+  对父组件的引用
 
+* `listeners`
 
+  ( `2.3.0+` ) 一个包含了所有父组件为当前组件注册的事件监听器的对象
 
+  这是 `data.on` 的一个别名
 
+* `injections`
 
+  ( `2.3.0+` ) 如果使用了 `inject` 选项，则该对象包含了应当被注入的 property
 
+在添加 `functional: true` 之后，需要更新我们的锚点标题组件的渲染函数
 
+* 为其增加 `context` 参数
 
+* 并将 `this.$slots.default` 更新为 `context.children`
 
+* 然后将 `this.level` 更新为 `context.props.level`
 
+因为函数式组件只是函数，所以渲染开销也低很多
 
+在作为包装组件时它们也同样非常有用
 
+比如，当你需要做这些时：
 
+* 程序化地在多个组件中选择一个来代为渲染
 
+* 在将 `children` 、`props` 、`data` 传递给子组件之前操作它们
 
+下面是一个 `smart-list` 组件的例子，它能根据传入 `prop` 的值来代为渲染更具体的组件：
 
+```js
+var EmptyList = { /* ... */ }
+var TableList = { /* ... */ }
+var OrderedList = { /* ... */ }
+var UnorderedList = { /* ... */ }
 
+Vue.component('smart-list', {
+  functional: true,
+  props: {
+    items: {
+      type: Array,
+      required: true
+    },
+    isOrdered: Boolean
+  },
+  render: function (createElement, context) {
+    function appropriateListComponent () {
+      var items = context.props.items
 
+      if (items.length === 0)           return EmptyList
+      if (typeof items[0] === 'object') return TableList
+      if (context.props.isOrdered)      return OrderedList
 
+      return UnorderedList
+    }
 
+    return createElement(
+      appropriateListComponent(),
+      context.data,
+      context.children
+    )
+  }
+})
+```
 
+#### 向子元素或子组件传递 attribute 和事件
 
+在普通组件中，没有被定义为 `prop` 的 attribute 会自动添加到组件的根元素上，将已有的同名 attribute 进行替换或与其进行[【智能合并】](https://cn.vuejs.org/v2/guide/class-and-style.html)
 
+然而函数式组件要求你显式定义该行为：
 
+```js
+Vue.component('my-functional-button', {
+  functional: true,
+  render: function (createElement, context) {
+    // 完全透传任何 attribute、事件监听器、子节点等。
+    return createElement('button', context.data, context.children)
+  }
+})
+```
 
+通过向 `createElement` 传入 `context.data` 作为第二个参数，我们就把 `my-functional-button` 上面所有的 attribute 和事件监听器都传递下去了
 
+* 事实上这是非常透明的，以至于那些事件甚至并不要求 `.native` 修饰符
 
+如果你使用基于模板的函数式组件，那么你还需要手动添加 attribute 和监听器
 
+* 因为我们可以访问到其独立的上下文内容，所以我们可以使用 `data.attrs` 传递任何 HTML attribute
 
+* 也可以使用 `listeners` (即 `data.on` 的别名) 传递任何事件监听器
 
+```html
+<template functional>
+  <button
+    class="btn btn-primary"
+    v-bind="data.attrs"
+    v-on="listeners"
+  >
+    <slot/>
+  </button>
+</template>
+```
 
+#### `slots()` 和 `children` 对比
 
+你可能想知道为什么同时需要 `slots()` 和 `children`
 
+`slots().default` 不是和 `children` 类似的吗？
 
+* 在一些场景中，是这样
 
+* 但如果是如下的带有子节点的函数式组件呢？
 
+```html
+<my-functional-component>
+  <p v-slot:foo>
+    first
+  </p>
+  <p>second</p>
+</my-functional-component>
+```
 
+对于这个组件，`children` 会给你两个段落标签
 
+* 而 `slots().default` 只会传递第二个匿名段落标签
 
+* `slots().foo` 会传递第一个具名段落标签
 
+> 同时拥有 `children` 和 `slots()`
+> * 因此你可以选择让组件感知某个插槽机制
+> * 还是简单地通过传递 `children` ，移交给其它组件去处理
 
+### 模板编译
 
+你可能会有兴趣知道，Vue 的模板实际上被编译成了渲染函数
 
+* 这是一个实现细节，通常不需要关心
 
+* 但如果你想看看模板的功能具体是怎样被编译的，可能会发现会非常有意思
 
+下面是一个使用 `Vue.compile` 来实时编译模板字符串的简单示例：
 
+```html
+<div>
+  <header>
+    <h1>I'm a template!</h1>
+  </header>
+  <p v-if="message">{{ message }}</p>
+  <p v-else>No message.</p>
+</div>
+```
 
+> [【详细示例请点击查看】](https://cn.vuejs.org/v2/guide/render-function.html#模板编译)
 
+## 插件
 
+插件通常用来为 Vue 添加全局功能
 
+插件的功能范围没有严格的限制，一般有下面几种：
 
+* 添加全局方法或者 property
 
+  如[【 vue-custom-element 】](https://github.com/karol-f/vue-custom-element)
 
+* 添加全局资源：指令/过滤器/过渡等
 
+  如[【 vue-touch 】](https://github.com/vuejs/vue-touch)
 
+* 通过全局混入来添加一些组件选项
 
+  如[【 vue-router 】](https://github.com/vuejs/vue-router)
 
+* 添加 Vue 实例方法，通过把它们添加到 `Vue.prototype` 上实现
 
+* 一个库，提供自己的 API ，同时提供上面提到的一个或多个功能
 
+  如[【 vue-router 】](https://github.com/vuejs/vue-router)
 
+### 使用插件
 
+通过全局方法 `Vue.use()` 使用插件
 
+它需要在你调用 `new Vue()` 启动应用之前完成：
 
+```js
+// 调用 `MyPlugin.install(Vue)`
+Vue.use(MyPlugin)
 
+new Vue({
+  // ...组件选项
+})
+```
 
+也可以传入一个可选的选项对象：
 
+```js
+Vue.use(MyPlugin, { someOption: true })
+```
 
+> `Vue.use` 会自动阻止多次注册相同插件，届时即使多次调用也只会注册一次该插件
 
+Vue.js 官方提供的一些插件 (例如 `vue-router` ) 在检测到 Vue 是可访问的全局变量时会自动调用 `Vue.use()`
 
+* 然而在像 CommonJS 这样的模块环境中，你应该始终显式地调用 `Vue.use()` ：
 
+```js
+// 用 Browserify 或 webpack 提供的 CommonJS 模块环境时
+var Vue = require('vue')
+var VueRouter = require('vue-router')
 
+// 不要忘了调用此方法
+Vue.use(VueRouter)
+```
 
+> [【 awesome-vue 】](https://github.com/vuejs/awesome-vue#components--libraries)集合了大量由社区贡献的插件和库
 
+### 开发插件
 
+Vue.js 的插件应该暴露一个 `install` 方法
 
+* 这个方法的第一个参数是 Vue 构造器
 
+* 第二个参数是一个可选的选项对象
 
+```js
+MyPlugin.install = function (Vue, options) {
+  // 1. 添加全局方法或 property
+  Vue.myGlobalMethod = function () {
+    // 逻辑...
+  }
 
+  // 2. 添加全局资源
+  Vue.directive('my-directive', {
+    bind (el, binding, vnode, oldVnode) {
+      // 逻辑...
+    }
+    ...
+  })
 
+  // 3. 注入组件选项
+  Vue.mixin({
+    created: function () {
+      // 逻辑...
+    }
+    ...
+  })
 
+  // 4. 添加实例方法
+  Vue.prototype.$myMethod = function (methodOptions) {
+    // 逻辑...
+  }
+}
+```
 
+## 过滤器
 
+Vue.js 允许你自定义过滤器，可被用于一些常见的文本格式化
 
+过滤器可以用在两个地方：
 
+* 双花括号插值
 
+* `v-bind` 表达式 (从 `2.1.0+` 开始支持)
 
+过滤器应该被添加在 JavaScript 表达式的尾部，由 **`管道`** 符号指示：
 
+```html
+<!-- 在双花括号中 -->
+{{ message | capitalize }}
 
+<!-- 在 `v-bind` 中 -->
+<div v-bind:id="rawId | formatId"></div>
+```
 
+你可以在一个组件的选项中定义本地的过滤器：
 
+```js
+filters: {
+  capitalize: function (value) {
+    if (!value) return ''
+    value = value.toString()
+    return value.charAt(0).toUpperCase() + value.slice(1)
+  }
+}
+```
 
+或者在创建 Vue 实例之前全局定义过滤器：
 
+```js
+Vue.filter('capitalize', function (value) {
+  if (!value) return ''
+  value = value.toString()
+  return value.charAt(0).toUpperCase() + value.slice(1)
+})
 
+new Vue({
+  // ...
+})
+```
 
+> 当全局过滤器和局部过滤器重名时，会采用局部过滤器
 
+下面这个例子用到了 `capitalize` 过滤器：
 
+[【示例效果请点击查看】](https://cn.vuejs.org/v2/guide/filters.html)
 
+过滤器函数总接收表达式的值 (之前的操作链的结果) 作为第一个参数
 
+* 在上述例子中，`capitalize` 过滤器函数将会收到 `message` 的值作为第一个参数
 
+过滤器可以串联：
 
+```html
+{{ message | filterA | filterB }}
+```
 
+在这个例子中
 
+* `filterA` 被定义为接收单个参数的过滤器函数，表达式 `message` 的值将作为参数传入到函数中
 
+* 然后继续调用同样被定义为接收单个参数的过滤器函数 `filterB` ，将 `filterA` 的结果传递到 `filterB` 中
 
+过滤器是 JavaScript 函数，因此可以接收参数：
 
+```html
+{{ message | filterA('arg1', arg2) }}
+```
 
+这里，`filterA` 被定义为接收三个参数的过滤器函数
 
+* 其中 `message` 的值作为第一个参数
 
+* 普通字符串 `'arg1'` 作为第二个参数
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+* 表达式 `arg2` 的值作为第三个参数
