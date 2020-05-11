@@ -253,7 +253,7 @@ directives: {
 
   > 仅保证父节点存在，但不一定已被插入文档中
 
-* update
+* `update`
 
   所在组件的 VNode 更新时调用，但是可能发生在其子 VNode 更新之前
 
@@ -261,11 +261,11 @@ directives: {
 
   但是你可以通过比较更新前后的值来忽略不必要的模板更新
 
-* componentUpdated
+* `componentUpdated`
 
   指令所在组件的 VNode 及其子 VNode 全部更新后调用
 
-* unbind
+* `unbind`
 
   只调用一次，指令与元素解绑时调用
 
@@ -361,21 +361,71 @@ vnode keys: tag, data, children, text, elm, ns, context, fnContext, fnOptions, f
 
 指令的参数可以是动态的
 
+例如，在 `v-mydirective:[argument]="value"` 中，`argument` 参数可以根据组件实例数据进行更新！
 
+* 这使得自定义指令可以在应用中被灵活使用
 
+例如你想要创建一个自定义指令，用来通过固定布局将元素固定在页面上
 
+* 我们可以像这样创建一个通过指令值来更新竖直位置像素值的自定义指令：
 
+```html
+<div id="baseexample">
+  <p>Scroll down the page</p>
+  <p v-pin="200">Stick me 200px from the top of the page</p>
+</div>
+```
 
+```js
+Vue.directive('pin', {
+  bind: function (el, binding, vnode) {
+    el.style.position = 'fixed'
+    el.style.top = binding.value + 'px'
+  }
+})
 
+new Vue({
+  el: '#baseexample'
+})
+```
 
+这会把该元素固定在距离页面顶部 `200` 像素的位置
 
+但如果场景是我们需要把元素固定在左侧而不是顶部又该怎么办呢？
 
+这时使用动态参数就可以非常方便地根据每个组件实例来进行更新：
 
+```html
+<div id="dynamicexample">
+  <h3>Scroll down inside this section ↓</h3>
+  <p v-pin:[direction]="200">I am pinned onto the page at 200px to the left.</p>
+</div>
+```
 
+```js
+Vue.directive('pin', {
+  bind: function (el, binding, vnode) {
+    el.style.position = 'fixed'
+    var s = (binding.arg == 'left' ? 'left' : 'top')
+    el.style[s] = binding.value + 'px'
+  }
+})
 
+new Vue({
+  el: '#dynamicexample',
+  data: function () {
+    return {
+      direction: 'left'
+    }
+  }
+})
+```
 
+[【示例效果请点击查看】](https://cn.vuejs.org/v2/guide/custom-directive.html#动态指令参数)
 
+这样这个自定义指令现在的灵活性就足以支持一些不同的用例了
 
+### 函数简写
 
 
 
