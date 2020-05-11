@@ -667,20 +667,18 @@ createElement(
 
 有一点要注意：
 
-正如 `v-bind:class` 和 `v-bind:style` 在模板语法中会被特别对待一样，它们在 VNode 数据对象中也有对应的顶层字段
+* 正如 `v-bind:class` 和 `v-bind:style` 在模板语法中会被特别对待一样，它们在 VNode 数据对象中也有对应的顶层字段
 
-该对象也允许你绑定普通的 `HTML` attribute，也允许绑定如 `innerHTML` 这样的 DOM property (这会覆盖 `v-html` 指令)
+* 该对象也允许你绑定普通的 `HTML` attribute，也允许绑定如 `innerHTML` 这样的 `DOM` property (但这会覆盖 `v-html` 指令)
 
 ```js
 {
-  // 与 `v-bind:class` 的 API 相同，
-  // 接受一个字符串、对象或字符串和对象组成的数组
+  // 与 `v-bind:class` 的 API 相同，接受一个字符串、对象或字符串和对象组成的数组
   'class': {
     foo: true,
     bar: false
   },
-  // 与 `v-bind:style` 的 API 相同，
-  // 接受一个字符串、对象，或对象组成的数组
+  // 与 `v-bind:style` 的 API 相同，接受一个字符串、对象，或对象组成的数组
   style: {
     color: 'red',
     fontSize: '14px'
@@ -698,18 +696,17 @@ createElement(
     innerHTML: 'baz'
   },
   // 事件监听器在 `on` 内，
-  // 但不再支持如 `v-on:keyup.enter` 这样的修饰器。
-  // 需要在处理函数中手动检查 keyCode。
+  // 但不再支持如 `v-on:keyup.enter` 这样的修饰器
+  // 需要在处理函数中手动检查 keyCode
   on: {
     click: this.clickHandler
   },
-  // 仅用于组件，用于监听原生事件，而不是组件内部使用
-  // `vm.$emit` 触发的事件。
+  // 仅用于组件，用于监听原生事件，而不是组件内部使用 `vm.$emit` 触发的事件
   nativeOn: {
     click: this.nativeClickHandler
   },
-  // 自定义指令。注意，你无法对 `binding` 中的 `oldValue`
-  // 赋值，因为 Vue 已经自动为你进行了同步。
+  // 自定义指令
+  // 注意，你无法对 `binding` 中的 `oldValue` 赋值，因为 Vue 已经自动为你进行了同步
   directives: [
     {
       name: 'my-custom-directive',
@@ -737,51 +734,153 @@ createElement(
 }
 ```
 
+#### 完整示例
 
+有了这些知识，我们现在可以完成我们最开始想实现的组件：
 
+```js
+var getChildrenTextContent = function (children) {
+  return children.map(function (node) {
+    return node.children
+      ? getChildrenTextContent(node.children)
+      : node.text
+  }).join('')
+}
 
+Vue.component('anchored-heading', {
+  render: function (createElement) {
+    // 创建 kebab-case 风格的 ID
+    var headingId = getChildrenTextContent(this.$slots.default)
+      .toLowerCase()
+      .replace(/\W+/g, '-')
+      .replace(/(^-|-$)/g, '')
 
+    return createElement(
+      'h' + this.level,
+      [
+        createElement('a', {
+          attrs: {
+            name: headingId,
+            href: '#' + headingId
+          }
+        }, this.$slots.default)
+      ]
+    )
+  },
+  props: {
+    level: {
+      type: Number,
+      required: true
+    }
+  }
+})
+```
 
+#### 约束
 
+> VNode 必须唯一
 
+组件树中的所有 VNode 必须是唯一的
 
+* 这意味着，下面的渲染函数是不合法的：
 
+```js
+render: function (createElement) {
+  var myParagraphVNode = createElement('p', 'hi')
+  return createElement('div', [
+    // 错误 - 重复的 VNode
+    myParagraphVNode, myParagraphVNode
+  ])
+}
+```
 
+如果你真的需要重复很多次的元素/组件，你可以使用工厂函数来实现
 
+例如，下面这渲染函数用完全合法的方式渲染了 `20` 个相同的段落：
 
+```js
+render: function (createElement) {
+  return createElement('div',
+    Array.apply(null, { length: 20 }).map(function () {
+      return createElement('p', 'hi')
+    })
+  )
+}
+```
 
+### 使用 JavaScript 代替模板功能
 
+#### `v-if` 和 `v-for`
 
+只要在原生的 JavaScript 中可以轻松完成的操作，Vue 的渲染函数就不会提供专有的替代方法
 
+比如，在模板中使用的 `v-if` 和 `v-for` ：
 
+```html
+<ul v-if="items.length">
+  <li v-for="item in items">{{ item.name }}</li>
+</ul>
+<p v-else>No items found.</p>
+```
 
+这些都可以在渲染函数中用 JavaScript 的 `if/else` 和 `map` 来重写：
 
+```js
+props: ['items'],
+render: function (createElement) {
+  if (this.items.length) {
+    return createElement('ul', this.items.map(function (item) {
+      return createElement('li', item.name)
+    }))
+  } else {
+    return createElement('p', 'No items found.')
+  }
+}
+```
 
+#### `v-model`
 
+渲染函数中没有与 `v-model` 的直接对应
 
+* 你必须自己实现相应的逻辑：
 
+```js
+props: ['value'],
+render: function (createElement) {
+  var self = this
+  return createElement('input', {
+    domProps: {
+      value: self.value
+    },
+    on: {
+      input: function (event) {
+        self.$emit('input', event.target.value)
+      }
+    }
+  })
+}
+```
 
+这就是深入底层的代价，但与 `v-model` 相比，这可以让你更好地控制交互细节
 
+#### 事件 & 按键修饰符
 
+对于 `.passive` 、`.capture` 和 `.once` 这些事件修饰符，Vue 提供了相应的前缀可以用于 `on` ：
 
+修饰符|前缀
+-|-
+.passive|&
+.capture|!
+.once|~
+.capture.once 或 .once.capture|~!
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```js
+on: {
+  '!click': this.doThisInCapturingMode,
+  '~keyup': this.doThisOnce,
+  '~!mouseover': this.doThisOnceInCapturingMode
+}
+```
 
 
 
