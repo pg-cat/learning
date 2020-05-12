@@ -88,25 +88,32 @@
 // f3(); // 9
 
 
-// 面试题
+// 面试题：`console.log(o)` 打印出了什么
 function fun(n ,o){
     console.log(o);
-    console.log(n,'+n');
-    return{
+    return {
         fun: function(m) {
-            console.log(m,'+m');
             return fun(m,n);
         }
     }
 }
 
 var a = fun(0); // underfind ，此时 n=0 o=underfind
+console.log('++++++++++++')
 a.fun(1);   // 0 ，此时 m=1 n=1 o=0
-a.fun(2);   // 1 ，此时 m=2 n=2 o =1
-a.fun(3);
+console.log('++++++++++++')
+a.fun(2);   // 0 ，此时 m=2 n=2 o=0
+console.log('++++++++++++')
+a.fun(3);   // 0 ，此时 m=3 n=3 o=0
+console.log('++++++++++++')
 
+var b = fun(0).fun(1).fun(2).fun(3);    // underfind 0 1 2
+console.log('++++++++++++')
 
-
-
+var c = fun(0).fun(1);  // underfind 0
+console.log('++++++++++++')
+c.fun(2);   // 1
+console.log('++++++++++++')
+c.fun(3);   // 1
 
 </script>
