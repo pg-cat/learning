@@ -79,7 +79,7 @@ Vue.set(vm.someObject, 'b', 2)
 this.$set(this.someObject,'b',2)
 ```
 
-有时你可能需要为已有对象赋值多个新 property，比如使用 Object.assign() 或 _.extend()
+有时你可能需要为已有对象赋值多个新 property ，比如使用 `Object.assign()` 或 `_.extend()`
 
 
 
