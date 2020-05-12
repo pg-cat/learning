@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+</body>
+</html>
+<script>
+// // 例 1
+// function sum(arr) {
+//     return arr.reduce(function (x, y) {
+//         return x + y;
+//     });
+// }
+
+// let su = sum([1, 2, 3, 4, 5]);
+// console.log(su); // 15
+// // 此时 su 接收到的是函数直接返回的值
+
+
+// // 例 2
+// function lazy_sum(arr) {
+//     var sum = function () {
+//         return arr.reduce(function (x, y) {
+//             return x + y;
+//         });
+//     }
+//     return sum;
+// }
+// let su = lazy_sum([1, 2, 3, 4, 5]);
+// console.log(su());
+// // 此时 su 接收到的是 lazy_sum 函数中变量 sum 后面的函数方法
+// // 并且还有 lazy_sum([1, 2, 3, 4, 5]) 被调用后的参数
+// // 所以 su() 后才会给出最终返回的值
+
+
+// // 例 3
+// function count() {
+//     var arr = [];
+//     for (var i=1; i<=3; i++) {
+//         arr.push(function () {
+//             console.log(i);
+//             return i * i;
+//         });
+//     }
+//     return arr;
+// }
+
+// var results = count();
+// // 此时数组 arr 中接收到的是 push() 的函数，但 i 值却是最终循环后改变的值 4
+// // 原因在于 push() 的函数并非立刻执行
+// var f1 = results[0];
+// var f2 = results[1];
+// var f3 = results[2];
+
+// f1();   // 16
+// f2();   // 16
+// f3();   // 16
+// // 返回闭包时牢记的一点就是：返回函数不要引用任何循环变量，或者后续会发生变化的变量
+
+
+// // 例 4
+// function count() {
+//     var arr = [];
+//     for (var i=1; i<=3; i++) {
+//         console.log(i,'+i')
+//         arr.push((function (n) {
+//             return function () {
+//                 console.log(n,'+n');
+//                 return n * n;
+//             }
+//         })(i));
+//     }
+//     return arr;
+// }
+
+// var results = count();
+// // 此时数组 arr 中接收到的是 push() 的立即执行的函数返回的函数，同时 i 的当前值也得以保留
+// var f1 = results[0];
+// var f2 = results[1];
+// var f3 = results[2];
+
+// f1(); // 1
+// f2(); // 4
+// f3(); // 9
+
+
+// 面试题
+function fun(n ,o){
+    console.log(o);
+    console.log(n,'+n');
+    return{
+        fun: function(m) {
+            console.log(m,'+m');
+            return fun(m,n);
+        }
+    }
+}
+
+var a = fun(0); // underfind ，此时 n=0 o=underfind
+a.fun(1);   // 0 ，此时 m=1 n=1 o=0
+// a.fun(2);   // 1 ，此时 m=2 n=2 o =1
+// a.fun(3);
+
+
+
+
+
+</script>
