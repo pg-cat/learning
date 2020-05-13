@@ -376,40 +376,88 @@ export default {
 }
 ```
 
+当映射的计算属性的名称与 `state` 的子节点名称相同时，我们也可以给 `mapState` 传一个字符串数组：
 
+```js
+computed: mapState([
+  // 映射 this.count 为 store.state.count
+  'count'
+])
+```
 
+#### 对象展开运算符
 
+`mapState` 函数返回的是一个对象
 
+我们如何将它与局部计算属性混合使用呢？
 
+通常，我们需要使用一个工具函数将多个对象合并为一个，以使我们可以将最终对象传给 `computed` 属性
 
+* 但是自从有了[【对象展开运算符】](https://github.com/tc39/proposal-object-rest-spread)，我们可以极大地简化写法：
 
+```js
+computed: {
+  localComputed () { /* ... */ },
+  // 使用对象展开运算符将此对象混入到外部对象中
+  ...mapState({
+    // ...
+  })
+}
+```
 
+### 组件仍然保有局部状态
 
+使用 Vuex 并不意味着你需要将 **`所有的`** 状态放入 Vuex
 
+* 虽然将所有的状态放到 Vuex 会使状态变化更显式和易调试，但也会使代码变得冗长和不直观
 
+* 如果有些状态严格属于单个组件，最好还是作为组件的局部状态
 
+* 你应该根据你的应用开发需要进行权衡和确定
 
+## Getter
 
+> [【在 scrimba 上尝试这节课】](https://scrimba.com/p/pnyzgAP/c2Be7TB)
 
+有时候我们需要从 `store` 中的 `state` 中派生出一些状态，例如对列表进行过滤并计数：
 
+```js
+computed: {
+  doneTodosCount () {
+    return this.$store.state.todos.filter(todo => todo.done).length
+  }
+}
+```
 
+如果有多个组件需要用到此属性，我们要么复制这个函数
 
+* 或者抽取到一个共享函数然后在多处导入它
 
+* 无论哪种方式都不是很理想
 
+Vuex 允许我们在 `store` 中定义 `getter`（可以认为是 `store` 的计算属性）
 
+* 就像计算属性一样，`getter` 的返回值会根据它的依赖被缓存起来
 
+* 且只有当它的依赖值发生了改变才会被重新计算
 
+`Getter` 接受 `state` 作为其第一个参数：
 
-
-
-
-
-
-
-
-
-
-
+```js
+const store = new Vuex.Store({
+  state: {
+    todos: [
+      { id: 1, text: '...', done: true },
+      { id: 2, text: '...', done: false }
+    ]
+  },
+  getters: {
+    doneTodos: state => {
+      return state.todos.filter(todo => todo.done)
+    }
+  }
+})
+```
 
 
 
