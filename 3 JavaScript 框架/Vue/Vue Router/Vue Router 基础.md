@@ -82,7 +82,7 @@ npm run build
 
 > 注意：教程中的案例代码将使用[【 ES2015 】](https://github.com/lukehoban/es6features)来编写
 >> 同时，所有的例子都将使用完整版的 Vue 以解析模板
->>> 更多细节请[【移步这里】](https://cn.vuejs.org/v2/guide/installation.html#运行时 + 编译器 vs. 只包含运行时)
+>>> 更多细节请[【移步这里】](https://cn.vuejs.org/v2/guide/installation.html#运行时-编译器-vs-只包含运行时)
 
 用 `Vue.js + Vue Router` 创建单页应用，是非常简单的
 
