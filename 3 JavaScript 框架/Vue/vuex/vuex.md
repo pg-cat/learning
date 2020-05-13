@@ -1117,7 +1117,7 @@ const store = new Vuex.Store({
 
 * 更改 `namespaced` 属性后不需要修改模块内的代码
 
-### 在带命名空间的模块内访问全局内容（Global Assets）
+#### 在带命名空间的模块内访问全局内容（Global Assets）
 
 如果你希望使用全局 `state` 和 `getter`
 
@@ -1161,7 +1161,7 @@ modules: {
 }
 ```
 
-### 在带命名空间的模块注册全局 action
+#### 在带命名空间的模块注册全局 action
 
 若需要在带命名空间的模块注册全局 action ，你可添加 `root: true` ，并将这个 action 的定义放在函数 `handler` 中
 
@@ -1187,7 +1187,7 @@ modules: {
 }
 ```
 
-### 带命名空间的绑定函数
+#### 带命名空间的绑定函数
 
 当使用 `mapState` , `mapGetters` , `mapActions` 和 `mapMutations` 这些函数来绑定带命名空间的模块时，写起来可能比较繁琐：
 
@@ -1252,39 +1252,66 @@ export default {
 }
 ```
 
-### 给插件开发者的注意事项
+#### 给插件开发者的注意事项
 
-如果你开发的插件（Plugin）提供了模块并允许用户将其添加到 Vuex store，可能需要考虑模块的空间名称问题
+如果你开发的[【插件（Plugin）】](https://vuex.vuejs.org/zh/guide/plugins.html)提供了模块并允许用户将其添加到 Vuex `store` ，可能需要考虑模块的空间名称问题
 
+对于这种情况，你可以通过插件的参数对象来允许用户指定空间名称：
 
+```js
+// 通过插件的参数对象得到空间名称
+// 然后返回 Vuex 插件函数
+export function createPlugin (options = {}) {
+  return function (store) {
+    // 把空间名字添加到插件模块的类型（type）中去
+    const namespace = options.namespace || ''
+    store.dispatch(namespace + 'pluginAction')
+  }
+}
+```
 
+### 模块动态注册
 
+在 `store` 创建 **`之后`** ，你可以使用 `store.registerModule` 方法注册模块：
 
+```js
+import Vuex from 'vuex'
 
+const store = new Vuex.Store({ /* 选项 */ })
 
+// 注册模块 `myModule`
+store.registerModule('myModule', {
+  // ...
+})
+// 注册嵌套模块 `nested/myModule`
+store.registerModule(['nested', 'myModule'], {
+  // ...
+})
+```
 
+之后就可以通过 `store.state.myModule` 和 `store.state.nested.myModule` 访问模块的状态
 
+模块动态注册功能使得其他 Vue 插件可以通过在 `store` 中附加新模块的方式来使用 Vuex 管理状态
 
+* 例如，[【 vuex-router-sync 】](https://github.com/vuejs/vuex-router-sync)插件就是通过动态注册模块将 `vue-router` 和 `vuex` 结合在一起，实现应用的路由状态管理
 
+> 你也可以使用 `store.unregisterModule(moduleName)` 来动态卸载模块，但注意：
+> * 你不能使用此方法卸载静态模块（即创建 `store` 时声明的模块）
+> * 你可以通过 `store.hasModule(moduleName)` 方法检查该模块是否已经被注册到 `store`
 
+#### 保留 state
 
+在注册一个新 `module` 时，你很有可能想保留过去的 `state` ，例如从一个服务端渲染的应用保留 `state`
 
+* 你可以通过 `preserveState` 选项将其归档：
 
+```js
+store.registerModule('a', module, { preserveState: true })
+```
 
+* 当你设置 `preserveState: true` 时，该模块会被注册，`action` 、`mutation` 和 `getter` 会被添加到 `store` 中，但是 `state` 不会
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+  > 这里假设 `store` 的 `state` 已经包含了这个 `module` 的 `state` 并且你不希望将其覆写
 
 
 
