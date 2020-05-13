@@ -1340,60 +1340,151 @@ const MyReusableModule = {
 
 > 【问题】：模块重用如何实现？
 
+## 项目结构
 
+Vuex 并不限制你的代码结构
 
+但是，它规定了一些需要遵守的规则：
 
+* 应用层级的状态应该集中到单个 `store` 对象中
 
+* 提交 `mutation` 是更改状态的唯一方法，并且这个过程是同步的
 
+* 异步逻辑都应该封装到 `action` 里面
 
+只要你遵守以上规则，如何组织代码随你便
 
+* 如果你的 `store` 文件太大
 
+* 只需将 `action` 、`mutation` 和 `getter` 分割到单独的文件
 
+对于大型应用，我们会希望把 Vuex 相关代码分割到模块中
 
+下面是项目结构示例：
 
+```sh
+├── index.html
+├── main.js
+├── api
+│   └── ... # 抽取出API请求
+├── components
+│   ├── App.vue
+│   └── ...
+└── store
+    ├── index.js          # 我们组装模块并导出 store 的地方
+    ├── actions.js        # 根级别的 action
+    ├── mutations.js      # 根级别的 mutation
+    └── modules
+        ├── cart.js       # 购物车模块
+        └── products.js   # 产品模块
+```
 
+> 请参考[【购物车示例】](https://github.com/vuejs/vuex/tree/dev/examples/shopping-cart)
 
+## 插件
 
+> [【在 Scrimba 上尝试这节课】](https://scrimba.com/p/pnyzgAP/cvp8ZkCR)
 
+Vuex 的 `store` 接受 `plugins` 选项，这个选项暴露出每次 `mutation` 的钩子
 
+* Vuex 插件就是一个函数，它接收 `store` 作为唯一参数：
 
+```js
+const myPlugin = store => {
+  // 当 store 初始化后调用
+  store.subscribe((mutation, state) => {
+    // 每次 mutation 之后调用
+    // mutation 的格式为 { type, payload }
+  })
+}
+```
 
+* 然后像这样使用：
 
+```js
+const store = new Vuex.Store({
+  // ...
+  plugins: [myPlugin]
+})
+```
 
+### 在插件内提交 `Mutation`
 
+在插件中不允许直接修改状态
 
+* 类似于组件，只能通过提交 `mutation` 来触发变化
 
+* 通过提交 `mutation` ，插件可以用来同步数据源到 `store`
 
+例如，同步 `websocket` 数据源到 `store`（下面是个大概例子，实际上 `createPlugin` 方法可以有更多选项来完成复杂任务）：
 
+```js
+export default function createWebSocketPlugin (socket) {
+  return store => {
+    socket.on('data', data => {
+      store.commit('receiveData', data)
+    })
+    store.subscribe(mutation => {
+      if (mutation.type === 'UPDATE_DATA') {
+        socket.emit('update', mutation.payload)
+      }
+    })
+  }
+}
+```
 
+```js
+const plugin = createWebSocketPlugin(socket)
 
+const store = new Vuex.Store({
+  state,
+  mutations,
+  plugins: [plugin]
+})
+```
 
+### 生成 `State` 快照
 
+有时候插件需要获得状态的 **`快照`** ，比较改变的前后状态
 
+想要实现这项功能，你需要对状态对象进行深拷贝：
 
+```js
+const myPluginWithSnapshot = store => {
+  let prevState = _.cloneDeep(store.state)
+  store.subscribe((mutation, state) => {
+    let nextState = _.cloneDeep(state)
 
+    // 比较 prevState 和 nextState...
 
+    // 保存状态，用于下一次 mutation
+    prevState = nextState
+  })
+}
+```
 
+生成状态快照的插件应该只在开发阶段使用，使用 `webpack` 或 `Browserify` ，让构建工具帮我们处理：
 
+```js
+const store = new Vuex.Store({
+  // ...
+  plugins: process.env.NODE_ENV !== 'production'
+    ? [myPluginWithSnapshot]
+    : []
+})
+```
 
+上面插件会默认启用
 
+在发布阶段，你需要使用 `webpack` 的 `DefinePlugin` 或者是 `Browserify` 的 `envify` 使 `process.env.NODE_ENV !== 'production'` 为 `false`
 
+### 内置 Logger 插件
 
+> 如果正在使用[【 vue-devtools 】](https://github.com/vuejs/vue-devtools)，你可能不需要此插件
 
+Vuex 自带一个日志插件用于一般的调试：
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+```js
 
 
 
