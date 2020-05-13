@@ -1485,71 +1485,212 @@ const store = new Vuex.Store({
 Vuex 自带一个日志插件用于一般的调试：
 
 ```js
+import createLogger from 'vuex/dist/logger'
 
+const store = new Vuex.Store({
+  plugins: [createLogger()]
+})
+```
 
+`createLogger` 函数有几个配置项：
 
+```js
+const logger = createLogger({
+  collapsed: false, // 自动展开记录的 mutation
+  filter (mutation, stateBefore, stateAfter) {
+    // 若 mutation 需要被记录，就让它返回 true 即可
+    // 顺便，`mutation` 是个 { type, payload } 对象
+    return mutation.type !== "aBlacklistedMutation"
+  },
+  transformer (state) {
+    // 在开始记录之前转换状态
+    // 例如，只返回指定的子树
+    return state.subTree
+  },
+  mutationTransformer (mutation) {
+    // mutation 按照 { type, payload } 格式记录
+    // 我们可以按任意方式格式化
+    return mutation.type
+  },
+  logger: console, // 自定义 console 实现，默认为 `console`
+})
+```
 
+日志插件还可以直接通过 `<script>` 标签引入，它会提供全局方法 `createVuexLogger`
 
+> 要注意：`logger` 插件会生成状态快照，所以仅在开发环境使用
 
+## 严格模式
 
+开启严格模式，仅需在创建 store 的时候传入 `strict: true` ：
 
+```js
+const store = new Vuex.Store({
+  // ...
+  strict: true
+})
+```
 
+在严格模式下，无论何时发生了状态变更且不是由 `mutation` 函数引起的，将会抛出错误
 
+* 这能保证所有的状态变更都能被调试工具跟踪到
 
+### 开发环境与发布环境
 
+不要在发布环境下启用严格模式！
 
+* 严格模式会深度监测状态树来检测不合规的状态变更
 
+* 请确保在发布环境下关闭严格模式，以避免性能损失
 
+类似于插件，我们可以让构建工具来处理这种情况：
 
+```js
+const store = new Vuex.Store({
+  // ...
+  strict: process.env.NODE_ENV !== 'production'
+})
+```
 
+## 表单处理
 
+> [【在 scrimba 上尝试这节课】](https://scrimba.com/p/pnyzgAP/cqKRgEC9)
 
+当在严格模式中使用 Vuex 时，在属于 Vuex 的 `state` 上使用 `v-model` 会比较棘手：
 
+```html
+<input v-model="obj.message">
+```
 
+假设这里的 `obj` 是在计算属性中返回的一个属于 Vuex `store` 的对象，在用户输入时，`v-model` 会试图直接修改 `obj.message`
 
+* 在严格模式中，由于这个修改不是在 `mutation` 函数中执行的, 这里会抛出一个错误
 
+用 **`Vuex 的思维`** 去解决这个问题的方法是：
 
+* 给 `<input>` 中绑定 `value`
 
+* 然后侦听 `input` 或者 `change` 事件
 
+* 在事件回调中调用一个方法
 
+```html
+<input :value="message" @input="updateMessage">
+```
 
+```js
+// ...
+computed: {
+  ...mapState({
+    message: state => state.obj.message
+  })
+},
+methods: {
+  updateMessage (e) {
+    this.$store.commit('updateMessage', e.target.value)
+  }
+}
+```
 
+下面是 `mutation` 函数：
 
+```js
+// ...
+mutations: {
+  updateMessage (state, message) {
+    state.obj.message = message
+  }
+}
+```
 
+### 双向绑定的计算属性
 
+必须承认，这样做比简单地使用 **`v-model + 局部状态`** 要啰嗦得多，并且也损失了一些 `v-model` 中很有用的特性
 
+另一个方法是使用带有 `setter` 的双向绑定计算属性：
 
+```html
+<input v-model="message">
+```
 
+```js
+// ...
+computed: {
+  message: {
+    get () {
+      return this.$store.state.obj.message
+    },
+    set (value) {
+      this.$store.commit('updateMessage', value)
+    }
+  }
+}
+```
 
+## 测试
 
+> [【在 Scrimba 上尝试这节课】](https://scrimba.com/p/pnyzgAP/cPGkpJhq)
 
+我们主要想针对 Vuex 中的 `mutation` 和 `action` 进行单元测试
 
+### 测试 Mutation
 
+Mutation 很容易被测试，因为它们仅仅是一些完全依赖参数的函数
 
+这里有一个小技巧：
 
+* 如果你在 `store.js` 文件中定义了 `mutation`
 
+* 并且使用 `ES2015` 模块功能默认输出了 `Vuex.Store` 的实例
 
+* 那么你仍然可以给 `mutation` 取个变量名然后把它输出去
 
+```js
+const state = { ... }
 
+// `mutations` 作为命名输出对象
+export const mutations = { ... }
 
+export default new Vuex.Store({
+  state,
+  mutations
+})
+```
 
+下面是用 `Mocha + Chai` 测试一个 mutation 的例子（实际上你可以用任何你喜欢的测试框架）：
 
+```js
+// mutations.js
+export const mutations = {
+  increment: state => state.count++
+}
+```
 
+```js
+// mutations.spec.js
+import { expect } from 'chai'
+import { mutations } from './store'
 
+// 解构 `mutations`
+const { increment } = mutations
 
+describe('mutations', () => {
+  it('INCREMENT', () => {
+    // 模拟状态
+    const state = { count: 0 }
+    // 应用 mutation
+    increment(state)
+    // 断言结果
+    expect(state.count).to.equal(1)
+  })
+})
+```
 
+### 测试 Action
 
+Action 应对起来略微棘手，因为它们可能需要调用外部的 API
 
-
-
-
-
-
-
-
-
-
-
+当测试 action 的时候，我们需要增加一个 mocking 服务层
 
 
 
