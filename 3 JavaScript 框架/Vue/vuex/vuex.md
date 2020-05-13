@@ -459,7 +459,7 @@ const store = new Vuex.Store({
 })
 ```
 
-
+### 通过属性访问
 
 
 
