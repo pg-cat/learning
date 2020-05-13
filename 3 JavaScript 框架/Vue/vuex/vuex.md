@@ -11,7 +11,7 @@ Vuex 是一个专为 Vue.js 应用程序开发的 **`状态管理模式`**
 
 * Vuex 也集成到 Vue 的官方调试工具[【 devtools extension 】](https://github.com/vuejs/vue-devtools)，提供了诸如零配置的 `time-travel` 调试、状态快照导入导出等高级调试功能
 
-### 什么是 **`状态管理模式`** ？
+### 什么是状态管理模式？
 
 让我们从一个简单的 Vue 计数应用开始：
 
