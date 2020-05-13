@@ -94,7 +94,7 @@ Vuex 可以帮助我们管理共享状态，并附带了更多的概念和框架
 
 ### 直接下载 / CDN 引用
 
-[【直接下载：https://unpkg.com/vuex】](https://unpkg.com/vuex)
+[【直接下载：https://unpkg.com/vuex 】](https://unpkg.com/vuex)
 
 [【 Unpkg.com 】](https://unpkg.com/)提供了基于 `NPM` 的 `CDN` 链接，并且此链接会一直指向 NPM 上发布的最新版本
 
