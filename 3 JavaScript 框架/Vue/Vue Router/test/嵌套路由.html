@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue Router 测试</title>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <h1>嵌套路由</h1>
+        <p>
+            <router-link to="/">【Go to Home】</router-link>
+            <router-link to="/foo">【Go to Foo】</router-link>
+            <router-link to="/bar">【Go to Bar】</router-link>
+            <router-link to="/user/fff">【Go to User】</router-link>
+            <router-link to="/user/fff/usertwo">【Go to User】</router-link>
+            <router-link to="/sss">【Go to 404】</router-link>
+        </p>
+
+        <router-view></router-view>
+    </div>
+</body>
+
+</html>
+<script>
+    // 组件
+
+    // 组件 主页面、Foo、Bar
+    const Home = { template: '<div>主页面</div>' }
+    const Foo = { template: '<div>foo</div>' }
+    const Bar = { template: '<div>bar</div>' }
+
+    // 组件 User
+    const User = {
+        template: `<div>
+            <h2>User {{ paramsName }}{{ paramsAll }}</h2>
+            <router-view></router-view>
+        </div>`,
+        data: () => {
+            return {
+                paramsName: '访问参数：'
+            }
+        },
+        computed: {
+            paramsAll: function () {
+                return this.$route.params.id
+            }
+        }
+    }
+    // 组件 User 不渲染子组件时展示的内容组件
+    const UserHome = { template: '<div>Use 主页面</div>' }
+    // 组件 User 内的子组件 UserOne
+    const UserOne = { template: '<div>Use UserOne</div>' }
+    // 组件 User 内的子组件
+    const UserTwo = { template: '<div>Use UserTwo</div>' }
+
+    // 组件 404
+    const No404 = { template: '<div>404</div>' }
+
+    // 路由加载
+    const router = new VueRouter({
+        routes: [
+            // 定义普通路由
+            { path: '', component: Home },
+            { path: '/foo', component: Foo },
+            { path: '/bar', component: Bar },
+
+            // 动态路径参数 以冒号开头，符合 /user/xxx 格式即可
+            { path: '/user/:id', component: User,
+                // 子组件路由
+                children:[
+                    { path: '/', component: UserHome },
+                    { path: 'userone', component: UserOne },
+                    { path: 'usertwo', component: UserTwo }
+                ]
+            },
+
+            // 404 页面
+            { path: '*', component: No404 }
+        ]
+    })
+
+    // 挂载 app
+    const app = new Vue({
+        router
+    }).$mount('#app')
+
+</script>
