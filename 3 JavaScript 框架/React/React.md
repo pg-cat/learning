@@ -595,7 +595,7 @@ ReactDOM.render(
     style={{opacity: this.state.opacity}}
     ```
 
-  > 这是因为 `React` 组件样式是一个对象，所以第一重大括号表示这是 `JavaScript` 语法，第二重大括号表示样式对象
+> 这是因为 `React` 组件样式是一个对象，所以第一重大括号表示这是 `JavaScript` 语法，第二重大括号表示样式对象
 
 ## `Ajax`
 
