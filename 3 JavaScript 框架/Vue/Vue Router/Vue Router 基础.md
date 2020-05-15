@@ -11,7 +11,7 @@ Vue Router 是[【 Vue.js 】](http://cn.vuejs.org/)官方的路由管理器
 
 包含的功能有：
 
-* 嵌套的路由/视图表
+* 嵌套的路由 / 视图表
 
 * 模块化的、基于组件的路由配置
 
@@ -566,49 +566,150 @@ router.push({ name: 'user', params: { userId: 123 }})
 
 ## 命名视图
 
+有时候想同时 (同级) 展示多个视图，而不是嵌套展示
 
+例如创建一个布局，有 **`sidebar (侧导航)`** 和 **`main (主内容)`** 两个视图，这个时候命名视图就派上用场了
 
+* 你可以在界面中拥有多个单独命名的视图，而不是只有一个单独的出口
 
+* 如果 `router-view` 没有设置名字，那么默认为 `default`
 
+```html
+<router-view class="view one"></router-view>
+<router-view class="view two" name="a"></router-view>
+<router-view class="view three" name="b"></router-view>
+```
 
+一个视图使用一个组件渲染，因此对于同个路由，多个视图就需要多个组件
 
+* 确保正确使用 `components` 配置 (带上 `s` )：
 
+```js
+const router = new VueRouter({
+  routes: [
+    {
+      path: '/',
+      components: {
+        default: Foo,
+        a: Bar,
+        b: Baz
+      }
+    }
+  ]
+})
+```
 
+> [【以上案例相关的可运行代码请移步这里】](https://jsfiddle.net/posva/6du90epg/)
 
+### 嵌套命名视图
 
+我们也有可能使用命名视图创建嵌套视图的复杂布局
 
+* 这时你也需要命名用到的嵌套 `router-view` 组件
 
+我们以一个设置面板为例：
 
+```
+/settings/emails                                       /settings/profile
++-----------------------------------+                  +------------------------------+
+| UserSettings                      |                  | UserSettings                 |
+| +-----+-------------------------+ |                  | +-----+--------------------+ |
+| | Nav | UserEmailsSubscriptions | |  +------------>  | | Nav | UserProfile        | |
+| |     +-------------------------+ |                  | |     +--------------------+ |
+| |     |                         | |                  | |     | UserProfilePreview | |
+| +-----+-------------------------+ |                  | +-----+--------------------+ |
++-----------------------------------+                  +------------------------------+
+```
 
+* `Nav` 只是一个常规组件
 
+* `UserSettings` 是一个视图组件
 
+* `UserEmailsSubscriptions` 、`UserProfile` 、`UserProfilePreview` 是嵌套的视图组件
 
+> 注意：我们先忽略 `HTML/CSS` 具体的布局的样子，只专注在用到的组件上
 
+UserSettings 组件的 `<template>` 部分应该是类似下面的这段代码：
 
+```html
+<!-- UserSettings.vue -->
+<div>
+  <h1>User Settings</h1>
+  <NavBar/>
+  <router-view/>
+  <router-view name="helper"/>
+</div>
+```
 
+嵌套的视图组件在此已经被忽略了，但是你可以在[【这里】](https://jsfiddle.net/posva/22wgksa3/)找到完整的源代码
 
+然后你可以用这个路由配置完成该布局：
 
+```js
+{
+  path: '/settings',
+  // 你也可以在顶级路由就配置命名视图
+  component: UserSettings,
+  children: [{
+    path: 'emails',
+    component: UserEmailsSubscriptions
+  }, {
+    path: 'profile',
+    components: {
+      default: UserProfile,
+      helper: UserProfilePreview
+    }
+  }]
+}
+```
 
+> 一个可以工作的[【示例的 `demo` 在这里】](https://jsfiddle.net/posva/22wgksa3/)
 
+## 重定向和别名
 
+### 重定向
 
+重定向也是通过 `routes` 配置来完成，下面例子是从 `/a` 重定向到 `/b` ：
 
+```js
+const router = new VueRouter({
+  routes: [
+    { path: '/a', redirect: '/b' }
+  ]
+})
+```
 
+重定向的目标也可以是一个命名的路由：
 
+```js
+const router = new VueRouter({
+  routes: [
+    { path: '/a', redirect: { name: 'foo' }}
+  ]
+})
+```
 
+甚至是一个方法，动态返回重定向目标：
 
+```js
+const router = new VueRouter({
+  routes: [
+    { path: '/a', redirect: to => {
+      // 方法接收 目标路由 作为参数
+      // return 重定向的 字符串路径/路径对象
+    }}
+  ]
+})
+```
 
+> 注意：导航守卫并没有应用在跳转路由上，而仅仅应用在其目标上
+>> 在上面这个例子中，为 `/a` 路由添加一个 `beforeEach` 或 `beforeLeave` 守卫并不会有任何效果
 
+> [【其它高级用法，请参考例子】](https://github.com/vuejs/vue-router/blob/dev/examples/redirect/app.js)
 
+### 别名
 
-
-
-
-
-
-
-
-
+**`重定向`** 的意思是，当用户访问 /a时，URL 将会被替换成 /b，然后匹配路由为 /b，那么“别名”又是什么呢？
 
 
 
