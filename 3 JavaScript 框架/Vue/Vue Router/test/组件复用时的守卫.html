@@ -53,17 +53,20 @@
 
         //// 路由守卫
         // 路由第一次被访问时触发
+        // 如：/user 或 /user/userone
         beforeRouteEnter(to, from, next) {
             console.log('第一次进来');
             next();
         },
         // 路由被重复多次访问时触发
         // 注意：不是当前路由被重复访问，是当前路由内的不同子路由被访问，当前路由是保持不变的
+        // 如：/user/userone 和 /user/usertwo ，以及 /user 被访问时
         beforeRouteUpdate(to, from, next) {
             console.log('再次进来');
             next();
         },
         // 路由转向别处前触发
+        // 如：/bar 或 /foo ，或其他
         beforeRouteLeave(to, from, next) {
             console.log('离开了');
             next();
