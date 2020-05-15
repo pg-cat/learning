@@ -484,7 +484,7 @@ export default {
 >>> 注意：**`参数`** 或 **`查询`** 的改变并不会触发 **`进入/离开的导航守卫`**
 > * `beforeRouteUpdate` 被触发时是子组件在变化，并不会触发 `beforeRouteEnter` 、`beforeRouteLeave`
 > * 所以为了避免 **`子路由`** 被访问时数据不会再次获取，才需要在 `beforeRouteUpdate` 中写上 `getPost()` 方法
-> * [【示例：组件复用时的守卫】](./test/组件复用时的守卫.html)
+> * [【示例：组件复用时的守卫】](https://github.com/pg-cat/learning/blob/master/3%20JavaScript%20%E6%A1%86%E6%9E%B6/Vue/Vue%20Router/test/组件复用时的守卫.html)
 
 ## 滚动行为
 
