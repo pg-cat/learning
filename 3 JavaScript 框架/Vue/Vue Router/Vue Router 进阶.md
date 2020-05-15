@@ -41,7 +41,7 @@ router.beforeEach((to, from, next) => {
 
 * `to: Route`
 
-  即将要进入的目标 路由对象
+  即将要进入的目标 **`路由对象`**
 
 * `from: Route`
 
@@ -252,25 +252,54 @@ const router = new VueRouter({
 
 那么如何访问这个 `meta` 字段呢？
 
+* 首先，我们称呼 `routes` 配置中的每个路由对象为 **`路由记录`**
 
+  路由记录可以是嵌套的，因此，当一个路由匹配成功后，他可能匹配多个路由记录
 
+  例如，根据上面的路由配置，`/foo/bar` 这个 URL 将会匹配父路由记录以及子路由记录
 
+* 一个路由匹配到的所有路由记录会暴露为 `$route` 对象 (还有在导航守卫中的路由对象) 的 `$route.matched` 数组
 
+  因此，我们需要遍历 `$route.matched` 来检查路由记录中的 `meta` 字段
 
+下面例子展示在全局导航守卫中检查元字段：
 
+```js
+router.beforeEach((to, from, next) => {
 
+  // 检测路由的 meta 对象中定义的字段是否为 true ，也就是说是否需要验证
+  // 在前面定义了 meta: { requiresAuth: true } ，所以此处返回的条件是 true
+  if (to.matched.some(record => record.meta.requiresAuth)) {
 
+    // 此路由需要验证，请检查是否已登录
+    // 如果没有，请重定向到登录页
+    if (!auth.loggedIn()) {
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      })
+    } else {
+      next()
+    }
+  } else {
+    next() // 确保一定要调用 next()
+  }
+})
+```
 
+## 过渡动效
 
+`<router-view>` 是基本的动态组件，所以我们可以用 `<transition>` 组件给它添加一些过渡效果：
 
+```html
+<transition>
+  <router-view></router-view>
+</transition>
+```
 
+> [【 Transition 的所有功能】](https://cn.vuejs.org/guide/transitions.html)在这里同样适用
 
-
-
-
-
-
-
+### 单个路由的过渡
 
 
 
