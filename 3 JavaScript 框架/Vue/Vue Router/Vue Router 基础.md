@@ -1,7 +1,7 @@
 以下内容整理自[【 Vue Router 官方文档】](https://router.vuejs.org/zh/)
 
 
-# Vue Router
+# Vue Router 基础
 
 ## 介绍
 
@@ -709,344 +709,260 @@ const router = new VueRouter({
 
 ### 别名
 
-**`重定向`** 的意思是，当用户访问 /a时，URL 将会被替换成 /b，然后匹配路由为 /b，那么“别名”又是什么呢？
+**`重定向`** 的意思是：
 
+当用户访问 `/a` 时，URL 将会被替换成 `/b` ，然后匹配路由为 `/b`
 
+那么 **`别名`** 又是什么呢？
 
+`/a` 的别名是 `/b` 意味着：
 
+* 当用户访问 `/b` 时，URL 会保持为 `/b`
 
+* 但是路由匹配则为 `/a` ，就像用户访问 `/a` 一样
 
+上面对应的路由配置为：
 
+```js
+const router = new VueRouter({
+  routes: [
+    { path: '/a', component: A, alias: '/b' }
+  ]
+})
+```
 
+**`别名`** 的功能让你可以自由地将 UI 结构映射到任意的 URL ，而不是受限于配置的嵌套路由结构
 
+> [【更多高级用法，请查看例子】](https://github.com/vuejs/vue-router/blob/dev/examples/route-alias/app.js)
 
+## 路由组件传参
 
+在组件中使用 `$route` 会使之与其对应路由形成高度耦合，从而使组件只能在某些特定的 URL 上使用，限制了其灵活性
 
+使用 `props` 将组件和路由解耦：
 
+* 使用 `$route` 的组件
 
+```js
+const User = {
+  template: '<div>User {{ $route.params.id }}</div>'
+}
+const router = new VueRouter({
+  routes: [
+    { path: '/user/:id', component: User }
+  ]
+})
+```
 
+* 通过 `props` 解耦
 
+```js
+const User = {
+  props: ['id'],
+  template: '<div>User {{ id }}</div>'
+}
+const router = new VueRouter({
+  routes: [
+    { path: '/user/:id', component: User, props: true },
 
+    // 对于包含命名视图的路由，你必须分别为每个命名视图添加 `props` 选项：
+    {
+      path: '/user/:id',
+      components: { default: User, sidebar: Sidebar },
+      props: { default: true, sidebar: false }
+    }
+  ]
+})
+```
 
+这样你便可以在任何地方使用该组件，使得该组件更易于重用和测试
 
+### 布尔模式
 
+如果 `props` 被设置为 `true` ，`route.params` 将会被设置为组件属性
 
+### 对象模式
 
+如果 `props` 是一个对象，它会被按原样设置为组件属性
 
+* 当 `props` 是静态的时候有用
 
+```js
+const router = new VueRouter({
+  routes: [
+    { path: '/promotion/from-newsletter', component: Promotion, props: { newsletterPopup: false } }
+  ]
+})
+```
 
+### 函数模式
 
+你可以创建一个函数返回 `props`
 
+这样你便可以将参数转换成另一种类型，将静态值与基于路由的值结合等等
 
+```js
+const router = new VueRouter({
+  routes: [
+    { path: '/search', component: SearchUser, props: (route) => ({ query: route.query.q }) }
+  ]
+})
+```
 
+URL `/search?q=vue` 会将 `{query: 'vue'}` 作为属性传递给 `SearchUser` 组件
 
+* 请尽可能保持 `props` 函数为无状态的，因为它只会在路由发生变化时起作用
 
+* 如果你需要状态来定义 `props` ，请使用包装组件，这样 Vue 才可以对状态变化做出反应
 
+> 更多高级用法，请[【查看例子】](https://github.com/vuejs/vue-router/blob/dev/examples/route-props/app.js)
 
+## HTML5 `History` 模式
 
+`vue-router` 默认 hash 模式
 
+* 使用 URL 的 hash 来模拟一个完整的 URL，于是当 URL 改变时，页面不会重新加载
 
+如果不想要很丑的 hash ，我们可以用路由的 **`history 模式`** ，这种模式充分利用 `history.pushState` API 来完成 URL 跳转而无须重新加载页面
 
+```js
+const router = new VueRouter({
+  mode: 'history',
+  routes: [...]
+})
+```
 
+当你使用 history 模式时，URL 就像正常的 `url` ，例如 `http://yoursite.com/user/id`
 
+* 不过这种模式要玩好，还需要后台配置支持
 
+  因为我们的应用是个单页客户端应用，如果后台没有正确的配置，当用户在浏览器直接访问 `http://oursite.com/user/id` 就会返回 `404`
 
+* 所以你要在服务端增加一个覆盖所有情况的候选资源：
 
+  如果 URL 匹配不到任何静态资源，则应该返回同一个 `index.html` 页面，这个页面就是你 `app` 依赖的页面
 
+### 后端配置例子
 
+* Apache
 
+```
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+```
 
+除了 `mod_rewrite` ，你也可以使用[【 FallbackResource 】](https://httpd.apache.org/docs/2.2/mod/mod_dir.html#fallbackresource)
 
+* nginx
 
+```
+location / {
+  try_files $uri $uri/ /index.html;
+}
+```
 
+* 原生 Node.js
 
+```js
+const http = require('http')
+const fs = require('fs')
+const httpPort = 80
 
+http.createServer((req, res) => {
+  fs.readFile('index.htm', 'utf-8', (err, content) => {
+    if (err) {
+      console.log('We cannot open "index.htm" file.')
+    }
 
+    res.writeHead(200, {
+      'Content-Type': 'text/html; charset=utf-8'
+    })
 
+    res.end(content)
+  })
+}).listen(httpPort, () => {
+  console.log('Server listening on: http://localhost:%s', httpPort)
+})
+```
 
+* 基于 Node.js 的 Express
 
+对于 `Node.js/Express` ，请考虑使用[【 connect-history-api-fallback 中间件】](https://github.com/bripkens/connect-history-api-fallback)
 
+* Internet Information Services (IIS)
 
+  * 安装[【 IIS UrlRewrite 】](https://www.iis.net/downloads/microsoft/url-rewrite)
 
+  * 在你的网站根目录中创建一个 `web.config` 文件，内容如下：
 
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <system.webServer>
+    <rewrite>
+      <rules>
+        <rule name="Handle History Mode and custom 404/500" stopProcessing="true">
+          <match url="(.*)" />
+          <conditions logicalGrouping="MatchAll">
+            <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
+            <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
+          </conditions>
+          <action type="Rewrite" url="/" />
+        </rule>
+      </rules>
+    </rewrite>
+  </system.webServer>
+</configuration>
+```
 
+* Caddy
 
+```
+rewrite {
+    regexp .*
+    to {path} /
+}
+```
 
+* Firebase 主机
 
+  在你的 `firebase.json` 中加入：
 
+```
+{
+  "hosting": {
+    "public": "dist",
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
+```
 
+### 警告
 
+给个警告，因为这么做以后，你的服务器就不再返回 `404` 错误页面，因为对于所有路径都会返回 `index.html` 文件
 
+* 为了避免这种情况，你应该在 Vue 应用里面覆盖所有的路由情况，然后在给出一个 `404` 页面
 
+```js
+const router = new VueRouter({
+  mode: 'history',
+  routes: [
+    { path: '*', component: NotFoundComponent }
+  ]
+})
+```
 
+* 或者，如果你使用 `Node.js` 服务器，你可以用服务端路由匹配到来的 URL ，并在没有匹配到路由的时候返回 `404` ，以实现回退
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+> 更多详情请查阅[【 Vue 服务端渲染文档 】](https://ssr.vuejs.org/zh/)
