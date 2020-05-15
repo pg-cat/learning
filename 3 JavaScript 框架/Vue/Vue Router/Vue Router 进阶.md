@@ -15,7 +15,7 @@
 * 单个路由独享的
 * 组件级的
 
-> 记住：**`参数`** 或 **`查询的改变`** 并不会触发 *`进入/离开的导航守卫`*
+> 记住：**`参数`** 或 **`查询`** 的改变并不会触发 *`进入/离开的导航守卫`*
 
 你可以通过[【观察 `$route` 对象】](https://router.vuejs.org/zh/guide/essentials/dynamic-matching.html#响应路由参数的变化)来应对这些变化，或使用 `beforeRouteUpdate` 的组件内守卫
 
@@ -481,11 +481,12 @@ export default {
 
 > 【问题】上例中的 `getPost()` 方法为什么需要写两个？
 >> 也就是说：`beforeRouteUpdate` 在组件复用时会不会触发 `beforeRouteEnter` ？
+>>> 注意：**`参数`** 或 **`查询`** 的改变并不会触发 **`进入/离开的导航守卫`**
+> * `beforeRouteUpdate` 被触发时是子组件在变化，并不会触发 `beforeRouteEnter` 、`beforeRouteLeave`
+> * 所以为了避免 **`子路由`** 被访问时数据不会再次获取，才需要在 `beforeRouteUpdate` 中写上 `getPost()` 方法
+> * [【示例：组件复用时的守卫】](/test/组件复用时的守卫.html)
 
-
-
-
-
+## 滚动行为
 
 
 
