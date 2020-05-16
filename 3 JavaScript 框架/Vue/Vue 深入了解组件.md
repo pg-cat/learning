@@ -469,18 +469,22 @@ Vue.component('my-component', {
   props: {
     // 基础的类型检查 (`null` 和 `undefined` 会通过任何类型验证)
     propA: Number,
+
     // 多个可能的类型
     propB: [String, Number],
+
     // 必填的字符串
     propC: {
       type: String,
       required: true
     },
+
     // 带有默认值的数字
     propD: {
       type: Number,
       default: 100
     },
+
     // 带有默认值的对象
     propE: {
       type: Object,
@@ -489,6 +493,7 @@ Vue.component('my-component', {
         return { message: 'hello' }
       }
     },
+
     // 自定义验证函数
     propF: {
       validator: function (value) {
@@ -579,8 +584,8 @@ Vue.component('blog-post', {
 
 在这种情况下，我们定义了两个不同的 `class` 的值：
 
-* form-control 这是在组件的模板内设置好的
-* date-picker-theme-dark 这是从组件的父级传入的
+* `form-control` 这是在组件的模板内设置好的
+* `date-picker-theme-dark` 这是从组件的父级传入的
 
 对于绝大多数 attribute 来说，从外部提供给组件的值会替换掉组件内部设置好的值
 
@@ -645,7 +650,7 @@ Vue.component('base-input', {
 
 ### 事件名
 
-不同于组件和 prop ，事件名不存在任何自动化的大小写转换
+不同于组件和 `prop` ，事件名不存在任何自动化的大小写转换
 
 * 而是触发的事件名需要完全匹配监听这个事件所用的名称
 
