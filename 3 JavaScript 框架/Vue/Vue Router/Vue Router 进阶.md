@@ -483,323 +483,150 @@ export default {
 >> 也就是说：`beforeRouteUpdate` 在组件复用时会不会触发 `beforeRouteEnter` ？
 >>> 注意：**`参数`** 或 **`查询`** 的改变并不会触发 **`进入/离开的导航守卫`**
 > * `beforeRouteUpdate` 被触发时是子组件在变化，并不会触发 `beforeRouteEnter` 、`beforeRouteLeave`
-> * 所以为了避免 **`子路由`** 被访问时数据不会再次获取，才需要在 `beforeRouteUpdate` 中写上 `getPost()` 方法
+> * 所以为了避免 **`子路由`** 被访问时数据不会再次获取的问题，才需要在 `beforeRouteUpdate` 中写上 `getPost()` 方法
 > * [【示例：组件复用时的守卫】](https://github.com/pg-cat/learning/blob/master/3%20JavaScript%20%E6%A1%86%E6%9E%B6/Vue/Vue%20Router/test/组件复用时的守卫.html)
 
 ## 滚动行为
 
+使用前端路由，当切换到新路由时，想要页面滚到顶部，或者是保持原先的滚动位置，就像重新加载页面那样
 
+* `vue-router` 能做到，而且更好，它让你可以自定义路由切换时页面如何滚动
 
+> 注意: 这个功能只在支持 `history.pushState` 的浏览器中可用
 
+当创建一个 Router 实例，你可以提供一个 `scrollBehavior` 方法：
 
+```js
+const router = new VueRouter({
+  routes: [...],
+  scrollBehavior (to, from, savedPosition) {
+    // return 期望滚动到哪个的位置
+  }
+})
+```
 
+`scrollBehavior` 方法接收 `to` 和 `from` 路由对象
 
+* 第三个参数 `savedPosition` 当且仅当 `popstate` 导航 (通过浏览器的 **`前进/后退`** 按钮触发) 时才可用
 
+这个方法返回滚动位置的对象信息，长这样：
 
+* `{ x: number, y: number }`
 
+* `{ selector: string, offset? : { x: number, y: number }}`
 
+  `offset` 只在 `2.6.0+` 支持
 
+如果返回一个 `falsy` (译者注：`falsy` 不是 `false` ，[【参考这里】](https://developer.mozilla.org/zh-CN/docs/Glossary/Falsy))的值，或者是一个空对象，那么不会发生滚动
 
+例如，对于所有路由导航，简单地让页面滚动到顶部：
 
+```js
+scrollBehavior (to, from, savedPosition) {
+  return { x: 0, y: 0 }
+}
+```
 
+返回 `savedPosition` ，在按下 **`后退/前进`** 按钮时，就会像浏览器的原生表现那样：
 
+```js
+scrollBehavior (to, from, savedPosition) {
+  if (savedPosition) {
+    return savedPosition
+  } else {
+    return { x: 0, y: 0 }
+  }
+}
+```
 
+如果你要模拟 **`滚动到锚点`** 的行为：
 
+```js
+scrollBehavior (to, from, savedPosition) {
+  if (to.hash) {
+    return {
+      selector: to.hash
+    }
+  }
+}
+```
 
+我们还可以利用[【路由元信息】](https://router.vuejs.org/zh/guide/advanced/meta.html)更细颗粒度地控制滚动
 
+> [【查看完整例子请移步这里】](https://github.com/vuejs/vue-router/blob/dev/examples/scroll-behavior/app.js)
 
+### 异步滚动
 
+> `2.8.0` 新增
 
+你也可以返回一个 `Promise` 来得出预期的位置描述：
 
+```js
+scrollBehavior (to, from, savedPosition) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve({ x: 0, y: 0 })
+    }, 500)
+  })
+}
+```
 
+将其挂载到从页面级别的过渡组件的事件上，令其滚动行为和页面过渡一起良好运行是可能的
 
+但是考虑到用例的多样性和复杂性，我们仅提供这个原始的接口，以支持不同用户场景的具体实现
 
+## 路由懒加载
 
+当打包构建应用时，JavaScript 包会变得非常大，影响页面加载
 
+* 如果我们能把不同路由对应的组件分割成不同的代码块
 
+* 然后当路由被访问的时候才加载对应组件，这样就更加高效了
 
+结合 Vue 的[【异步组件】](https://cn.vuejs.org/v2/guide/components-dynamic-async.html#异步组件)和 Webpack 的[【代码分割功能】](https://doc.webpack-china.org/guides/code-splitting-async/#require-ensure-/)，轻松实现路由组件的懒加载
 
+* 首先，可以将异步组件定义为返回一个 Promise 的工厂函数 (该函数返回的 `Promise` 应该 `resolve` 组件本身)：
 
+```js
+const Foo = () => Promise.resolve({ /* 组件定义对象 */ })
+```
 
+* 第二，在 `Webpack 2` 中，我们可以使用动态 `import` 语法来定义 **`代码分块点 (split point)`** ：
 
+```js
+import('./Foo.vue') // 返回 Promise
+```
 
+> 注意：如果您使用的是 `Babel` ，你将需要添加 `syntax-dynamic-import` 插件，才能使 `Babel` 可以正确地解析语法
 
+结合这两者，这就是如何定义一个能够被 Webpack 自动代码分割的异步组件：
 
+```js
+const Foo = () => import('./Foo.vue')
+```
 
+在路由配置中什么都不需要改变，只需要像往常一样使用 `Foo` ：
 
+```js
+const router = new VueRouter({
+  routes: [
+    { path: '/foo', component: Foo }
+  ]
+})
+```
 
+### 把组件按组分块
 
+有时候我们想把某个路由下的所有组件都打包在 **`同个异步块`** 中
 
+* 只需要使用[【命名 chunk 】](https://webpack.js.org/guides/code-splitting-require/#chunkname)
 
+  一个特殊的注释语法来提供 `chunk name` (需要 `Webpack > 2.4` )
 
+```js
+const Foo = () => import(/* webpackChunkName: "group-foo" */ './Foo.vue')
+const Bar = () => import(/* webpackChunkName: "group-foo" */ './Bar.vue')
+const Baz = () => import(/* webpackChunkName: "group-foo" */ './Baz.vue')
+```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Webpack 会将任何一个异步模块与相同的块名称组合到相同的异步块中
