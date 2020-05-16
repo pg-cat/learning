@@ -2539,9 +2539,9 @@ Vue.config.keyCodes.f1 = 112
 
 * 扫一眼 HTML 模板便能轻松定位在 JavaScript 代码里对应的方法
 
-* 因为你无须在 JavaScript 里手动绑定事件，你的 ViewModel 代码可以是非常纯粹的逻辑，和 DOM 完全解耦，更易于测试
+* 因为你无须在 JavaScript 里手动绑定事件，你的 `ViewModel` 代码可以是非常纯粹的逻辑，和 DOM 完全解耦，更易于测试
 
-* 当一个 ViewModel 被销毁时，所有的事件处理器都会自动被删除
+* 当一个 `ViewModel` 被销毁时，所有的事件处理器都会自动被删除
 
   你无须担心如何清理它们
 
