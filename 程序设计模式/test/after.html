@@ -1,29 +1,36 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title></title>
-  </head>
-  <body>
 
-  </body>
+<head>
+  <meta charset="utf-8">
+  <title></title>
+</head>
+
+<body>
+
+</body>
+
 </html>
 <script type="text/javascript">
 
   //  写一个函数，调用第三次的时候，输出一个内容
-  function after(times,callback){
-    return function(){
-      if( --times  == 0){
+  function after(times, callback) {
+    return function () {
+      console.log(times,'+times');
+      if (--times == 0) {
         callback();
       }
     }
   }
+
   //  封装一层简单地函数
-  var fnc = after(3,function(){
+  var fnc = after(3, function () {
     console.log('after');
   });
-  fnc();
-  fnc();
-  fnc();
+
+  fnc();  // 3 "+times"
+  fnc();  // 2 "+times"
+  fnc();  // 1 "+times"
+  // 第三次 fnc() 时也会输出：after
 
 </script>

@@ -18,7 +18,7 @@
     if (typeof Factory[superType] === 'function') {
 
       // 创建了一个黑猫的构造函数 F
-      function F() { };
+      var F = function () {};
 
       F.prototype = new Factory[superType]();
       type.constructor = type;
@@ -28,6 +28,7 @@
       throw new Error('创建没有成功');
     }
   }
+
   //  橘猫
   Factory.orangeCat = function () {
     this.type = 'orangeCat';
@@ -40,6 +41,7 @@
       return new Error('方法不能调用');
     }
   }
+
   //  黑猫
   Factory.blackCat = function () {
     this.type = 'blackCat';
@@ -57,14 +59,15 @@
     this.price = price;
     this.speed = speed;
   }
+
   // 实现继承
   Factory(ZH, 'orangeCat');
-  // ZH.prototype.getPrice = function () {
-  //   return this.price;
-  // }
-  // ZH.prototype.getSpeed = function () {
-  //   return this.speed;
-  // }
+  ZH.prototype.getPrice = function () {
+    return this.price;
+  }
+  ZH.prototype.getSpeed = function () {
+    return this.speed;
+  }
 
   var a = new ZH(130, 160);
   console.log(a);

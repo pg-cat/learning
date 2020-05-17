@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>函数节流</title>
+</head>
+
+<body>
+    函数节流的基本思想是函数预先设定一个执行周期，当调用动作的时刻大于等于执行周期则执行该动作，然后进入下一个新周期（一定时间内js方法只跑一次。比如人的眨眼睛，就是一定时间内眨一次）
+</body>
+
+</html>
+<script>
+    function throttle(cb, delay) {
+        let startTime = Date.now()
+        return function () {
+            let currTime = Date.now()
+            if (currTime - startTime > delay) {
+                cb()
+                startTime = currTime
+            }
+        }
+    }
+</script>

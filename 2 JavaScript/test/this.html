@@ -1,26 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
+  <title>this</title>
 </head>
+
 <body>
-  
+
 </body>
+
 </html>
 <script>
-var name="小王";
-var age = 13;
-var obj = {
-  name:"小张",
-  objAge:this.age,
-  myFun:function(){
-    console.log(this.name +"年龄："+this.age);
+  var name = "小王";
+  var age = 13;
+  var obj = {
+    name: "小张",
+    objAge: this.age, // 此处 this 指向的 obj 对象外，默认是 windows 下，此处的 this.age 也就是 age = 13 的 age
+    myFun: function () {
+      console.log(this.name + "年龄：" + this.age); // 此处 this 指向的是 obj 对象内
+    }
   }
-}
 
-console.log(obj.objAge);
-obj.myFun();
+  console.log(obj.objAge);  // 13
+
+  obj.myFun();  // 小张年龄：undefined
+  // 获取不到 age 值的原因：此处的 myFun() 形成的闭包环境中，无 age 可寻找，this 指向的 obj 对象内无 age 变量
 </script>
