@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sleep 函数</title>
+</head>
+
+<body>
+    js不像java一样有sleep()方法，但由于js是单线程的，可以利用伪死循环阻塞主线程来达到延迟执行的效果
+</body>
+
+</html>
+<script>
+    function sleep(delay) {
+        // 获取一个初始时间
+        let startTime = new Date().getTime()
+        // 如果时间差小于延迟时间，就一直循环
+        while (new Date().getTime() - startTime < delay) {
+            continue
+        }
+    }
+</script>
