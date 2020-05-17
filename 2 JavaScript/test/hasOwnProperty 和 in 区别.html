@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hasOwnProperty 和 in 区别</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+    let obj = {
+        a: 3,
+        b: 4
+    }
+
+    // obj 为实例对象，无函数特有的 prototype ，故此处会报错
+    // obj.prototype.c = 5;
+    console.log(obj); // undefined
+
+    // 给 obj 的原型加属性
+    obj.__proto__.d = 6;
+    // 此处不推荐此操作，因为 obj 的上层原型为所有对象的共有原型 Object
+
+    // in 会把包括原型上的属性也给找出来
+    for (let key in obj) {
+        console.log(key + ' : ' + obj[key], '+in');
+
+        // hasOwnProperty 只找当前实例上的属性
+        if (obj.hasOwnProperty(key)) {
+            console.log(key + ' : ' + obj[key], '+hasOwnProperty');
+        }
+    }
+
+
+    // 查看 prototype
+    class objClass {
+        c = 3;
+    }
+
+    // 此处添加了一个原型属性 e ，且它在实例化后的对象的 __proto__ 上可以找到
+    objClass.prototype.e = 3;
+
+    // 实例化
+    objC = new objClass;
+
+    console.log(objC.__proto__);    // {e: 3, constructor: ƒ}
+</script>
