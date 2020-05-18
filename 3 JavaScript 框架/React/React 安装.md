@@ -11,6 +11,8 @@ React 是一个用于构建用户界面的 JavaScript 库
 
 ## 在网站中添加 React
 
+> 根据需要选择性地使用 React
+
 React 从一开始就被设计为逐步采用，并且你可以 **`根据需要选择性地使用 React`**
 
 * 可能你只想在现有页面中 **`局部地添加交互性`**
@@ -246,6 +248,8 @@ npx babel --watch src --out-dir . --presets react-app/prod
 
 ## 创建新的 React 应用
 
+> 使用集成的工具链，以实现最佳的用户和开发人员体验
+
 本页将介绍一些流行的 React 工具链，它们有助于完成如下任务：
 
 * 扩展文件和组件的规模
@@ -319,99 +323,204 @@ Create React App 不会处理后端逻辑或操纵数据库
 
 #### Gatsby
 
+[【 Gatsby 】](https://www.gatsbyjs.org/)是用 React 创建 **`静态网站`** 的最佳方式
 
+* 它让你能使用 React 组件，但输出预渲染的 HTML 和 CSS 以保证最快的加载速度
 
+* 从 Gatsby 的[【官方指南】](https://www.gatsbyjs.org/docs/)和[【入门示例集】](https://www.gatsbyjs.org/docs/gatsby-starters/)了解更多
 
+#### 更灵活的工具链
 
+以下工具链为 React 提供更多更具灵活性的方案
 
+推荐给更有经验的使用者：
 
+* [【 Neutrino 】](https://neutrinojs.org/)把[【 webpack 】](https://webpack.js.org/)的强大功能和简单预设结合在一起
 
+  并且包括了[【 React 应用】](https://neutrinojs.org/packages/react/)和[【 React 组件】](https://neutrinojs.org/packages/react-components/)的预设
 
+* [【 Parcel 】](https://parceljs.org/)是一个快速的、零配置的网页应用打包器，并且可以[【搭配 React 一起工作】](https://parceljs.org/recipes.html#react)
 
+* [【 Razzle 】](https://github.com/jaredpalmer/razzle)是一个无需配置的服务端渲染框架，但它提供了比 Next.js 更多的灵活性
 
+### 从头开始打造工具链
 
+一组 JavaScript 构建工具链通常由这些组成：
 
+* 一个 package 管理器，比如[【 Yarn 】](https://yarnpkg.com/)或[【 npm 】](https://www.npmjs.com/)
 
+  它能让你充分利用庞大的第三方 package 的生态系统，并且轻松地安装或更新它们。
 
+* 一个打包器，比如[【 webpack 】](https://webpack.js.org/)或[【 Parcel 】](https://parceljs.org/)
 
+  它能让你编写模块化代码，并将它们组合在一起成为小的 package ，以优化加载时间。
 
+* 一个编译器，例如[【 Babel 】](https://babeljs.io/)
 
+  它能让你编写的新版本 JavaScript 代码，在旧版浏览器中依然能够工作
 
+如果你倾向于从头开始打造你自己的 JavaScript 工具链，可以[【查看这个指南】](https://blog.usejournal.com/creating-a-react-app-from-scratch-f3c693b84658)，它重新创建了一些 Create React App 的功能
 
+别忘了确保你自定义的工具链[【针对生产环境进行了正确配置】](https://react.docschina.org/docs/optimizing-performance.html#use-the-production-build)
 
+## CDN 链接
 
+> 可以通过 CDN 获得 React 和 ReactDOM 的 UMD 版本
 
+```html
+<script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+```
 
+上述版本仅用于开发环境，不适合用于生产环境
 
+压缩优化后可用于生产的 React 版本可通过如下方式引用：
 
+```html
+<script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+```
 
+如果需要加载指定版本的 react 和 react-dom，可以把 16 替换成所需加载的版本号
 
+### 为什么要使用 crossorigin 属性？
 
+如果你通过 CDN 的方式引入 React ，我们建议你设置[【 crossorigin 】](https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes)属性：
 
+```html
+<script crossorigin src="..."></script>
+```
 
+我们同时建议你验证使用的 CDN 是否设置了 `Access-Control-Allow-Origin: *` HTTP 请求头：
 
+![图片](https://react.docschina.org/static/89baed0a6540f29e954065ce04661048/13ae7/cdn-cors-header.png)
 
+这样能在 React 16 及以上的版本中有更好的[【错误处理体验】](https://react.docschina.org/blog/2017/07/26/error-handling-in-react-16.html)
 
+## 发布渠道
 
+> React 依靠强大的开源社区收集 bug 报告，发起 pull request 和[【提交 RFC 】](https://github.com/reactjs/rfcs)
+>> 为了鼓励大家反馈，我们打算共享一些特殊的 React 版本，其中包括未发布的功能
 
+React 的每个发布渠道都是针对不同的用例进行设计的：
 
+* [【最新版本】](https://react.docschina.org/docs/release-channels.html#latest-channel)用于稳定的 semver React 版本
 
+  此版本可通过 npm 安装获取
 
+  此渠道为目前大家已经在用的方式
 
+  其主要用于所有面向用户的 React 应用程序
 
+* [【 Next 版本】](https://react.docschina.org/docs/release-channels.html#next-channel)主要用于追踪 React 源码仓库的 master 分支
 
+  我们会将其视为下一个次要版本发布的候选版本
 
+  使用它可以进行 React 与第三方项目间的集成测试
 
+* [【实验阶段版本】](https://react.docschina.org/docs/release-channels.html#experimental-channel)包含稳定版本中不提供的实验阶段的 API 与功能
 
+  同时它也追踪了 master 分支，但启用了附加新功能的标志
 
+  使用此渠道可以尝试即将发布的功能
 
+所有版本都将发布到 npm ，但只有最新版本遵循[【语义版本控制】](https://react.docschina.org/docs/faq-versioning.html)
 
+* 预发布版本（应用于 Next 和实验渠道的版本）会根据其内容的哈希值生成版本
 
+* 例如，Next 的版本为 `0.0.0-1022ee0ec` ，实验版为 `0.0.0-experimental-1022ee0ec`
 
+> 最新版是面向用户应用程序的唯一官方支持发布渠道
+>> 提供 Next 和实验版本的目的是用于测试，我们并不保证功能在这两个版本中不发生变化
+>> * 因为它们并不遵循用于最新版发布的 semver 协议
 
+将预发布版本发布到与稳定版本相同的注册表，我们可以利用许多支持 npm 工作流的工具，比如：
 
+* [【 unpkg 】](https://unpkg.com/)
+* [【 CodeSandbox 】](https://codesandbox.io/)
 
+### 最新版渠道
 
+最新版是用于稳定 React 版本的渠道
 
+* 它对应是 npm 中 latest 标签
 
+* 此版本是所有交付给真实用户的 React 应用程序的推荐版本
 
+> 如果你不确定应该使用哪个版本，那就用最新版
+>> 如果你是 React 开发人员，那么这就是你正确的选择
 
+你可以认为最新版的更新是非常稳定的
 
+* 版本遵循语义版本控制方案
 
+* 在[【版本政策】](https://react.docschina.org/docs/faq-versioning.html)中了解更多关于我们对稳定性和增量迁移的承诺
 
+### Next 渠道
 
+Next 属于预发布渠道，用于追踪 React 仓库的 master 分支
 
+* 我们使用在 Next 渠道的预发布版本作为最新版发布渠道的候选版本
 
+* 你可以将 Next 视为最新版的超集，它的更新频率更高
 
+最近的 Next 版本和最近的最新版本之间的变化程度，与两个次要的 semver 版本之间的变化程度大致相同
 
+* 但是，Next 渠道不遵循语义版本控制
 
+* 在 Next 渠道中，你应该预期到后续的版本中偶尔会有不兼容的改动
 
+> 不要在面向用户的应用程序中使用预发布版本
 
+Next 渠道中的预发布版本在 npm 中携带 `next` 标签发布
 
+* 版本号是根据其构建内容的哈希值生成的
 
+  例如：`0.0.0-1022ee0ec`
 
+#### 使用 Next 渠道进行集成测试
 
+Next 渠道用于支持 React 与其他项目之间的集成测试
 
+* React 的所有更改在发布之前都要经过大量的内部测试
 
+* 然而，React 的整个生态系统使用了无数的环境和配置，我们不可能针对每一项进行测试
 
+如果你是 React 第三方框架、库、开发者工具或类似基础设施项目的作者，则可以通过定期针对最新版本运行的测试用例，帮助我们一起维持 React 稳定，为你的用户和整个 React 社区保驾护航
 
+如果你对此有兴趣，请按照下列步骤进行操作：
 
+* 在你喜欢的持续集成平台上设置 cron job
 
+  [【 CircleCI 】](https://circleci.com/docs/2.0/triggers/#scheduled-builds)和[【 Travis CI 】](https://docs.travis-ci.com/user/cron-jobs/)均支持 cron job
 
+* 在 cron job 中，使用 npm 的 `next` 标签将 React 版本更新至 Next 渠道中的最新版本
 
+  * 使用 npm cli ：
 
+  ```sh
+  npm update react@next react-dom@next
+  ```
 
+  * 或者 yarn ：
 
+  ```sh
+  yarn upgrade react@next react-dom@next
+  ```
 
+* 针对更新的 packages 运行你的测试用例
 
+* 如果均通过，那么恭喜你！
 
+  你的项目可以与下个小版本的 React 一起使用
 
+* 如果发生意外中断，请通过[【提交 issus 】](https://github.com/facebook/react/issues)告知我们
 
+Next.js 项目使用了这个工作流
 
+* 你可以参考他们的[【 CircleCI 配置】](https://github.com/zeit/next.js/blob/c0a1c0f93966fe33edd93fb53e5fafb0dcd80a9e/.circleci/config.yml)作为示例
 
-
-
-
+### 实验版渠道
 
 
 
