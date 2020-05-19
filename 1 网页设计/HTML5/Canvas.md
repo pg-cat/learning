@@ -1087,7 +1087,7 @@ translate(x, y)
 ```js
 var ctx;
 function draw(){
-  var canvas = document.getElementById('tutorial1');
+  var canvas = document.getElementById('tutorial');
   if (!canvas.getContext) return;
   var ctx = canvas.getContext("2d");
 
@@ -1123,7 +1123,7 @@ rotate(angle)
 ```js
 var ctx;
 function draw(){
-  var canvas = document.getElementById('tutorial1');
+  var canvas = document.getElementById('tutorial');
   if (!canvas.getContext) return;
   var ctx = canvas.getContext("2d");
 
@@ -1186,7 +1186,7 @@ f (dy)|垂直移动
 ```js
 var ctx;
 function draw(){
-  var canvas = document.getElementById('tutorial1');
+  var canvas = document.getElementById('tutorial');
   if (!canvas.getContext) return;
   var ctx = canvas.getContext("2d");
   ctx.transform(1, 1, 0, 1, 0, 0);
@@ -1210,7 +1210,7 @@ draw();
 ```js
 var ctx;
 function draw(){
-  var canvas = document.getElementById('tutorial1');
+  var canvas = document.getElementById('tutorial');
   if (!canvas.getContext) return;
   var ctx = canvas.getContext("2d");
 
