@@ -890,14 +890,33 @@ canvas 提供了两种方法来渲染文本：
 fillText(text, x, y [, maxWidth])|在指定的 (x,y) 位置填充指定的文本，绘制的最大宽度是可选的
 strokeText(text, x, y [, maxWidth])|在指定的 (x,y) 位置绘制文本边框，绘制的最大宽度是可选的
 
+```js
+var ctx;
+function draw(){
+  var canvas = document.getElementById('tutorial');
+  if (!canvas.getContext) return;
+  ctx = canvas.getContext("2d");
 
+  ctx.font = "100px sans-serif"
+  ctx.fillText("天若有情", 10, 100);
+  ctx.strokeText("天若有情", 10, 200)
+}
 
+draw();
+```
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/404304980-5b74dd8e7499e_articlex.png)
 
+### 给文本添加样式
 
+样式|说明
+-|-
+`font = value`|当前我们用来绘制文本的样式，这个字符串使用和 CSS `font` 属性相同的语法（默认的字体是 `10px sans-serif` ）
+`textAlign = value`|文本对齐选项，可选的值包括：`start` ，`end` ，`left` ，right 或 center（默认值是 `start` ）
+`textBaseline = value`|基线对齐选项，可选的值包括：`top` ，`hanging` ，`middle` ，`alphabetic` ，`ideographic` ，`bottom`（默认值是 `alphabetic` ）
+`direction = value`|文本方向，可能的值包括：`ltr`，`rtl`，`inherit`（默认值是 `inherit` ）
 
-
-
+## 绘制图片
 
 
 
