@@ -248,7 +248,7 @@ SVG 有一些预定义的形状元素，可被开发者使用和操作：
 
 ### 实例 1
 
-`<rect />` 标签可用来创建矩形，以及矩形的变种：
+`<rect />` 元素可用来创建矩形，以及矩形的变种：
 
 ```html
 <!DOCTYPE html>
@@ -281,160 +281,636 @@ SVG 有一些预定义的形状元素，可被开发者使用和操作：
 
 让我们看看另一个例子，它包含一些新的属性：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <rect x="50" y="20" width="150" height="150" style="fill:blue;stroke:pink;stroke-width:5;fill-opacity:0.1;stroke-opacity:0.9" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/rect2.svg)（右键单击 SVG 图形预览源）
 
+代码解析：
 
+* x 属性定义矩形的左侧位置
 
+  例如，`x="0"` 定义矩形到浏览器窗口左侧的距离是 `0px`
 
+* y 属性定义矩形的顶端位置
 
+  例如，`y="0"` 定义矩形到浏览器窗口顶端的距离是 `0px`
 
+* CSS 的 `fill-opacity` 属性定义填充颜色透明度
 
+  合法的范围是：`0 - 1`
 
+* CSS 的 `stroke-opacity` 属性定义轮廓颜色的透明度
 
+  合法的范围是：`0 - 1`
 
+### 实例 3
 
+定义整个元素的不透明度：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <rect x="50" y="20" width="150" height="150" style="fill:blue;stroke:pink;stroke-width:5;opacity:0.5" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/rect3.svg)（右键单击 SVG 图形预览源）
 
+代码解析：
 
+* CSS `opacity` 属性用于定义了元素的透明值
 
+  范围: `0 - 1`
 
+### 实例 4
 
+最后一个例子，创建一个圆角矩形：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <rect x="50" y="20" rx="20" ry="20" width="150" height="150" style="fill:red;stroke:black;stroke-width:5;opacity:0.5" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/rect4.svg)（右键单击 SVG 图形预览源）
 
+代码解析：
 
+* `rx` 和 `ry` 属性可使矩形产生圆角
 
+## 圆形 `<circle />`
 
+`<circle />` 元素可用来创建一个圆：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+   <circle cx="100" cy="50" r="40" stroke="black" stroke-width="2" fill="red" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/circle1.svg)（右键单击 SVG 图形预览源）
 
+代码解析：
 
+* `cx` 和 `cy` 属性定义圆点的x和y坐标
 
+  如果省略 `cx` 和 `cy` ，圆的中心会被设置为 `(0, 0)`
 
+* `r` 属性定义圆的半径
 
+## 椭圆 `<ellipse />`
 
+### 实例 1
 
+`<ellipse />` 元素是用来创建一个椭圆：
 
+* 椭圆与圆很相似
 
+* 不同之处在于椭圆有不同的 `x` 和 `y` 半径，而圆的 `x` 和 `y` 半径是相同的
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <ellipse cx="300" cy="80" rx="100" ry="50" style="fill:yellow;stroke:purple;stroke-width:2" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/ellipse1.svg)（右键单击 SVG 图形预览源）
 
+代码解析：
 
+* `cx` 属性定义的椭圆中心的 `x` 坐标
 
+* `cy` 属性定义的椭圆中心的 `y` 坐标
 
+* `rx` 属性定义的水平半径
 
+* `ry` 属性定义的垂直半径
 
+### 实例 2
 
+下面的例子创建了三个累叠而上的椭圆：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <ellipse cx="240" cy="100" rx="220" ry="30" style="fill:purple" />
+  <ellipse cx="220" cy="70" rx="190" ry="20" style="fill:lime" />
+  <ellipse cx="210" cy="45" rx="170" ry="15" style="fill:yellow" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/ellipse2.svg)（右键单击 SVG 图形预览源）
 
+### 实例 3
 
+下面的例子组合了两个椭圆（一个黄的和一个白的）：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <ellipse cx="240" cy="50" rx="220" ry="30" style="fill:yellow" />
+  <ellipse cx="220" cy="50" rx="190" ry="20" style="fill:white" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/ellipse3.svg)（右键单击 SVG 图形预览源）
 
+## 直线 `<line />`
 
+`<line />` 元素是用来创建一个直线：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <line x1="0" y1="0" x2="200" y2="200" style="stroke:rgb(255,0,0);stroke-width:2" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/line1.svg)（右键单击 SVG 图形预览源）
 
+代码解析：
 
+* `x1` 属性在 `x` 轴定义线条的开始
 
+* `y1` 属性在 `y` 轴定义线条的开始
 
+* `x2` 属性在 `x` 轴定义线条的结束
 
+* `y2` 属性在 `y` 轴定义线条的结束
 
+## 多边形 `<polygon />`
 
+### 实例 1
 
+`<polygon />` 元素用来创建含有不少于三个边的图形：
 
+* 多边形是由直线组成，其形状是 **`封闭`** 的（所有的 **`线条`** 连接起来）
 
+> `polygon` 来自希腊：`"Poly"` 意味 `"many"` ， `"gon"` 意味 `"angle"`
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg  height="210" width="500">
+  <polygon points="200,10 250,190 160,210"
+  style="fill:lime;stroke:purple;stroke-width:1"/>
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/polygon1.svg)（右键单击 SVG 图形预览源）
 
+代码解析：
 
+* `points` 属性定义多边形每个角的 `x` 和 `y` 坐标
 
+### 实例 2
 
+下面的示例创建一个四边的多边形：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg height="250" width="500">
+  <polygon points="220,10 300,210 170,250 123,234" style="fill:lime;stroke:purple;stroke-width:1" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/polygon2.svg)（右键单击 SVG 图形预览源）
 
+### 实例 3
 
+使用 `<polygon>` 元素创建一个星型：
 
+```html
+<svg height="210" width="500">
+  <polygon points="100,10 40,198 190,78 10,78 160,198"
+  style="fill:lime;stroke:purple;stroke-width:5;fill-rule:nonzero;" />
+</svg>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/polygon3.svg)（右键单击 SVG 图形预览源）
 
+### 实例 4
+改变 `fill-rule` 属性为 `"evenodd"` ：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg height="210" width="500">
+  <polygon points="100,10 40,198 190,78 10,78 160,198"
+  style="fill:lime;stroke:purple;stroke-width:5;fill-rule:evenodd;" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/polygon4.svg)（右键单击 SVG 图形预览源）
 
+## 曲线 `<polyline />`
 
+### 实例 1
 
+`<polyline />` 元素是用于创建任何只有直线的形状：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <polyline points="20,20 40,25 60,40 80,120 120,140 200,180" style="fill:none;stroke:black;stroke-width:3" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/polyline1.svg)（右键单击 SVG 图形预览源）
 
+### 实例 2
 
+只有直线的另一个例子：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <polyline points="0,40 40,40 40,80 80,80 80,120 120,120 120,160" style="fill:white;stroke:red;stroke-width:4" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/polyline2.svg)（右键单击 SVG 图形预览源）
 
+## 路径 `<path />`
 
+`<path />` 元素用于定义一个路径
 
+下面的命令可用于路径数据：
 
+* M = moveto 移动
+* L = lineto 线条
+* H = horizontal lineto 水平线条
+* V = vertical lineto 垂直线条
+* C = curveto 曲线
+* S = smooth curveto 平滑曲线
+* Q = quadratic Bézier curve 二次方贝塞尔曲线
+* T = smooth quadratic Bézier curveto 平滑二次方贝塞尔曲线
+* A = elliptical Arc 椭圆弧
+* Z = closepath 闭合路径
 
+> 注意：以上所有命令均允许小写字母
+>> 大写表示绝对定位，小写表示相对定位
 
+### 实例 1
 
+下面的例子定义了一条路径，它开始于位置 `150 0` ，到达位置 `75 200` ，然后从那里开始到 `225 200` ，最后在 `150 0` 关闭路径
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <path d="M150 0 L75 200 L225 200 Z" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/path1.svg)（右键单击 SVG 图形预览源）
 
+### 实例 2
 
+下面的例子创建了一个二次方贝塞尔曲线，A 和 C 分别是起点和终点，B 是控制点：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="400" width="450">
+<path id="lineAB" d="M 100 350 l 150 -300" stroke="red" stroke-width="3" fill="none" />
+  <path id="lineBC" d="M 250 50 l 150 300" stroke="red" stroke-width="3" fill="none" />
+  <path d="M 175 200 l 150 0" stroke="green" stroke-width="3" fill="none" />
+  <path d="M 100 350 q 150 -300 300 0" stroke="blue" stroke-width="5" fill="none" />
+  <!-- Mark relevant points -->
+  <g stroke="black" stroke-width="3" fill="black">
+    <circle id="pointA" cx="100" cy="350" r="3" />
+    <circle id="pointB" cx="250" cy="50" r="3" />
+    <circle id="pointC" cx="400" cy="350" r="3" />
+  </g>
+  <!-- Label the points -->
+  <g font-size="30" font="sans-serif" fill="black" stroke="none" text-anchor="middle">
+    <text x="100" y="350" dx="-30">A</text>
+    <text x="250" y="50" dy="-10">B</text>
+    <text x="400" y="350" dx="30">C</text>
+  </g>
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/path2.svg)（右键单击 SVG 图形预览源）
 
+> 复杂吗？是的！！
+>> 由于在绘制路径时的复杂性，强烈建议使用[【 SVG 编辑器】](https://c.runoob.com/more/svgeditor/)来创建复杂的图形
 
+## 文本 `<text></text>`
 
+`<text></text>` 元素用于定义文本
 
+### 实例 1
 
+写一个文本：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <text x="0" y="15" fill="red">I love SVG</text>
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/text1.svg)（右键单击 SVG 图形预览源）
 
+### 实例 2
 
+旋转的文字：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <text x="0" y="15" fill="red" transform="rotate(30 20,40)">I love SVG</text>
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/text2.svg)（右键单击 SVG 图形预览源）
 
+### 实例 3
 
+路径上的文字：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <path id="path1" d="M75,20 a1,1 0 0,0 100,0" />
+  </defs>
+  <text x="10" y="100" style="fill:red;">
+    <textPath xlink:href="#path1">I love SVG I love SVG</textPath>
+  </text>
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/text3.svg)（右键单击 SVG 图形预览源）
 
+### 实例 4
+
+元素可以安排任何分小组与 `<tspan>` 元素的数量
+
+* 每个 `<tspan>` 元素可以包含不同的格式和位置
+
+* 几行文本(与 `<tspan>` 元素)
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <text x="10" y="20" style="fill:red;">Several lines:
+    <tspan x="10" y="45">First line</tspan>
+    <tspan x="10" y="70">Second line</tspan>
+  </text>
+</svg>
+
+</body>
+</html>
+```
+
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/text4.svg)（右键单击 SVG 图形预览源）
+
+### 实例 5
+
+作为链接文本（ `<a>` 元素）：
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+xmlns:xlink="http://www.w3.org/1999/xlink">
+  <a xlink:href="//www.w3cschool.cc/svg/" target="_blank">
+    <text x="0" y="15" fill="red">I love SVG</text>
+  </a>
+</svg>
+
+</body>
+</html>
+```
+
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/text5.svg)（右键单击 SVG 图形预览源）
+
+## Stroke 属性
+
+SVG 提供了一个范围广泛 stroke 属性
+
+在本章中，我们将看看下面：
+
+* stroke
+* stroke-width
+* stroke-linecap
+* stroke-dasharray
+
+所有 stroke 属性，可应用于任何种类的线条，文字和元素就像一个圆的轮廓
+
+### 实例 1
+
+Stroke 属性定义一条线，文本或元素轮廓颜色：
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <g fill="none">
+    <path stroke="red" d="M5 20 l215 0" />
+    <path stroke="black" d="M5 40 l215 0" />
+    <path stroke="blue" d="M5 60 l215 0" />
+  </g>
+</svg>
+
+</body>
+</html>
+```
+
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/stroke0.svg)（右键单击 SVG 图形预览源）
+
+### 实例 2
+
+stroke-width 属性定义了一条线，文本或元素轮廓厚度：
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <g fill="none" stroke="black">
+    <path stroke-width="2" d="M5 20 l215 0" />
+    <path stroke-width="4" d="M5 40 l215 0" />
+    <path stroke-width="6" d="M5 60 l215 0" />
+  </g>
+</svg>
+
+</body>
+</html>
+```
+
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/stroke1.svg)（右键单击 SVG 图形预览源）
+
+### 实例 3
+
+`stroke-linecap` 属性定义不同类型的开放路径的终结：
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <g fill="none" stroke="black" stroke-width="6">
+    <path stroke-linecap="butt" d="M5 20 l215 0" />
+    <path stroke-linecap="round" d="M5 40 l215 0" />
+    <path stroke-linecap="square" d="M5 60 l215 0" />
+  </g>
+</svg>
+
+</body>
+</html>
+```
+
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/stroke2.svg)（右键单击 SVG 图形预览源）
+
+## 实例 4
+
+`stroke-dasharray` 属性用于创建虚线：
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <g fill="none" stroke="black" stroke-width="4">
+    <path stroke-dasharray="5,5" d="M5 20 l215 0" />
+    <path stroke-dasharray="10,10" d="M5 40 l215 0" />
+    <path stroke-dasharray="20,10,5,5,5,10" d="M5 60 l215 0" />
+  </g>
+</svg>
+
+</body>
+</html>
+```
+
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/stroke3.svg)（右键单击 SVG 图形预览源）
+
+## 滤镜
 
 
 
