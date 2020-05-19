@@ -206,29 +206,18 @@ canvas 只支持一种原生的图形绘制：矩形
 
 canvast 提供了三种方法绘制矩形：
 
-* `fillRect(x, y, width, height)`
-
-  绘制一个填充的矩形
-
-* `strokeRect(x, y, width, height)`
-
-  绘制一个矩形的边框
-
-* `clearRect(x, y, widh, height)`
-
-  清除指定的矩形区域，然后这块区域会变的完全透明
+方法|说明
+-|-
+`fillRect(x, y, width, height)`|绘制一个填充的矩形
+`strokeRect(x, y, width, height)`|绘制一个矩形的边框
+`clearRect(x, y, widh, height)`|清除指定的矩形区域，然后这块区域会变的完全透明
 
 这三个方法具有相同的参数：
 
-* x ，y
-
-  指的是矩形的左上角的坐标
-
-  相对于 canvas 的坐标原点
-
-* width ，height
-
-  指的是绘制的矩形的宽和高
+参数|说明
+-|-
+x ，y|指的是矩形的左上角的坐标，相对于 canvas 的坐标原点
+width ，height|指的是绘制的矩形的宽和高
 
 ```js
 function draw(){
