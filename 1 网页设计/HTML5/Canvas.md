@@ -260,8 +260,8 @@ ctx.clearRect(15, 15, 50, 25);
 
 参数|描述
 -|-
-x|矩形左上角的 `x` 坐标
-y|矩形左上角的 `y` 坐标
+x|矩形左上角的 x 坐标
+y|矩形左上角的 y 坐标
 width|矩形的宽度，以像素计
 height|矩形的高度，以像素计
 
@@ -605,21 +605,16 @@ draw();
 
 ![图片](https://www.runoob.com/wp-content/uploads/2018/12/1544764428-2467-240px-BC3A9zier-3-big.svg-.png)
 
-绘制二次贝塞尔曲线：
+#### 绘制二次贝塞尔曲线
 
 ```
 quadraticCurveTo(cp1x, cp1y, x, y)
 ```
 
-参数说明：
-
-* cp1x 和 cp1y
-
-  控制点坐标
-​
-* x 和 y
-
-  结束点坐标
+参数|说明
+-|-
+cp1x 和 cp1y|控制点坐标
+​x 和 y|结束点坐标
 
 ```js
 function draw(){
@@ -649,76 +644,274 @@ draw();
 
 ![图片](https://www.runoob.com/wp-content/uploads/2018/12/274915666-5b74dd8ecb2e2_articlex.png)
 
+#### 绘制三次贝塞尔曲线
+
+```
+bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y)
+```
+
+参数|说明
+-|-
+cp1x 和 cp1y|控制点 1 坐标
+cp2x 和 cp2y|控制点 2 坐标
+​x 和 y|结束点坐标
+
+```js
+function draw(){
+  var canvas = document.getElementById('tutorial');
+  if (!canvas.getContext) return;
+  var ctx = canvas.getContext("2d");
 
+  ctx.beginPath();
+  ctx.moveTo(40, 200); // 起始点
 
+  var cp1x = 20, cp1y = 100;  // 控制点1
+  var cp2x = 100, cp2y = 120;  // 控制点2
+  var x = 200, y = 200; // 结束点
 
+  // 绘制二次贝塞尔曲线
+  ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y);
+  ctx.stroke();
 
+  ctx.beginPath();
+  ctx.rect(40, 200, 10, 10);
+  ctx.rect(cp1x, cp1y, 10, 10);
+  ctx.rect(cp2x, cp2y, 10, 10);
+  ctx.rect(x, y, 10, 10);
+  ctx.fill();
+}
 
+draw();
+```
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/3947786617-5b74dd8ec8678_articlex.png)
 
+## 添加样式和颜色
 
+在前面的绘制矩形章节中，只用到了默认的线条和颜色
 
+如果想要给图形上色，有两个重要的属性可以做到：
 
+参数|说明
+-|-
+fillStyle = color|设置图形的填充颜色
+strokeStyle = color|设置图形轮廓的颜色
 
+备注：
 
+* color 可以是表示 css 颜色值的字符串、渐变对象或者图案对象
 
+* 默认情况下，线条和填充颜色都是黑色
 
+* 一旦您设置了 `strokeStyle` 或者 `fillStyle` 的值，那么这个新值就会成为新绘制的图形的默认值
 
+  如果你要给每个图形上不同的颜色，你需要重新设置 `fillStyle` 或 `strokeStyle` 的值
 
+### fillStyle
 
+```js
+function draw(){
+  var canvas = document.getElementById('tutorial');
+  if (!canvas.getContext) return;
+  var ctx = canvas.getContext("2d");
+  for (var i = 0; i < 6; i++){
+    for (var j = 0; j < 6; j++){
+      ctx.fillStyle = 'rgb(' + Math.floor(255 - 42.5 * i) + ',' +
+        Math.floor(255 - 42.5 * j) + ',0)';
+      ctx.fillRect(j * 50, i * 50, 50, 50);
+    }
+  }
+}
 
+draw();
+```
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/2505008676-5b74dd8ebad41_articlex.png)
 
+### strokeStyle
 
+```js
+function draw(){
+    var canvas = document.getElementById('tutorial');
+    if (!canvas.getContext) return;
+    var ctx = canvas.getContext("2d");
+    for (var i = 0; i < 6; i++){
+        for (var j = 0; j < 6; j++){
+            ctx.strokeStyle = `rgb(${randomInt(0, 255)},${randomInt(0, 255)},${randomInt(0, 255)})`;
+            ctx.strokeRect(j * 50, i * 50, 40, 40);
+        }
+    }
+}
+draw();
+/**
+ 返回随机的 [from, to] 之间的整数(包括 from ，也包括 to )
+ */
+function randomInt(from, to){
+    return parseInt(Math.random() * (to - from + 1) + from);
+}
+```
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/3288535670-5b74dd8ea12d9_articlex.png)
 
+### 透明度
 
+`globalAlpha = transparencyValue`
 
+* 这个属性影响到 canvas 里所有图形的透明度
 
+* 有效的值范围是 `0.0`（完全透明）到 `1.0`（完全不透明），默认是 `1.0`
 
+> `globalAlpha` 属性在需要绘制大量拥有相同透明度的图形时候相当高效
+>> 不过，使用 `rgba()` 设置透明度更加好一些
 
+### 线宽
 
+`line style`
 
+* 线宽
 
+* 只能是正值
 
+* 默认是 `1.0`
 
+* 起始点和终点的连线为中心，上下各占线宽的一半
 
+```js
+ctx.beginPath();
+ctx.moveTo(10, 10);
+ctx.lineTo(100, 10);
+ctx.lineWidth = 10;
+ctx.stroke();
 
+ctx.beginPath();
+ctx.moveTo(110, 10);
+ctx.lineTo(160, 10)
+ctx.lineWidth = 20;
+ctx.stroke()
+```
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/3410060825-5b74dd8ea12d9_articlex.png)
 
+### 线条末端样式
 
+`lineCap = type`
 
+* 线条末端样式
 
+* `type` 共有 `3` 个值
 
+type 值|说明
+-|-
+butt|线段末端以方形结束
+round|线段末端以圆形结束
+square|线段末端以方形结束
 
+> `square` 会增加一个宽度和线段相同，高度是线段厚度一半的矩形区域
 
+```js
+var lineCaps = ["butt", "round", "square"];
 
+for (var i = 0; i < 3; i++){
+  ctx.beginPath();
 
+  ctx.moveTo(20 + 30 * i, 30);
+  ctx.lineTo(20 + 30 * i, 100);
 
+  ctx.lineWidth = 20;
+  ctx.lineCap = lineCaps[i];
 
+  ctx.stroke();
+}
 
+ctx.beginPath();
 
+ctx.moveTo(0, 30);
+ctx.lineTo(300, 30);
 
+ctx.moveTo(0, 100);
+ctx.lineTo(300, 100)
 
+ctx.strokeStyle = "red";
+ctx.lineWidth = 1;
+ctx.stroke();
+```
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/3380216230-5b74dd8e97e85_articlex.png)
 
+### 线条间接合处的样式
 
+`lineJoin = type`
 
+* 同一个 path 内，设定线条与线条间接合处的样式
 
+* `type` 共有 `3` 个值
 
+type 值|说明
+-|-
+round|通过填充一个额外的，圆心在相连部分末端的扇形，绘制拐角的形状；圆角的半径是线段的宽度
+bevel|在相连部分的末端填充一个额外的以三角形为底的区域，每个部分都有各自独立的矩形拐角
+miter (默认)|通过延伸相连部分的外边缘，使其相交于一点，形成一个额外的菱形区域
 
+```js
+function draw(){
+  var canvas = document.getElementById('tutorial');
+  if (!canvas.getContext) return;
+  var ctx = canvas.getContext("2d");
 
+  var lineJoin = ['round', 'bevel', 'miter'];
+  ctx.lineWidth = 20;
 
+  for (var i = 0; i < lineJoin.length; i++){
+    ctx.lineJoin = lineJoin[i];
+    ctx.beginPath();
 
+    ctx.moveTo(50, 50 + i * 50);
+    ctx.lineTo(100, 100 + i * 50);
+    ctx.lineTo(150, 50 + i * 50);
+    ctx.lineTo(200, 100 + i * 50);
+    ctx.lineTo(250, 50 + i * 50);
 
+    ctx.stroke();
+  }
+}
 
+draw();
+```
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/1584506777-5b74dd8e82768_articlex.png)
 
+### 虚线
 
+用 `setLineDash` 方法和 `lineDashOffset` 属性来制定虚线样式
 
+* `setLineDash` 方法接受一个数组，来指定线段与间隙的交替
 
+* `lineDashOffset` 属性设置起始偏移量
 
+```js
+function draw(){
+  var canvas = document.getElementById('tutorial');
+  if (!canvas.getContext) return;
+  var ctx = canvas.getContext("2d");
 
+  ctx.setLineDash([20, 5]);  // [实线长度, 间隙长度]
+  ctx.lineDashOffset = -0;
+  ctx.strokeRect(50, 50, 210, 210);
+}
+
+draw();
+```
+
+> 备注：`getLineDash()` 返回一个包含当前虚线样式，长度为非负偶数的数组
+
+## 绘制文本
+
+canvas 提供了两种方法来渲染文本：
+
+方法|说明
+-|-
+fillText(text, x, y [, maxWidth])|在指定的 (x,y) 位置填充指定的文本，绘制的最大宽度是可选的
+strokeText(text, x, y [, maxWidth])|在指定的 (x,y) 位置绘制文本边框，绘制的最大宽度是可选的
 
 
 
