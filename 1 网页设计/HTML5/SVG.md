@@ -912,155 +912,613 @@ stroke-width 属性定义了一条线，文本或元素轮廓厚度：
 
 ## 滤镜
 
+> 注意： Internet Explorer 和 Safari 不支持 SVG 滤镜！
 
+SVG 滤镜用来增加对 SVG 图形的特殊效果
 
+> 我们将仅展示一个可能采用的特殊效果
+> * 基础知识展示后，你已经学会使用特殊效果，你应该能够适用于其他地方
+> * 这里的关键是给你一个怎样做 SVG 的想法，而不是重复整个规范
 
+SVG可用的滤镜有：
 
+* feBlend - 与图像相结合的滤镜
+* feColorMatrix - 用于彩色滤光片转换
+* feComponentTransfer
+* feComposite
+* feConvolveMatrix
+* feDiffuseLighting
+* feDisplacementMap
+* feFlood
+* feGaussianBlur - 创建模糊效果
+* feImage
+* feMerge
+* feMorphology
+* feOffset - 过滤阴影
+* feSpecularLighting
+* feTile
+* feTurbulence
+* feDistantLight - 用于照明过滤
+* fePointLight - 用于照明过滤
+* feSpotLight - 用于照明过滤
 
+> 除此之外，您可以在每个 SVG 元素上使用多个滤镜！
 
+### `defs` 和 `filter`
 
+所有互联网的 SVG 滤镜定义在 `<defs></defs>` 元素中
 
+* `<defs></defs>` 元素定义短并含有特殊元素（如滤镜）
 
+`<filter></filter>` 标签用来定义 SVG 滤镜
 
+* `<filter></filter>` 标签使用必需的 `id` 属性来定义向图形应用哪个滤镜？
 
+## 模糊效果
 
+`<feGaussianBlur />` 元素是用于创建模糊效果：
 
+![图片](https://www.runoob.com/images/svg_fegaussianblur.jpg)
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<p><b>Note: </b>Internet Explorer and Safari do not support SVG filters yet!</p>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <defs>
+    <filter id="f1" x="0" y="0">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="15" />
+    </filter>
+  </defs>
+  <rect width="90" height="90" stroke="green" stroke-width="3" fill="yellow" filter="url(#f1)" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/fegaussianblur1.svg)（右键单击 SVG 图形预览源）
 
+代码解析：
 
+* `<filter></filter>` 元素 `id` 属性定义一个滤镜的唯一名称
 
+* `<feGaussianBlur />` 元素定义模糊效果
 
+* `in="SourceGraphic"` 这个部分定义了由整个图像创建效果
 
+* `stdDeviation` 属性定义模糊量
 
+* `<rect />` 元素的滤镜属性用来把元素链接到"f1"滤镜
 
+## 阴影
 
+`<feOffset />` 元素是用于创建阴影效果。我们的想法是采取一个SVG图形（图像或元素）并移动它在xy平面上一点儿
 
+### 实例 1
 
+第一个例子偏移一个矩形（带 `<feOffset />` ），然后混合偏移图像顶部（含 `<feBlend />` ）：
 
+![图片](https://www.runoob.com/images/svg_feoffset.gif)
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<p><b>Note: </b>Internet Explorer and Safari do not support SVG filters yet!</p>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <defs>
+    <filter id="f1" x="0" y="0" width="200%" height="200%">
+      <feOffset result="offOut" in="SourceGraphic" dx="20" dy="20" />
+      <feBlend in="SourceGraphic" in2="offOut" mode="normal" />
+    </filter>
+  </defs>
+  <rect width="90" height="90" stroke="green" stroke-width="3"
+  fill="yellow" filter="url(#f1)" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/feoffset1.svg)（右键单击 SVG 图形预览源）
 
+代码解析：
 
+* `<filter></filter>` 元素 `id` 属性定义一个滤镜的唯一名称
 
+* `<rect />` 元素的滤镜属性用来把元素链接到 `f1` 滤镜
 
+### 实例 2
 
+现在，偏移图像可以变的模糊（含 `<feGaussianBlur />` ）：
 
+![图片](https://www.runoob.com/images/svg_feoffset2.jpg)
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<p><b>Note: </b>Internet Explorer and Safari do not support SVG filters yet!</p>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <defs>
+    <filter id="f1" x="0" y="0" width="200%" height="200%">
+      <feOffset result="offOut" in="SourceGraphic" dx="20" dy="20" />
+      <feGaussianBlur result="blurOut" in="offOut" stdDeviation="10" />
+      <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+    </filter>
+  </defs>
+  <rect width="90" height="90" stroke="green" stroke-width="3" fill="yellow" filter="url(#f1)" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/feoffset2.svg)（右键单击 SVG 图形预览源）
 
+代码解析：
 
+* `<feGaussianBlur />` 元素的 `stdDeviation` 属性定义了模糊量
 
+### 实例 3
 
+现在，制作一个黑色的阴影：
 
+![图片](https://www.runoob.com/images/svg_feoffset3.jpg)
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<p><b>Note: </b>Internet Explorer and Safari do not support SVG filters yet!</p>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <defs>
+    <filter id="f1" x="0" y="0" width="200%" height="200%">
+      <feOffset result="offOut" in="SourceAlpha" dx="20" dy="20" />
+      <feGaussianBlur result="blurOut" in="offOut" stdDeviation="10" />
+      <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+    </filter>
+  </defs>
+  <rect width="90" height="90" stroke="green" stroke-width="3" fill="yellow" filter="url(#f1)" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/feoffset3.svg)（右键单击 SVG 图形预览源）
 
+代码解析：
 
+* `<feOffset />` 元素的属性改为 `"SourceAlpha"` 在 Alpha 通道使用残影，而不是整个 RGBA 像素
 
+### 实例 4
 
+现在为阴影涂上一层颜色：
 
+![图片](https://www.runoob.com/images/svg_feoffset4.jpg)
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<p><b>Note: </b>Internet Explorer and Safari do not support SVG filters yet!</p>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <defs>
+    <filter id="f1" x="0" y="0" width="200%" height="200%">
+      <feOffset result="offOut" in="SourceGraphic" dx="20" dy="20" />
+      <feColorMatrix result = "matrixOut" in = "offOut" type = "matrix" values = "0.2 0 0 0 0 0 0.2 0 0 0 0 0 0.2 0 0 0 0 0 1 0"/>
+      <feGaussianBlur result="blurOut" in="matrixOut" stdDeviation="10" />
+      <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+    </filter>
+  </defs>
+  <rect width="90" height="90" stroke="green" stroke-width="3" fill="yellow" filter="url(#f1)" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/feoffset4.svg)（右键单击 SVG 图形预览源）
 
+代码解析：
 
+* `<feColorMatrix />` 过滤器是用来转换偏移的图像使之更接近黑色的颜色
 
+  `'0.2'` 矩阵的三个值都获取乘以红色，绿色和蓝色通道
 
+  降低其值带来的颜色至黑色（黑色为 `0` ）
 
+#### 变换矩阵的定义和说明
 
+`<feColorMatrix />` 的 `matrix` 是一个 `4*5` 的矩阵
 
+* 前面 `4` 列是颜色通道的比例系数，最后一列是常量偏移
 
+![图片](https://www.runoob.com/wp-content/uploads/2017/09/20160422110932437.png)
 
+上面公式中的 `rr` 表示 `red to red` 系数，以此类推，`c1~c4` 表示常量偏移
 
+* 第一个 `4*5` 矩阵为变换矩阵，第二个单列矩阵为待变换对象的像素值
 
+  右侧单列矩阵为矩阵 `1` 和 `2` 的点积结果
 
+* 这个变换矩阵看起来比较复杂，在实践上常使用一个简化的对角矩阵
 
+  即除了 `rr/gg/bb/aa` 取值非零外，其余行列取值为 `0`
 
+  这就退化成了简单的各颜色通道的独立调整
 
+`<feColorMatrix />` 的语法:
 
+```html
+<filter id="f1" x="0%" y="0%" width="100%" height="100%">
+  <feColorMatrix
+     result="original" id="c1" type="matrix"
+     values="1 0 0 0 0
+             0 1 0 0 0
+             0 0 1 0 0
+             0 0 0 1 0" />
+</filter>
+```
 
+上述 `<feColorMatrix />` 过滤器的类型值为 `matrix` ，除此之外，还有 **`saturate（饱和度）`** 和 **`hueRotate（色相旋转）`** ，取值比较简单，这里不做说明
 
+* 显然当变换矩阵为单位对角矩阵时，变换结果和原值相等
 
+* 我们可以尝试调整比例系数，比如把 `rr` 的值设置为 `0` ，即去除图像中的 `red` 颜色通道含量：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg width="100%" height="100%" viewBox="0 0 150 120" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 
+    <filter id="colorMatrix">
+        <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0
+           0 1 0 0 0
+           0 0 1 0 0
+           0 0 0 1 0" />
+    </filter>
+    <g filter="">
+        <circle cx="30" cy="30" r="20" fill="red" fill-opacity="0.5" />
+    </g>
+    <g filter="url(#colorMatrix)">
+        <circle cx="80" cy="30" r="20" fill="red" fill-opacity="0.5" />
+    </g>
+</svg>
 
+</body>
+</html>
+```
 
+## 渐变
 
+渐变是一种从一种颜色到另一种颜色的平滑过渡
 
+* 另外，可以把多个颜色的过渡应用到同一个元素上
 
+SVG 渐变主要有两种类型：
 
+* Linear
+* Radial
 
+## 渐变 - 线性
 
+`<linearGradient></linearGradient>` 元素用于定义线性渐变
 
+* `<linearGradient></linearGradient>` 标签必须嵌套在 `<defs></defs>` 的内部
 
+* `<defs></defs>` 标签是 `definitions` 的缩写，它可对诸如渐变之类的特殊元素进行定义
 
+线性渐变可以定义为水平，垂直或角渐变：
 
+* 当 `y1` 和 `y2` 相等，而 `x1` 和 `x2` 不同时，可创建水平渐变
 
+* 当 `x1` 和 `x2` 相等，而 `y1` 和 `y2` 不同时，可创建垂直渐变
 
+* 当 `x1` 和 `x2` 不同，且 `y1` 和 `y2` 不同时，可创建角形渐变
 
+### 实例 1
 
+定义水平线性渐变从黄色到红色的椭圆形：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:rgb(255,255,0);stop-opacity:1" />
+      <stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <ellipse cx="200" cy="70" rx="85" ry="55" fill="url(#grad1)" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/linear1.svg)（右键单击 SVG 图形预览源）
 
+代码解析：
 
+* `<linearGradient></linearGradient>` 标签的 `id` 属性可为渐变定义一个唯一的名称
 
+* `<linearGradient></linearGradient>` 标签的 `X1` ，`X2` ，`Y1` ，`Y2` 属性定义渐变开始和结束位置
 
+* 渐变的颜色范围可由两种或多种颜色组成
 
+  每种颜色通过一个 `<stop />` 标签来规定
 
+  `offset` 属性用来定义渐变的开始和结束位置。
 
+* 填充属性把 `<ellipse />` 元素链接到此渐变
 
+### 实例 2
 
+定义一个垂直线性渐变从黄色到红色的椭圆形：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+      <stop offset="100%" style="stop-color:rgb(255,255,0);stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <ellipse cx="200" cy="70" rx="85" ry="55" fill="url(#grad1)" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/linear2.svg)（右键单击 SVG 图形预览源）
 
+### 实例 3
 
+定义一个椭圆形，水平线性渐变从黄色到红色并添加一个椭圆内文本：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:rgb(255,255,0);stop-opacity:1" />
+      <stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <ellipse cx="200" cy="70" rx="85" ry="55" fill="url(#grad1)" />
+  <text fill="#ffffff" font-size="45" font-family="Verdana" x="150" y="86">SVG</text>
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/linear3.svg)（右键单击 SVG 图形预览源）
 
+代码解析：
 
+* `<text></text>` 元素是用来添加一个文本
 
+## 渐变- 放射性
 
+`<radialGradient></radialGradient>` 元素用于定义放射性渐变
 
+* `<radialGradient></radialGradient>` 标签必须嵌套在 `<defs></defs>` 的内部
 
+* `<defs></defs>` 标签是 `definitions` 的缩写，它可对诸如渐变之类的特殊元素进行定义
 
+### 实例 1
 
+定义一个放射性渐变从白色到蓝色椭圆：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <defs>
+    <radialGradient id="grad1" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity:0" />
+      <stop offset="100%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  <ellipse cx="200" cy="70" rx="85" ry="55" fill="url(#grad1)" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/radial1.svg)（右键单击 SVG 图形预览源）
 
+代码解析：
 
+* `<radialGradient></radialGradient>` 标签的 `id` 属性可为渐变定义一个唯一的名称
 
+* `cx` ，`cy` 和 `r` 属性定义的最外层圆和 `fx` 和 `fy` 定义的最内层圆
 
+* 渐变颜色范围可以由两个或两个以上的颜色组成
 
+  每种颜色用一个 `<stop />` 标签指定
 
+  `offset` 属性用来定义渐变色开始和结束
 
+* 填充属性把 `<ellipse />` 元素链接到此渐变
 
+### 实例 2
 
+定义放射性渐变从白色到蓝色的另一个椭圆：
 
+```html
+<!DOCTYPE html>
+<html>
+<body>
 
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <defs>
+    <radialGradient id="grad1" cx="20%" cy="30%" r="30%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity:0" />
+      <stop offset="100%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  <ellipse cx="200" cy="70" rx="85" ry="55" fill="url(#grad1)" />
+</svg>
 
+</body>
+</html>
+```
 
+> 对于 Opera 用户：[【查看 SVG 文件】](https://www.runoob.com/try/demo_source/radial2.svg)（右键单击 SVG 图形预览源）
 
+## 实例
+
+下面的例子是把 SVG 代码直接嵌入到 HTML 代码中
+
+* 谷歌 Chrome ，火狐，Internet Explorer 9 ，和 Safari 都支持
+
+> 注意：下面的例子将不会在 Opera 运行
+>> 即使 Opera 支持 SVG ，它也不支持 SVG 在 HTML 代码中直接使用
+
+### [【 SVG 基本形状】](https://www.runoob.com/svg/svg-examples.html)
+
+一个圆
+
+矩形
+
+不透明矩形
+
+一个矩形不透明2
+
+一个带圆角矩形
+
+一个椭圆
+
+累叠而上的三个椭圆
+
+两个椭圆
+
+一条线
+
+三角形
+
+四边形
+
+一个星星
+
+另一个星星
+
+折线
+
+另一个折线
+
+路径
+
+二次贝塞尔曲线
+
+编写文字
+
+旋转文本
+
+路径上文字
+
+几行文字
+
+文本链接
+
+定义一条线，文本或轮廓颜色（stroke）
+
+定义一条线宽度，文本或轮廓（stroke-width）
+
+stroke-linecap属性定义不同类型的开放路径的终结：
+
+定义虚线（stroke-dasharray）
+
+### [【 SVG 滤镜】](https://www.runoob.com/svg/svg-examples.html)
+
+feGaussianBlur - 模糊效果
+
+feOffset - 偏移一个矩形，然后混合偏移图像顶部
+
+feOffset - 模糊偏移图像
+
+feOffset - 使阴影变黑色
+
+feOffset - 为阴影涂上一层颜色
+
+一个feBlend滤镜
+
+一个feColorMatrix滤镜
+
+一个feComponentTransfer滤镜
+
+feOffset、feFlood、feComposite、feMerge 以及 feMergeNode
+
+一个feMorphology滤镜
+
+滤镜1
+
+滤镜2
+
+滤镜3
+
+滤镜4
+
+滤镜5
+
+滤镜6
+
+### [【 SVG 渐变】](https://www.runoob.com/svg/svg-examples.html)
+
+水平线性渐变从黄色到红色的椭圆形
+
+垂直线性渐变从黄色到红色椭圆形
+
+水平线性渐变从黄色到红色并添加一个椭圆内文本
+
+放射性渐变从白色到蓝色椭圆
+
+放射性渐变从白色到蓝色的另一个椭圆
+
+### [【 SVG 杂项】](https://www.runoob.com/svg/svg-examples.html)
+
+重复用 5 秒时间淡出的矩形
+
+矩形会变大并改变颜色
+
+会改变颜色的三个矩形
+
+沿一个运动路径移动的文本
+
+沿一个运动路径移动、旋转并缩放的文本
+
+沿一个运动路径移动、旋转并缩放的文本 + 逐步放大并改变颜色的矩形
+
+## [【参考手册】](https://www.runoob.com/svg/svg-reference.html)
