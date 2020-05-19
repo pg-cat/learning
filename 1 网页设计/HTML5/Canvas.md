@@ -584,7 +584,7 @@ draw();
 
 #### 绘制二次贝塞尔曲线
 
-```
+```js
 quadraticCurveTo(cp1x, cp1y, x, y)
 ```
 
@@ -623,7 +623,7 @@ draw();
 
 #### 绘制三次贝塞尔曲线
 
-```
+```js
 bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y)
 ```
 
@@ -918,133 +918,355 @@ draw();
 
 ## 绘制图片
 
+我们也可以在 canvas 上直接绘制图片
 
+### 由零开始创建图片
 
+```js
+var img = new Image();   // 创建一个 <img> 元素
+img.src = 'myImage.png'; // 设置图片源地址
+```
 
+脚本执行后图片开始装载
 
+#### 绘制 img
 
+```js
+// 参数 1：要绘制的 img
+// 参数 2、3：绘制的 img 在 canvas 中的坐标
+ctx.drawImage(img,0,0);
+```
 
+> 注意：考虑到图片是从网络加载，如果 `drawImage` 的时候图片还没有完全加载完成，则什么都不做，个别浏览器会抛异常
+>> 所以我们应该保证在 `img` 绘制完成之后再 `drawImage`
 
+```js
+var img = new Image();   // 创建img元素
+img.onload = function(){
+  ctx.drawImage(img, 0, 0)
+}
+img.src = 'myImage.png'; // 设置图片源地址
+```
 
+### 绘制 img 标签元素中的图片
 
+`​img` 可以 `new` ，也可以来源于我们页面的 `<img>` 标签
 
+```js
+<img src="./美女.jpg" alt="" width="300"><br>
+<canvas id="tutorial" width="600" height="400"></canvas>
+function draw(){
+    var canvas = document.getElementById('tutorial');
+    if (!canvas.getContext) return;
+    var ctx = canvas.getContext("2d");
+    var img = document.querySelector("img");
+    ctx.drawImage(img, 0, 0);
+}
+document.querySelector("img").onclick = function (){
+    draw();
+}
+```
 
+第一张图片就是页面中的 `<img>` 标签：
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/2255709523-5b74dd8eb033e_articlex.png)
 
+### 缩放图片
 
+`drawImage()` 也可以再添加两个参数：
 
+```js
+drawImage(image, x, y, width, height)
+```
 
+这个方法多了 `2` 个参数：
 
+* `width` 和 `height`
 
+* 这两个参数用来控制当向 canvas 画入时应该缩放的大小
 
+```js
+ctx.drawImage(img, 0, 0, 400, 200)
+```
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/327614951-5b74dd8e71ab1_articlex.png)
 
+### 切片
 
+```js
+drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+```
 
+* 第一个参数和其它的是相同的，都是一个图像或者另一个 canvas 的引用
 
+* 其他 `8` 个参数：
 
+  前 `4` 个是定义图像源的切片位置和大小
 
+  后 `4` 个则是定义切片的目标显示位置和大小
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/2106688680-54566fa3d81dc_articlex.jpeg)
 
+## 状态的保存和恢复
 
+`save()` 和 `restore()` 方法是用来保存和恢复 canvas 状态的，都没有参数
 
+​Canvas 的状态就是当前画面应用的所有样式和变形的一个快照
 
+### save()
 
+Canvas 状态存储在栈中，每当 `save()` 方法被调用后，当前的状态就被推送到栈中保存
 
+一个绘画状态包括：
 
+* 当前应用的变形（即移动，旋转和缩放）
 
+* strokeStyle ，fillStyle ，globalAlpha ，lineWidth ，lineCap ，lineJoin ，miterLimit ，shadowOffsetX ，shadowOffsetY ，shadowBlur ，shadowColor ，globalCompositeOperation 的值
 
+* 当前的裁切路径（ clipping path ）
 
+​> 可以调用任意多次 save 方法（类似数组的 `push()` ）
 
+### restore()
 
+每一次调用 restore 方法，上一个保存的状态就从栈中弹出，所有设定都恢复（类似数组的 `pop()` ）
 
+```js
+var ctx;
+function draw(){
+  var canvas = document.getElementById('tutorial');
+  if (!canvas.getContext) return;
+  var ctx = canvas.getContext("2d");
 
+  ctx.fillRect(0, 0, 150, 150);   // 使用默认设置绘制一个矩形
+  ctx.save();                  // 保存默认状态
 
+  ctx.fillStyle = 'red'       // 在原有配置基础上对颜色做改变
+  ctx.fillRect(15, 15, 120, 120); // 使用新的设置绘制一个矩形
+  ctx.save();                  // 保存当前状态
 
+  ctx.fillStyle = '#FFF'       // 再次改变颜色配置
+  ctx.fillRect(30, 30, 90, 90);   // 使用新的配置绘制一个矩形
 
+  ctx.restore();               // 重新加载之前的颜色状态
+  ctx.fillRect(45, 45, 60, 60);   // 使用上一次的配置绘制一个矩形
 
+  ctx.restore();               // 加载默认颜色配置
+  ctx.fillRect(60, 60, 30, 30);   // 使用加载的配置绘制一个矩形
+}
 
+draw();
+```
 
+## 变形
 
+### 移动 canvas 的原点
 
+```js
+translate(x, y)
+```
 
+* 用来移动 canvas 的原点到指定的位置
 
+* `​translate` 方法接受两个参数：
 
+  `x` 是左右偏移量，`y` 是上下偏移量，如下图所示
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/829832336-5b74dd8e3ad9a_articlex.png)
 
+在做变形之前先保存状态是一个良好的习惯
 
+* 大多数情况下，调用 restore 方法比手动恢复原先的状态要简单得多
 
+* 又如果你是在一个循环中做位移但没有保存和恢复 canvas 的状态
 
+  很可能到最后会发现怎么有些东西不见了，那是因为它很可能已经超出 canvas 范围以外了
 
+> 注意：translate 移动的是 canvas 的坐标原点(坐标变换)
 
+```js
+var ctx;
+function draw(){
+  var canvas = document.getElementById('tutorial1');
+  if (!canvas.getContext) return;
+  var ctx = canvas.getContext("2d");
 
+  ctx.save(); //保存坐标原点平移之前的状态
+  ctx.translate(100, 100);
+  ctx.strokeRect(0, 0, 100, 100)
 
+  ctx.restore(); //恢复到最初状态
+  ctx.translate(220, 220);
+  ctx.fillRect(0, 0, 100, 100)
+}
+draw();
+```
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/1230266743-5b74dd8e3b0ce_articlex.png)
 
+### 旋转坐标轴
 
+```js
+rotate(angle)
+```
 
+* 旋转坐标轴
 
+​* 这个方法只接受一个参数：
 
+  旋转的角度( angle )，它是顺时针方向的，以弧度为单位的值
 
+* 旋转的中心是坐标原点
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/3322150878-5b74dd8e2b6a4_articlex.png)
 
+```js
+var ctx;
+function draw(){
+  var canvas = document.getElementById('tutorial1');
+  if (!canvas.getContext) return;
+  var ctx = canvas.getContext("2d");
 
+  ctx.fillStyle = "red";
+  ctx.save();
 
+  ctx.translate(100, 100);
+  ctx.rotate(Math.PI / 180 * 45);
+  ctx.fillStyle = "blue";
+  ctx.fillRect(0, 0, 100, 100);
+  ctx.restore();
 
+  ctx.save();
+  ctx.translate(0, 0);
+  ctx.fillRect(0, 0, 50, 50)
+  ctx.restore();
+}
+draw();
+```
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/1819968878-5b74dd8e1e770_articlex.png)
 
+### 缩放
 
+```js
+scale(x, y)
+```
 
+* 我们用它来增减图形在 canvas 中的像素数目，对形状，位图进行缩小或者放大
 
+* scale 方法接受两个参数：
 
+  x ，y 分别是横轴和纵轴的缩放因子，它们都必须是正值
 
+  值比 `1.0` 小表示缩小，比 `1.0` 大则表示放大，值为 `1.0` 时什么效果都没有
 
+默认情况下，canvas 的 `1` 单位就是 `1` 个像素
 
+* 举例说，如果我们设置缩放因子是 `0.5` ，`1` 个单位就变成对应 `0.5` 个像素，这样绘制出来的形状就会是原先的一半
 
+* 同理，设置为 `2.0` 时，`1` 个单位就对应变成了 `2` 像素，绘制的结果就是图形放大了 `2` 倍
 
+### 变形矩阵
 
+```js
+transform(a, b, c, d, e, f)
+```
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/2958376259-5b74dd8e15192_articlex.png)
 
+参数|说明
+-|-
+a (m11)|水平缩放
+b (m12)|水平倾斜
+c (m21)|垂直倾斜
+d (m22)|垂直缩放
+e (dx)|水平移动
+f (dy)|垂直移动
 
+```js
+var ctx;
+function draw(){
+  var canvas = document.getElementById('tutorial1');
+  if (!canvas.getContext) return;
+  var ctx = canvas.getContext("2d");
+  ctx.transform(1, 1, 0, 1, 0, 0);
+  ctx.fillRect(0, 0, 100, 100);
+}
+draw();
+```
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/489430190-5b74dd8e17ad2_articlex.png)
 
+## 合成
 
+在前面的所有例子中，我们总是将一个图形画在另一个之上，对于其他更多的情况，仅仅这样是远远不够的
 
+* 比如，对合成的图形来说，绘制顺序会有限制
 
+* 不过，我们可以利用 `globalCompositeOperation` 属性来改变这种状况
 
+`globalCompositeOperation = type`
 
+```js
+var ctx;
+function draw(){
+  var canvas = document.getElementById('tutorial1');
+  if (!canvas.getContext) return;
+  var ctx = canvas.getContext("2d");
 
+  ctx.fillStyle = "blue";
+  ctx.fillRect(0, 0, 200, 200);
 
+  ctx.globalCompositeOperation = "source-over"; // 全局合成操作
+  ctx.fillStyle = "red";
+  ctx.fillRect(100, 100, 200, 200);
+}
+draw();
+```
 
+> 注：下面的展示中，蓝色是原有的，红色是新的
 
+type 是下面 `13` 种字符串值之一：
 
+* `source-over`
 
+  这是默认设置，新图像会覆盖在原有图像
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/1858023544-5b74dd8e0813d.png)
 
+* `source-in`
 
+  仅仅会出现新图像与原来图像重叠的部分，其他区域都变成透明的
 
+  包括其他的老图像区域也会透明
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/2183873141-5b74dd8e02a4a_articlex.png)
 
+* `source-out`
 
+  仅仅显示新图像与老图像没有重叠的部分，其余部分全部透明
 
+  老图像也不显示
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/2402253130-5b74dd8dd7621_articlex.png)
 
+* `source-atop`
 
+  新图像仅仅显示与老图像重叠区域
 
+  老图像仍然可以显示
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/1206278247-5b74dd8dd9036_articlex.png)
 
+* destination-over
 
+  新图像会在老图像的下面
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/2492190378-5b74dd8dca608_articlex.png)
 
+* `destination-in`
 
-
-
-
-
-
-
-
-
+  仅仅新老图像重叠部分的老图像被显示，其他区域全部透明
 
 
 
