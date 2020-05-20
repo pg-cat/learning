@@ -112,7 +112,7 @@
 
 可以用这几种方式自定义构建：
 
-* 在线自定义构建
+* [【在线自定义构建】](https://echarts.apache.org/builder.html)
 
   比较方便
 
@@ -270,38 +270,157 @@ node node_modules/echarts/build/build.js --min -i echarts.custom.js -o lib/echar
 
 首先我们在 `myProject` 目录下使用 npm 安装[【 rollup 】](https://rollupjs.org/)：
 
+```sh
+npm install rollup --save-dev
+npm install rollup-plugin-node-resolve --save-dev
+npm install rollup-plugin-uglify --save-dev
+```
 
+接下来创建项目 JS 文件 `myProject/line.js` 来绘制图表，内容为：
 
+```js
+// 引入 echarts 主模块。
+import * as echarts from 'echarts/lib/echarts';
+// 引入折线图。
+import 'echarts/lib/chart/line';
+// 引入提示框组件、标题组件、工具箱组件。
+import 'echarts/lib/component/tooltip';
+import 'echarts/lib/component/title';
+import 'echarts/lib/component/toolbox';
 
+// 基于准备好的dom，初始化 echarts 实例并绘制图表。
+echarts.init(document.getElementById('main')).setOption({
+  title: { text: 'Line Chart' },
+  tooltip: {},
+  toolbox: {
+    feature: {
+      dataView: {},
+      saveAsImage: {
+        pixelRatio: 2
+      },
+      restore: {}
+    }
+  },
+  xAxis: {},
+  yAxis: {},
+  series: [{
+    type: 'line',
+    smooth: true,
+    data: [[12, 5], [24, 20], [36, 36], [48, 10], [60, 10], [72, 20]]
+  }]
+});
+```
 
+对于不支持 ES Module 的浏览器而言，刚才创建的 `myProject/line.js` 还不能直接被网页引用并在浏览器中运行，需要进行构建
 
+使用 rollup 构建前，需要创建它的配置文件 `myProject/rollup.config.js` ，内容如下：
 
+```js
+// 这个插件用于在 `node_module` 文件夹（即 npm 用于管理模块的文件夹）中寻找模块
+// 比如，代码中有
+// `import 'echarts/lib/chart/line';` 时，这个插件能够寻找到
+// `node_module/echarts/lib/chart/line.js` 这个模块文件
+import nodeResolve from 'rollup-plugin-node-resolve';
 
+// 用于压缩构建出的代码
+import uglify from 'rollup-plugin-uglify';
 
+// 用于多语言支持（如果不需要可忽略此 plugin）
+// import ecLangPlugin from 'echarts/build/rollup-plugin-ec-lang';
 
+export default {
+  name: 'myProject',
 
+  // 入口代码文件，就是刚才所创建的文件
+  input: './line.js',
 
+  plugins: [
+    nodeResolve(),
 
+    // ecLangPlugin({lang: 'en'}),
 
+    // 消除代码中的 __DEV__ 代码段，从而不在控制台打印错误提示信息
+    uglify()
+  ],
+  output: {
+    // 以 UMD 格式输出，从而能在各种浏览器中加载使用
+    format: 'umd',
 
+    // 输出 source map 便于调试
+    sourcemap: true,
 
+    // 输出文件的路径
+    file: 'lib/line.min.js'
+  }
+};
+```
 
+然后在 `myProject` 目录下使用命令行，构建工程代码 `myProject/line.js` ：
 
+```sh
+./node_modules/.bin/rollup -c
+```
 
+> 其中 `-c` 表示让 rollup 使用我们刚才创建的 `myProject/rollup.config.js` 文件作为配置文件
 
+构建生成的 `myProject/lib/line.min.js` 文件包括了工程代码和 echarts 代码，并且仅仅包括我们所需要的图和组件，并且可以在浏览器中使用
 
+我们可以用一个示例页面来测试一下，创建文件 `myProject/line.html` ，内容如下：
 
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>myProject</title>
+</head>
+<body>
+  <!-- 为 echarts 准备一个具备大小（宽高）的Dom。 -->
+  <div id="main" style="width: 600px;height:400px;"></div>
 
+  <!-- 引入刚才构建好的文件。 -->
+  <script src="lib/line.min.js"></script>
+</body>
+</html>
+```
 
+在浏览器里打开 `myProject/line.html` 则会得到如下效果：
 
+![图片](https://echarts.apache.org/zh/documents/asset/img/custom-build-line.png)
 
+### 多语言支持
 
+上面的例子中能看到，工具箱组件（ toolbox ）的提示文字是中文
 
+* 本质上，echarts 图表显示出来的文字，都可以通过 `option` 来定制，改成任意语言
 
+* 但是如果想 **`默认就是某种语言`** ，则需要通过构建来实现
 
+在上面的例子中，可以在 `echarts/build/build.js` 的参数中指定语言：
 
+```sh
+node node_modules/echarts/build/build.js --min -i echarts.custom.js -o lib/echarts.custom.min.js --lang en
+```
 
+* 表示使用内置的英文
 
+  此外还可以是 `--lang fi`
+
+```sh
+node node_modules/echarts/build/build.js --min -i echarts.custom.js -o lib/echarts.custom.min.js --lang my/langXX.js
+```
+
+* 表示在构建时使用 `myProject/my/langXX.js` 文件来替换 `myProject/node_modules/echarts/lib/lang.js` 文件
+
+  这样可以在 `myProject/my/langXX.js` 文件中自定义语言
+
+  > 注意：这种方式中，必须指定 `-o` 或者 `--output`
+
+另外，上面的 rollup 插件 `echarts/build/rollup-plugin-ec-lang` 也可以传入同样的参数，实现同样的功能
+
+## 在 webpack 中
+
+Webpack 是目前比较流行的模块打包工具，你可以在使用 webpack 的项目中轻松的引入和打包 ECharts，这里假设你已经对 webpack 具有一定的了解并且在自己的项目中使用
 
 
 
