@@ -1268,303 +1268,287 @@ type 是下面 `13` 种字符串值之一：
 
   仅仅新老图像重叠部分的老图像被显示，其他区域全部透明
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/284693590-5b74dd8dc7f3e_articlex.png)
 
+* `destination-out`
 
+  仅仅老图像与新图像没有重叠的部分。 注意显示的是老图像的部分区域
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/1921976761-5b74dd8daba2d_articlex.png)
 
+* `destination-atop`
 
+  老图像仅仅仅仅显示重叠部分，新图像会显示在老图像的下面
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/4055109887-5b74dd8db283c_articlex.png)
 
+* `lighter`
 
+  新老图像都显示，但是重叠区域的颜色做加处理
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/1200224117-5b74dd8d9453e_articlex.png)
 
+* `darken`
 
+  保留重叠部分最黑的像素（每个颜色位进行比较，得到最小的）
 
+  ```css
+  blue: #0000ff
+  red: #ff0000
+  ```
 
+  所以重叠部分的颜色：`#000000`
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/3835256030-5b74dd8d92ba5_articlex.png)
 
+* `lighten`
 
+  保证重叠部分最量的像素（每个颜色位进行比较，得到最大的）
 
+  ```css
+  blue: #0000ff
+  red: #ff0000
+  ```
 
+  所以重叠部分的颜色：`#ff00ff`
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/1617768463-5b74dd8d99843_articlex.png)
 
+* `xor`
 
+  重叠部分会变成透明
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/2521026104-5b74dd8d6abd6_articlex.png)
 
+* `copy`
 
+  只有新图像会被保留，其余的全部被清除(边透明)
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/2454891415-5b74dd8d67aec_articlex.png)
 
+## 裁剪路径
 
+```js
+clip()
+```
 
+* 把已经创建的路径转换成裁剪路径
 
+* 裁剪路径的作用是遮罩
 
+  只显示裁剪路径内的区域，裁剪路径外的区域会被隐藏
 
+> 注意：`clip()` 只能遮罩在这个方法调用之后绘制的图像，如果是 `clip()` 方法调用之前绘制的图像，则无法实现遮罩
 
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/2023283460-5b74dd8d67aec_articlex.png)
 
+```js
+var ctx;
+function draw(){
+  var canvas = document.getElementById('tutorial1');
+  if (!canvas.getContext) return;
+  var ctx = canvas.getContext("2d");
 
+  ctx.beginPath();
+  ctx.arc(20,20, 100, 0, Math.PI * 2);
+  ctx.clip();
 
+  ctx.fillStyle = "pink";
+  ctx.fillRect(20, 20, 100,100);
+}
 
+draw();
+```
 
+## 动画
 
+### 动画的基本步骤
 
+* 清空 canvas
 
+  再绘制每一帧动画之前，需要清空所有
 
+  清空所有最简单的做法就是 `clearRect()` 方法
 
+* 保存 canvas 状态
 
+  如果在绘制的过程中会更改 canvas 的状态(颜色、移动了坐标原点等)，又在绘制每一帧时都是原始状态的话，则最好保存下 canvas 的状态
 
+* 绘制动画图形
 
+  这一步才是真正的绘制动画帧
 
+* 恢复 canvas 状态
 
+  如果你前面保存了 canvas 状态，则应该在绘制完成一帧之后恢复 canvas 状态
 
+### 控制动画
 
+我们可用通过 canvas 的方法或者自定义的方法把图像会知道到 canvas 上
 
+* 正常情况，我们能看到绘制的结果是在脚本执行结束之后
 
+* 例如，我们不可能在一个 `for` 循环内部完成动画
 
+* 也就是，为了执行动画，我们需要一些可以定时执行重绘的方法
 
+一般用到下面三个方法：
 
+* `setInterval()`
+* `setTimeout()`
+* `requestAnimationFrame()`
 
+### 案例 1 ：太阳系
 
+```js
+let sun;
+let earth;
+let moon;
+let ctx;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function init(){
+  sun = new Image();
+  earth = new Image();
+  moon = new Image();
+  sun.src = "sun.png";
+  earth.src = "earth.png";
+  moon.src = "moon.png";
+
+  let canvas = document.querySelector("#solar");
+  ctx = canvas.getContext("2d");
+
+  sun.onload = function (){
+    draw()
+  }
+}
+
+init();
+
+function draw(){
+  // 清空所有的内容
+  ctx.clearRect(0, 0, 300, 300);
+
+  // 绘制太阳
+  ctx.drawImage(sun, 0, 0, 300, 300);
+
+  ctx.save();
+  ctx.translate(150, 150);
+
+  // 绘制 earth 轨道
+  ctx.beginPath();
+  ctx.strokeStyle = "rgba(255,255,0,0.5)";
+  ctx.arc(0, 0, 100, 0, 2 * Math.PI)
+  ctx.stroke()
+
+  let time = new Date();
+  // 绘制地球
+  ctx.rotate(2 * Math.PI / 60 * time.getSeconds() + 2 * Math.PI / 60000 * time.getMilliseconds())
+  ctx.translate(100, 0);
+  ctx.drawImage(earth, -12, -12)
+
+  // 绘制月球轨道
+  ctx.beginPath();
+  ctx.strokeStyle = "rgba(255,255,255,.3)";
+  ctx.arc(0, 0, 40, 0, 2 * Math.PI);
+  ctx.stroke();
+
+  //绘制月球
+  ctx.rotate(2 * Math.PI / 6 * time.getSeconds() + 2 * Math.PI / 6000 * time.getMilliseconds());
+  ctx.translate(40, 0);
+  ctx.drawImage(moon, -3.5, -3.5);
+  ctx.restore();
+
+  requestAnimationFrame(draw);
+}
+```
+
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/796853783-5b74dd8f41e21_articlex.gif)
+
+### 案例 2 ：模拟时钟
+
+```js
+init();
+
+function init(){
+  let canvas = document.querySelector("#solar");
+  let ctx = canvas.getContext("2d");
+  draw(ctx);
+}
+
+function draw(ctx){
+  requestAnimationFrame(function step(){
+    drawDial(ctx); // 绘制表盘
+    drawAllHands(ctx); // 绘制时分秒针
+    requestAnimationFrame(step);
+  });
+}
+
+/* 绘制时分秒针 */
+function drawAllHands(ctx){
+  let time = new Date();
+
+  let s = time.getSeconds();
+  let m = time.getMinutes();
+  let h = time.getHours();
+
+  let pi = Math.PI;
+  let secondAngle = pi / 180 * 6 * s;  // 计算出来 s 针的弧度
+  let minuteAngle = pi / 180 * 6 * m + secondAngle / 60;  // 计算出来分针的弧度
+  let hourAngle = pi / 180 * 30 * h + minuteAngle / 12;  // 计算出来时针的弧度
+
+  drawHand(hourAngle, 60, 6, "red", ctx);  // 绘制时针
+  drawHand(minuteAngle, 106, 4, "green", ctx);  // 绘制分针
+  drawHand(secondAngle, 129, 2, "blue", ctx);  // 绘制秒针
+}
+/* 绘制时针、或分针、或秒针
+ * 参数1：要绘制的针的角度
+ * 参数2：要绘制的针的长度
+ * 参数3：要绘制的针的宽度
+ * 参数4：要绘制的针的颜色
+ * 参数4：ctx
+ * */
+function drawHand(angle, len, width, color, ctx){
+  ctx.save();
+  ctx.translate(150, 150); // 把坐标轴的远点平移到原来的中心
+  ctx.rotate(-Math.PI / 2 + angle);  // 旋转坐标轴，x 轴就是针的角度
+  ctx.beginPath();
+  ctx.moveTo(-4, 0);
+  ctx.lineTo(len, 0);  // 沿着x轴绘制针
+  ctx.lineWidth = width;
+  ctx.strokeStyle = color;
+  ctx.lineCap = "round";
+  ctx.stroke();
+  ctx.closePath();
+  ctx.restore();
+}
+
+/* 绘制表盘 */
+function drawDial(ctx){
+  let pi = Math.PI;
+
+  ctx.clearRect(0, 0, 300, 300); // 清除所有内容
+  ctx.save();
+
+  ctx.translate(150, 150); // 移动坐标原点到原来的中心
+  ctx.beginPath();
+  ctx.arc(0, 0, 148, 0, 2 * pi); // 绘制圆周
+  ctx.stroke();
+  ctx.closePath();
+
+  for (let i = 0; i < 60; i++){ // 绘制刻度
+    ctx.save();
+    ctx.rotate(-pi / 2 + i * pi / 30);  // 旋转坐标轴，坐标轴 x 的正方形从向上开始算起
+    ctx.beginPath();
+    ctx.moveTo(110, 0);
+    ctx.lineTo(140, 0);
+    ctx.lineWidth = i % 5 ? 2 : 4;
+    ctx.strokeStyle = i % 5 ? "blue" : "red";
+    ctx.stroke();
+    ctx.closePath();
+    ctx.restore();
+  }
+  ctx.restore();
+}
+```
+
+![图片](https://www.runoob.com/wp-content/uploads/2018/12/2372262871-5b74dd8da51e5_articlex.gif)
