@@ -102,7 +102,7 @@
 
 这些构建好的 echarts 提供了下面这几种定制：
 
-版本|文件位置|说明
+版本名称|文件位置|说明
 -|-|-
 完全版|`echarts/dist/echarts.js`|体积最大，包含所有的图表和组件，所包含内容参见：`echarts/echarts.all.js`
 常用版|`echarts/dist/echarts.common.js`|体积适中，包含常见的图表和组件，所包含内容参见：`echarts/echarts.common.js`
