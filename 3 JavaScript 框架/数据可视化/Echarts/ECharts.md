@@ -1442,7 +1442,9 @@ option = {
 
 有了数据表之后，使用者可以灵活得配置：数据如何对应到轴和图形系列
 
-用户可以使用 seriesLayoutBy 配置项，改变图表对于行列的理解。seriesLayoutBy 可取值：
+用户可以使用 seriesLayoutBy 配置项，改变图表对于行列的理解
+
+seriesLayoutBy 可取值：
 
 
 

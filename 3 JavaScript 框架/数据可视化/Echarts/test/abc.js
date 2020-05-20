@@ -1,35 +1,22 @@
-var myChart = echarts.init(document.getElementById('main'));
-// 显示标题，图例和空的坐标轴
-myChart.setOption({
-  title: {
-    text: '异步数据加载示例'
-  },
+option = {
+  legend: {},
   tooltip: {},
-  legend: {
-    data: ['销量']
+  dataset: {
+    // 这里指定了维度名的顺序，从而可以利用默认的维度到坐标轴的映射。
+    // 如果不指定 dimensions，也可以通过指定 series.encode 完成映射，参见后文。
+    dimensions: ['product', '2015', '2016', '2017'],
+    source: [
+      { product: 'Matcha Latte', '2015': 43.3, '2016': 85.8, '2017': 93.7 },
+      { product: 'Milk Tea', '2015': 83.1, '2016': 73.4, '2017': 55.1 },
+      { product: 'Cheese Cocoa', '2015': 86.4, '2016': 65.2, '2017': 82.5 },
+      { product: 'Walnut Brownie', '2015': 72.4, '2016': 53.9, '2017': 39.1 }
+    ]
   },
-  xAxis: {
-    data: []
-  },
+  xAxis: { type: 'category' },
   yAxis: {},
-  series: [{
-    name: '销量',
-    type: 'bar',
-    data: []
-  }]
-});
-
-// 异步加载数据
-$.get('data.json').done(function (data) {
-  // 填入数据
-  myChart.setOption({
-    xAxis: {
-      data: data.categories
-    },
-    series: [{
-      // 根据名字对应到相应的系列
-      name: '销量',
-      data: data.data
-    }]
-  });
-});
+  series: [
+    { type: 'bar' },
+    { type: 'bar' },
+    { type: 'bar' }
+  ]
+};
