@@ -2007,23 +2007,115 @@ dataZoom 组件现在支持几种子组件：
 
 先只在对单独一个横轴，加上 `dataZoom` 组件，代码示例如下：
 
+```js
+option = {
+  xAxis: {
+    type: 'value'
+  },
+  yAxis: {
+    type: 'value'
+  },
+  dataZoom: [
+    {   // 这个 dataZoom 组件，默认控制 x 轴
+      type: 'slider', // 这个 dataZoom 组件是 slider 型 dataZoom 组件
+      start: 10,      // 左边在 10% 的位置
+      end: 60         // 右边在 60% 的位置
+    }
+  ],
+  series: [
+    {
+      type: 'scatter', // 这是个『散点图』
+      itemStyle: {
+        opacity: 0.8
+      },
+      symbolSize: function (val) {
+        return val[2] * 40;
+      },
+      data: [["14.616", "7.241", "0.896"], ["3.958", "5.701", "0.955"], ["2.768", "8.971", "0.669"], ["9.051", "9.710", "0.171"], ["14.046", "4.182", "0.536"], ["12.295", "1.429", "0.962"], ["4.417", "8.167", "0.113"], ["0.492", "4.771", "0.785"], ["7.632", "2.605", "0.645"], ["14.242", "5.042", "0.368"]]
+    }
+  ]
+}
+```
 
+可以看到如下结果：
 
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=doc-example/scatter-tutorial-dataZoom-1)
 
+上面的图只能拖动 dataZoom 组件导致窗口变化
 
+* 如果想在坐标系内进行拖动，以及用滚轮（或移动触屏上的两指滑动）进行缩放
 
+* 那么要再加上一个 `inside` 型的 `dataZoom` 组件
 
+直接在上面的 `option.dataZoom` 中增加即可：
 
+```js
+option = {
+  ...,
+  dataZoom: [
+    {   // 这个 dataZoom 组件，默认控制 x 轴
+      type: 'slider', // 这个 dataZoom 组件是 slider 型 dataZoom 组件
+      start: 10,      // 左边在 10% 的位置
+      end: 60         // 右边在 60% 的位置
+    },
+    {   // 这个 dataZoom 组件，也控制 x 轴
+      type: 'inside', // 这个 dataZoom 组件是 inside 型 dataZoom 组件
+      start: 10,      // 左边在 10% 的位置
+      end: 60         // 右边在 60% 的位置
+    }
+  ],
+  ...
+}
+```
 
+可以看到如下结果（能在坐标系中进行滑动，以及使用滚轮缩放了）：
 
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=doc-example/scatter-tutorial-dataZoom-2)
 
+如果想 `y` 轴也能够缩放，那么在 `y` 轴上也加上 `dataZoom` 组件：
 
+```js
+option = {
+  ...,
+  dataZoom: [
+    {
+      type: 'slider',
+      xAxisIndex: 0,
+      start: 10,
+      end: 60
+    },
+    {
+      type: 'inside',
+      xAxisIndex: 0,
+      start: 10,
+      end: 60
+    },
+    {
+      type: 'slider',
+      yAxisIndex: 0,
+      start: 30,
+      end: 80
+    },
+    {
+      type: 'inside',
+      yAxisIndex: 0,
+      start: 30,
+      end: 80
+    }
+  ],
+  ...
+}
+```
 
+可以看到如下结果：
 
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=doc-example/scatter-tutorial-dataZoom-3)
 
+## 移动端自适应
 
+ECharts 工作在用户指定高宽的 DOM 节点（容器）中
 
-
+ECharts 的『组件』和『系列』都在这个 DOM 节点中，每个节点都可以由用户指定位置。图表库内部并不适宜实现 DOM 文档流布局，因此采用类似绝对布局的简单容易理解的布局方式。但是有时候容器尺寸极端时，这种方式并不能自动避免组件重叠的情况，尤其在移动端小屏的情况下
 
 
 
