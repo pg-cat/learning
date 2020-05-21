@@ -1,30 +1,13 @@
-option = {
-    ...,
-    dataZoom: [
-        {
-            type: 'slider',
-            xAxisIndex: 0,
-            start: 10,
-            end: 60
-        },
-        {
-            type: 'inside',
-            xAxisIndex: 0,
-            start: 10,
-            end: 60
-        },
-        {
-            type: 'slider',
-            yAxisIndex: 0,
-            start: 30,
-            end: 80
-        },
-        {
-            type: 'inside',
-            yAxisIndex: 0,
-            start: 30,
-            end: 80
-        }
-    ],
-    ...
+series: {
+  data: [
+    {                        // 这里每一个项就是数据项（dataItem）
+      value: [3434, 129, '圣马力诺'], // 这是数据项的数据值（value）
+      itemStyle: { ...}
+    },
+    [1212, 5454, '梵蒂冈'],   // 也可以直接是 dataItem 的 value，这更常见。
+    [2323, 3223, '瑙鲁'],     // 每个 value 都是『三维』的，每列是一个维度。
+    [4343, 23, '图瓦卢']    // 假如是『气泡图』，常见第一维度映射到x轴，
+    // 第二维度映射到y轴，
+    // 第三维度映射到气泡半径（symbolSize）
+  ]
 }
