@@ -72,7 +72,7 @@
     - [多个 query 被满足时的优先级](#多个-query-被满足时的优先级)
     - [默认 query](#默认-query)
     - [注意事项](#注意事项)
-    - [不支持 merge [【TOP】](#)](#不支持-merge-top)
+    - [不支持 merge](#不支持-merge)
 - [数据的视觉映射](#数据的视觉映射)
   - [数据和维度](#数据和维度)
   - [visualMap 组件](#visualmap-组件)
@@ -2410,7 +2410,7 @@ media: [
 
 > `left / right / top / bottom / width / height` 不受这个限制
 
-#### 不支持 merge [【TOP】](#)
+#### 不支持 merge
 
 **`『复合 option 』`** 中的 `media` 不支持 merge
 
