@@ -70,6 +70,13 @@
         - [横向（ horizontal ）和纵向（ vertical ）](#横向-horizontal-和纵向-vertical-)
         - [与 ECharts 2 的兼容](#与-echarts-2-的兼容)
     - [Media Query](#media-query)
+        - [query](#query)
+        - [option](#option)
+        - [多个 query 被满足时的优先级](#多个-query-被满足时的优先级)
+        - [默认 query](#默认-query)
+        - [注意事项](#注意事项)
+        - [不支持 merge](#不支持-merge)
+- [数据的视觉映射](#数据的视觉映射)
 
 <!-- /TOC -->
 
@@ -2252,55 +2259,182 @@ ECharts 2 中的 `x / x2 / y / y2` 的命名方式仍被兼容，对应于 `left
 
 ### Media Query
 
+[【 Media Query 】](http://www.w3.org/TR/css3-mediaqueries/#media1)提供了 **`『随着容器尺寸改变而改变』`** 的能力。
 
+如下例子，可尝试拖动右下角的圆点，随着尺寸变化，`legend` 和 **`系列`** 会自动改变布局位置和方式：
 
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=doc-example/pie-media)
 
+要在 `option` 中设置 `Media Query` 须遵循如下格式：
 
+```js
+option = {
+  baseOption: { // 这里是基本的 『原子 option 』
+    title: { ...},
+    legend: { ...},
+    series: [{ ...}, { ...}, ...],
+    ...
+    },
+  media: [ // 这里定义了 media query 的逐条规则
+    {
+      query: { ...},   // 这里写规则
+      option: {       // 这里写此规则满足下的 option
+        legend: { ...},
+        ...
+      }
+    },
+    {
+      query: { ...},   // 第二个规则
+      option: {       // 第二个规则对应的 option
+        legend: { ...},
+        ...
+      }
+    },
+    {
+      // 这条里没有写规则，表示 『默认』，即所有规则都不满足时，采纳这个 option
+      option: {
+        legend: { ...},
+        ...
+      }
+    }
+  ]
+};
+```
 
+上面的例子中，`baseOption` 以及 `media` 每个 `option` 都是 **`『原子 option』`** ，即普通的含有各组件、系列定义的 `option`
 
+* 而由 **`『原子option』`** 组合成的整个 `option` ，我们称为 **`『复合 option』`**
 
+* `baseOption` 是必然被使用的，此外，满足了某个 `query` 条件时，对应的 `option` 会被使用 `chart.mergeOption()` 来 merge 进去
 
+#### query
 
+每个 `query` 类似于这样：
 
+```js
+{
+  minWidth: 200,
+  maxHeight: 300,
+  minAspectRatio: 1.3
+}
+```
 
+现在支持三个属性：`width` 、`height` 、`aspectRatio`（长宽比）
 
+* 每个属性都可以加上 `min` 或 `max` 前缀
 
+  比如 `minWidth: 200` 表示 **`『大于等于 200px 宽度』`**
 
+* 两个属性一起写表示 **`『并且』`** ，比如：
 
+  `{minWidth: 200, maxHeight: 300}` 表示 **`『大于等于200px宽度，并且小于等于300px高度』`**
 
+#### option
 
+`media` 中的 `option` 既然是 **`『原子 option』`** ，理论上可以写任何 `option` 的配置项
 
+* 但是一般我们只写跟布局定位相关的
 
+* 例如，截取上面例子中的一部分 `query` 和 `option`
 
+```js
+media: [
+  ...,
+  {
+    query: {
+      maxAspectRatio: 1           // 当长宽比小于 1 时
+    },
+    option: {
+      legend: {                   // legend 放在底部中间
+        right: 'center',
+        bottom: 0,
+        orient: 'horizontal'    // legend 横向布局
+      },
+      series: [                   // 两个饼图左右布局
+        {
+          radius: [20, '50%'],
+          center: ['50%', '30%']
+        },
+        {
+          radius: [30, '50%'],
+          center: ['50%', '70%']
+        }
+      ]
+    }
+  },
+  {
+    query: {
+      maxWidth: 500               // 当容器宽度小于 500 时
+    },
+    option: {
+      legend: {
+        right: 10,              // legend 放置在右侧中间
+        top: '15%',
+        orient: 'vertical'      // 纵向布局
+      },
+      series: [                   // 两个饼图上下布局
+        {
+          radius: [20, '50%'],
+          center: ['50%', '30%']
+        },
+        {
+          radius: [30, '50%'],
+          center: ['50%', '75%']
+        }
+      ]
+    }
+  },
+  ...
+]
+```
 
+#### 多个 query 被满足时的优先级
 
+> 注意：可以有多个 `query` 同时被满足，会都被 `mergeOption` ，定义在后的后被 merge（即优先级更高）
 
+#### 默认 query
 
+如果 `media` 中有某项不写 `query` ，则表示 **`『默认值』`** ，即所有规则都不满足时，采纳这个 `option`
 
+#### 注意事项
 
+在不少情况下，并不需要容器 DOM 节点任意随着拖拽变化大小，而是只是根据不同终端设置几个典型尺寸
 
+但是如果容器 DOM 节点需要能任意随着拖拽变化大小，那么目前使用时需要注意这件事：
 
+* 某个配置项，如果在某一个 `query` 和 `option` 中出现，那么在其他 `query` 和 `option` 中也必须出现
 
+* 否则不能够回归到原来的状态
 
+> `left / right / top / bottom / width / height` 不受这个限制
 
+#### 不支持 merge
 
+**`『复合 option 』`** 中的 `media` 不支持 merge
 
+* 也就是说，当第二（或三、四、五 ... ）次 `chart.setOption(rawOption)` 时
 
+* 如果 `rawOption` 是 复合 `option`（即包含 `media` 列表），那么新的 `rawOption.media` 列表不会和老的 `media` 列表进行 merge
 
+* 而是简单替代
 
+> 当然，`rawOption.baseOption` 仍然会正常和老的 `option` 进行 merge
 
+其实，很少有场景需要使用 **`『复合 option 』`** 来多次 `setOption` ，而我们推荐的做法是：
 
+* 使用 `mediaQuery` 时，第一次 `setOption` 使用 **`『复合 option 』`**
 
+* 后面 `setOption` 时仅使用 **`『原子 option 』`**
 
+  也就是仅仅用 `setOption` 来改变 `baseOption`
 
+最后看一个和时间轴结合的例子：
 
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=doc-example/bar-media-timeline)
 
+## 数据的视觉映射
 
-
-
-
-
-
+数据可视化是 **`数据`** 到 **`视觉元素`** 的映射过程（这个过程也可称为视觉编码，视觉元素也可称为视觉通道）
 
 
 
