@@ -1,4 +1,5 @@
 以下内容整理自[【 ECharts 官方文档】](https://echarts.apache.org/zh/tutorial.html#5%20分钟上手%20ECharts)
+
 ---
 
 ## 目录
@@ -14,7 +15,7 @@
     - [创建和安装](#创建和安装)
     - [自定义构建](#自定义构建)
     - [允许被引用的模块](#允许被引用的模块)
-    - [引用 `lib` 还是 `src`](#引用-lib-还是-src)
+    - [引用 lib 还是 src](#引用-lib-还是-src)
     - [直接使用 rollup 自定义构建](#直接使用-rollup-自定义构建)
     - [多语言支持](#多语言支持)
 - [在 webpack 中](#在-webpack-中)
@@ -308,7 +309,7 @@ node node_modules/echarts/build/build.js --min -i echarts.custom.js -o lib/echar
 
 * 因为在后续 echarts 版本升级中，内部模块的接口和功能可能变化，甚至模块本身也可能被移除
 
-### 引用 `lib` 还是 `src`
+### 引用 lib 还是 src
 
 面对问题：引用 `echarts/lib/**` 还是 `echarts/src/**`
 
