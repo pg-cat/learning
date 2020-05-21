@@ -1497,7 +1497,7 @@ option = {
 
 [【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=dataset-series-layout-by)
 
-### 维度
+### 维度（ dimension ）
 
 介绍 `encode` 之前，首先要介绍 **`维度（dimension）`** 的概念
 
@@ -1507,103 +1507,463 @@ option = {
 
 * 反之，如果我们把系列（series）对应到 **`行`** ，那么每一行就是 **`维度（dimension）`** ，每一列就是 **`数据项（item）`**
 
+维度可以有单独的名字，便于在图表中显示
+
+* 维度名（ dimension name ）可以在定义在 `dataset` 的第一行（或者第一列）
+
+* 例如上面的例子中的 `'score'` 、`'amount'` 、`'product'` 就是维度名
+
+  从第二行开始，才是正式的数据
+
+* `dataset.source` 中第一行（列）到底包含不包含维度名，ECharts 默认会自动探测
+
+  当然也可以设置 `dataset.sourceHeader: true` 显示声明第一行（列）就是维度
+
+  或者 `dataset.sourceHeader: false` 表明第一行（列）开始就直接是数据
+
+维度的定义，也可以使用单独的 `dataset.dimensions` 或者 `series.dimensions` 来定义，这样可以同时指定维度名，和维度的类型（ dimension type ）：
 
+```js
+var option1 = {
+  dataset: {
+    dimensions: [
+      { name: 'score' },
 
+      // 可以简写为 string ，表示维度名
+      'amount',
 
+      // 可以在 type 中指定维度类型
+      { name: 'product', type: 'ordinal' }
+    ],
+    source: [...]
+  },
+  ...
+};
 
+var option2 = {
+  dataset: {
+    source: [...]
+  },
+  series: {
+    type: 'line',
 
+    // 在系列中设置的 dimensions 会更优先采纳
+    dimensions: [
 
+      null, // 可以设置为 null 表示不想设置维度名
 
+      'amount',
+      { name: 'product', type: 'ordinal' }
+    ]
+  },
+  ...
+};
+```
 
+大多数情况下，我们并不需要去设置维度类型，因为会自动判断
+
+* 但是如果因为数据为空之类原因导致判断不足够准确时，可以手动设置维度类型
 
+维度类型（ dimension type ）可以取这些值：
+
+取值|说明
+-|-
+'number'|默认，表示普通数据
+'ordinal'|对于类目、文本这些 `string` 类型的数据，如果需要能在数轴上使用，须是 `'ordinal'` 类型（ ECharts 默认会自动判断这个类型，但是自动判断也是不可能很完备的，所以使用者也可以手动强制指定）
+'time'|表示时间数据，设置成 `'time'` 则能支持自动解析数据成时间戳（ timestamp ），比如该维度的数据是 `'2017-05-10'` ，会自动被解析（如果这个维度被用在时间数轴（[【 `axis.type` 】](https://echarts.apache.org/zh/option.html#xAxis.type)为 `'time'` ）上，那么会被自动设置为 `'time'` 类型，时间类型的支持参见[【 data 】](https://echarts.apache.org/zh/option.html#series.data)）
+'float'|如果设置成 `'float'` ，在存储时候会使用 `TypedArray` ，对性能优化有好处
+'int'|如果设置成 `'int'` ，在存储时候会使用 `TypedArray` ，对性能优化有好处
+
+### 数据到图形的映射（ encode ）
+
+了解了维度的概念后，我们就可以使用[【 encode 】](https://echarts.apache.org/zh/option.html#series.encode)来做映射，总体是这样的感觉：
+
+```js
+var option = {
+  dataset: {
+    source: [
+      ['score', 'amount', 'product'],
+      [89.3, 58212, 'Matcha Latte'],
+      [57.1, 78254, 'Milk Tea'],
+      [74.4, 41032, 'Cheese Cocoa'],
+      [50.1, 12755, 'Cheese Brownie'],
+      [89.7, 20145, 'Matcha Cocoa'],
+      [68.1, 79146, 'Tea'],
+      [19.6, 91852, 'Orange Juice'],
+      [10.6, 101852, 'Lemon Juice'],
+      [32.7, 20112, 'Walnut Brownie']
+    ]
+  },
+  xAxis: {},
+  yAxis: { type: 'category' },
+  series: [
+    {
+      type: 'bar',
+      encode: {
 
+        // 将 "amount" 列映射到 X 轴
+        x: 'amount',
 
+        // 将 "product" 列映射到 Y 轴
+        y: 'product'
+      }
+    }
+  ]
+};
+```
 
+效果如下：
 
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=doc-example/dataset-encode-simple0)
 
+encode 声明的基本结构如下
 
+* 其中冒号左边是坐标系、标签等特定名称，如 `x` 、`y` 、`tooltip` 等
 
+* 冒号右边是数据中的维度名（ string 格式）或者维度的序号（ number 格式，从 `0` 开始计数），可以指定一个或多个维度（使用数组）
 
+通常情况下，下面各种信息（ encode 支持的属性）不需要所有的都写，按需写即可
 
+```js
+// 在任何坐标系和系列中，都支持：
+encode: {
 
+  // 使用 “名为 product 的维度” 和 “名为 score 的维度” 的值在 tooltip 中显示
+  tooltip: ['product', 'score']
 
+  // 使用 “维度 1” 和 “维度 3” 的维度名连起来作为系列名
+  // 有时候名字比较长，这可以避免在 series.name 重复输入这些名字
+  seriesName: [1, 3],
 
+    // 表示使用 “维度2” 中的值作为 id
+    // 这在使用 setOption 动态更新数据时有用处，可以使新老数据用 id 对应起来，从而能够产生合适的数据更新动画
+    itemId: 2,
 
+      // 指定数据项的名称使用 “维度3” 在饼图等图表中有用，可以使这个名字显示在图例（legend）中
+      itemName: 3
+}
 
+// 直角坐标系（grid/cartesian）特有的属性：
+encode: {
+  // 把 “维度1”、“维度5”、“名为 score 的维度” 映射到 X 轴：
+  x: [1, 5, 'score'],
 
+    // 把“维度0”映射到 Y 轴。
+    y: 0
+}
 
+// 单轴（singleAxis）特有的属性：
+encode: {
+  single: 3
+}
 
+// 极坐标系（polar）特有的属性：
+encode: {
+  radius: 3,
+    angle: 2
+}
 
+// 地理坐标系（geo）特有的属性：
+encode: {
+  lng: 3,
+    lat: 2
+}
 
+// 对于一些没有坐标系的图表，例如饼图、漏斗图等，可以是：
+encode: {
+  value: 3
+}
+```
 
+下面给出个更丰富的 `encode` 的示例：
 
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=dataset-encode1)
 
+### 视觉通道（颜色、尺寸等）的映射
 
+我们可以使用 `visualMap` 组件进行视觉通道的映射
 
+> 详见[【 visualMap 】](https://echarts.apache.org/zh/option.html#visualMap)文档的介绍
 
+这是一个示例：
 
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=dataset-encode0)
 
+### 默认的映射
 
+值得一提的是，ECharts 针对以下图表给出了简单的默认的映射：
 
+* 最常见直角坐标系中的：
+  * 折线图
+  * 柱状图
+  * 散点图
+  * K 线图 等
+* 饼图
+* 漏斗图
 
+从而不需要配置 encode 也可以出现图表（一旦给出了 encode ，那么就不会采用默认映射）
 
+默认的映射规则不易做得复杂，基本规则大体是：
 
+* 在坐标系中（如直角坐标系、极坐标系等）
 
+  * 如果有类目轴（ `axis.type` 为 `'category'` ），则将第一列（行）映射到这个轴上，后续每一列（行）对应一个系列
 
+  * 如果没有类目轴，假如坐标系有两个轴（例如直角坐标系的 `X` `Y` 轴），则每两列对应一个系列，这两列分别映射到这两个轴上
 
+* 如果没有坐标系（如饼图）
+
+  * 取第一列（行）为名字，第二列（行）为数值
 
+    如果只有一列，则取第一列为数值
 
+默认的规则不能满足要求时，就可以自己来配置 encode ，也并不复杂：
 
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=dataset-default)
 
+### 几个常见的映射设置方式
 
+* 如何把第三列设置为 X 轴，第五列设置为 Y 轴？
 
+```js
+series: {
+  // 注意维度序号（ dimensionIndex ）从 0 开始计数，第三列是 dimensions[2]
+  encode: {x: 2, y: 4},
+  ...
+}
+```
 
+* 如何把第三行设置为 X 轴，第五行设置为 Y 轴？
 
+```js
+series: {
+  encode: {x: 2, y: 4},
+  seriesLayoutBy: 'row',
+  ...
+}
+```
 
+* 如何把第二列设置为标签？
 
+  关于标签的显示[【 label.formatter 】](https://echarts.apache.org/zh/option.html#series.label.formatter)，现在支持引用特定维度的值
 
+```js
+series: {
+  label: {
+    // `'{@score}'` 表示 “名为 score” 的维度里的值
+    // `'{@[4]}'` 表示引用序号为 4 的维度里的值
+    formatter: 'aaa{@product}bbb{@score}ccc{@[4]}ddd'
+  }
+}
+```
 
+* 如何让第 2 列和第 3 列显示在提示框（ tooltip ）中？
 
+```js
+series: {
+  encode: {
+    tooltip: [1, 2]
+    ...
+  },
+  ...
+}
+```
 
+* 数据里没有维度名，那么怎么给出维度名？
 
+```js
+dataset: {
+  dimensions: ['score', 'amount'],
+  source: [
+    [89.3, 3371],
+    [92.1, 8123],
+    [94.4, 1954],
+    [85.4, 829]
+  ]
+}
+```
 
+* 如何把第三列映射为气泡图的点的大小？
 
+```js
+var option = {
+  dataset: {
+    source: [
+      [12, 323, 11.2],
+      [23, 167, 8.3],
+      [81, 284, 12],
+      [91, 413, 4.1],
+      [13, 287, 13.5]
+    ]
+  },
+  visualMap: {
+    show: false,
+    dimension: 2, // 指向第三列（列序号从 0 开始记，所以设置为 2）
+    min: 2, // 需要给出数值范围，最小数值
+    max: 15, // 需要给出数值范围，最大数值
+    inRange: {
+      // 气泡尺寸：5 像素到 60 像素
+      symbolSize: [5, 60]
+    }
+  },
+  xAxis: {},
+  yAxis: {},
+  series: {
+    type: 'scatter'
+  }
+};
+```
 
+* encode 里指定了映射，但是不管用？
 
+  可以查查有没有拼错，比如，维度名是：`'Life Expectancy'` ，encode 中拼成了 `'Life Expectency'`
 
+### 数据的各种格式
 
+多数常见图表中，数据适于用二维表的形式描述
 
+* 广为使用的数据表格软件（如 `MS Excel` 、`Numbers` ）或者关系数据数据库都是二维表
 
+* 他们的数据可以导出成 JSON 格式，输入到 `dataset.source` 中，在不少情况下可以免去一些数据处理的步骤
 
+> 假如数据导出成 csv 文件，那么可以使用一些 csv 工具如[【 dsv 】](https://github.com/d3/d3-dsv)或者[【 PapaParse 】](https://github.com/mholt/PapaParse)将 csv 转成 JSON
 
+在 JavaScript 常用的数据传输格式中，二维数组可以比较直观的存储二维表
 
+* 前面的示例都是使用二维数组表示
 
+* 除了二维数组以外，dataset 也支持例如下面 `key-value` 方式的数据格式，这类格式也非常常见
 
+  但是这类格式中，目前并不支持 `seriesLayoutBy` 参数
 
+```js
+dataset: [{
 
+  // 按行的 key-value 形式（对象数组），这是个比较常见的格式
+  source: [
+    { product: 'Matcha Latte', count: 823, score: 95.8 },
+    { product: 'Milk Tea', count: 235, score: 81.4 },
+    { product: 'Cheese Cocoa', count: 1042, score: 91.2 },
+    { product: 'Walnut Brownie', count: 988, score: 76.9 }
+  ]
+}, {
 
+  // 按列的 key-value 形式
+  source: {
+    'product': ['Matcha Latte', 'Milk Tea', 'Cheese Cocoa', 'Walnut Brownie'],
+    'count': [823, 235, 1042, 988],
+    'score': [95.8, 81.4, 91.2, 76.9]
+  }
+}]
+```
 
+### 多个 dataset 和他们的引用
 
+可以同时定义多个 `dataset` ，系列可以通过 `series.datasetIndex` 来指定引用哪个 `dataset` ，例如：
 
+```js
+var option = {
+  dataset: [{
 
+    // 序号为 0 的 dataset
+    source: [...],
+  }, {
 
+    // 序号为 1 的 dataset
+    source: [...]
+  }, {
 
+    // 序号为 2 的 dataset
+    source: [...]
+  }],
 
+  series: [{
 
+    // 使用序号为 2 的 dataset
+    datasetIndex: 2
+  }, {
 
+    // 使用序号为 1 的 dataset
+    datasetIndex: 1
+  }]
+}
+```
 
+### ECharts 3 的数据设置方式
 
+> ECharts 3 的数据设置方式（ series.data ）仍正常使用
 
+ECharts 4 之前一直以来的数据声明方式仍然被正常支持，如果系列已经声明了[【 series.data 】](https://echarts.apache.org/zh/option.html#series.data)，那么就会使用 series.data 而非 `dataset`
 
+```js
+{
+  xAxis: {
+    type: 'category'
+    data: ['Matcha Latte', 'Milk Tea', 'Cheese Cocoa', 'Walnut Brownie']
+  },
+  yAxis: { },
+  series: [{
+    type: 'bar',
+    name: '2015',
+    data: [89.3, 92.1, 94.4, 85.4]
+  }, {
+    type: 'bar',
+    name: '2016',
+    data: [95.8, 89.4, 91.2, 76.9]
+  }, {
+    type: 'bar',
+    name: '2017',
+    data: [97.7, 83.1, 92.5, 78.1]
+  }]
+}
+```
 
+其实，`series.data` 也是种会一直存在的重要设置方式
 
+* 一些特殊的非 `table` 格式的图表，如[【 treemap 】](https://echarts.apache.org/zh/option.html#series-treemap)、[【 graph 】](https://echarts.apache.org/zh/option.html#series-graph)、[【 lines 】](https://echarts.apache.org/zh/option.html#series-lines)等，现在仍不支持在 `dataset` 中设置，仍然需要使用 `series.data`
 
+* 另外，对于巨大数据量的渲染（如百万以上的数据量），需要使用 `appendData` 进行增量加载，这种情况不支持使用 `dataset`
 
+### 其他
 
+目前并非所有图表都支持 `dataset`
 
+* 支持 `dataset` 的图表有：
 
+  * line
+  * bar
+  * pie
+  * scatter
+  * effectScatter
+  * parallel
+  * candlestick
+  * map
+  * funnel
+  * custom
 
+* 后续会有更多的图表进行支持
 
+最后，给出一个示例，多个图表共享一个 `dataset` ，并带有联动交互：
+
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=dataset-link)
+
+## 在图表中加入交互组件
+
+除了图表外，ECharts 中还提供了很多交互组件，例如：
+
+* [【图例组件 legend 】](https://echarts.apache.org/zh/option.html#legend)
+* [【标题组件 title 】](https://echarts.apache.org/zh/option.html#title)
+* [【视觉映射组件 visualMap 】](https://echarts.apache.org/zh/option.html#visualMap)
+* [【数据区域缩放组件 dataZoom】](https://echarts.apache.org/zh/option.html#dataZoom)
+* [【时间线组件 timeline 】](https://echarts.apache.org/zh/option.html#timeline)
+
+### 数据区域缩放组件
+
+**`『概览数据整体，按需关注数据细节』`** 是数据可视化的基本交互需求
+
+`dataZoom` 组件能够在[【直角坐标系（ grid ）】](https://echarts.apache.org/zh/option.html#grid)、[【极坐标系（ polar ）】](https://echarts.apache.org/zh/option.html#polar)中实现这一功能，如下例子：
+
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=doc-example/scatter-dataZoom-all)
 
 
 
