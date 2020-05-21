@@ -81,6 +81,7 @@
     - [visualMap 组件](#visualmap-组件)
         - [视觉映射方式的配置](#视觉映射方式的配置)
 - [事件和行为](#事件和行为)
+    - [鼠标事件的处理](#鼠标事件的处理)
 
 <!-- /TOC -->
 
@@ -2609,16 +2610,32 @@ option = {
 
 ## 事件和行为
 
+在 ECharts 的图表中用户的操作将会触发相应的事件
 
+* 开发者可以监听这些事件，然后通过回调函数做相应的处理
 
+* 比如跳转到一个地址，或者弹出对话框，或者做数据下钻等等
 
+在 ECharts 3 中绑定事件跟 2 一样都是通过 `on` 方法，但是事件名称比 2 更加简单了
 
+* ECharts 3 中，事件名称对应 DOM 事件名称，均为小写的字符串，如下是一个绑定点击操作的示例
 
+```js
+myChart.on('click', function (params) {
+  // 控制台打印数据的名称
+  console.log(params.name);
+});
+```
 
+在 ECharts 中事件分为两种类型：
 
+* 一种是用户鼠标操作点击，或者 `hover` 图表的图形时触发的事件
 
+* 还有一种是用户在使用可以交互的组件后触发的行为事件
 
+  例如，在切换图例开关时触发的[【 legendselectchanged 】](https://echarts.apache.org/zh/api.html#events.legendselectchanged)事件（这里需要注意切换图例开关是不会触发 `'legendselected'` 事件的），数据区域缩放时触发的[【 datazoom 】](https://echarts.apache.org/zh/api.html#events.legendselectchanged)事件等等
 
+### 鼠标事件的处理
 
 
 
