@@ -1978,25 +1978,34 @@ ECharts 4 之前一直以来的数据声明方式仍然被正常支持，如果�
 
 [【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=doc-example/scatter-dataZoom-all)
 
+* `dataZoom` 组件是对 **`数轴（ axis ）`** 进行**`『数据窗口缩放』`** **`『数据窗口平移』`** 操作
 
+  > 可以通过 `dataZoom.xAxisIndex` 或 `dataZoom.yAxisIndex` 来指定 `dataZoom` 控制哪个或哪些数轴
 
+* `dataZoom` 组件可同时存在多个，起到共同控制的作用
 
+  控制同一个数轴的组件，会自动联动
 
+* `dataZoom` 的运行原理是通过 **`『数据过滤』`** 来达到 **`『数据窗口缩放』`** 的效果
 
+  数据过滤模式的设置不同，效果也不同，参见：[【 dataZoom.filterMode 】](https://echarts.apache.org/zh/option.html#dataZoom.filterMode)
 
+* `dataZoom` 的数据窗口范围的设置，目前支持两种形式：
 
+  * 百分比形式：参见[【 dataZoom.start 】](https://echarts.apache.org/zh/option.html#dataZoom.start)和[【 dataZoom.end 】](https://echarts.apache.org/zh/option.html#dataZoom.end)
+  * 绝对数值形式：参见[【 dataZoom.startValue 】](https://echarts.apache.org/zh/option.html#dataZoom.startValue)和[【 dataZoom.endValue 】](https://echarts.apache.org/zh/option.html#dataZoom.endValue)
 
+dataZoom 组件现在支持几种子组件：
 
+子组件|说明
+-|-
+[【内置型数据区域缩放组件（ dataZoomInside ）】](https://echarts.apache.org/zh/option.html#dataZoom-inside)|内置于坐标系中
+[【滑动条型数据区域缩放组件（ dataZoomSlider ）】](https://echarts.apache.org/zh/option.html#dataZoom-slider)|有单独的滑动条操作
+[【框选型数据区域缩放组件（ dataZoomSelect ）】](https://echarts.apache.org/zh/option.html#toolbox.feature.dataZoom)|全屏的选框进行数据区域缩放，入口和配置项均在 `toolbox` 中
 
+### 在代码加入 dataZoom 组件
 
-
-
-
-
-
-
-
-
+先只在对单独一个横轴，加上 `dataZoom` 组件，代码示例如下：
 
 
 
