@@ -1,7 +1,43 @@
 以下内容整理自[【 Vue Router 官方文档】](https://router.vuejs.org/zh/)
 
+---
 
-# Vue Router 基础
+<!-- TOC -->
+
+- [介绍](#介绍)
+- [安装](#安装)
+  - [直接下载 / CDN](#直接下载--cdn)
+  - [NPM](#npm)
+  - [构建开发版](#构建开发版)
+- [起步](#起步)
+  - [HTML](#html)
+  - [JavaScript](#javascript)
+- [动态路由匹配](#动态路由匹配)
+  - [响应路由参数的变化](#响应路由参数的变化)
+  - [捕获所有路由或 `404 Not found` 路由](#捕获所有路由或-404-not-found-路由)
+  - [高级匹配模式](#高级匹配模式)
+  - [匹配优先级](#匹配优先级)
+- [嵌套路由](#嵌套路由)
+- [编程式的导航](#编程式的导航)
+  - [`router.push(location, onComplete?, onAbort?)`](#routerpushlocation-oncomplete-onabort)
+  - [`router.replace(location, onComplete?, onAbort?)`](#routerreplacelocation-oncomplete-onabort)
+  - [`router.go(n)`](#routergon)
+  - [操作 `History`](#操作-history)
+- [命名路由](#命名路由)
+- [命名视图](#命名视图)
+  - [嵌套命名视图](#嵌套命名视图)
+- [重定向和别名](#重定向和别名)
+  - [重定向](#重定向)
+  - [别名](#别名)
+- [路由组件传参](#路由组件传参)
+  - [布尔模式](#布尔模式)
+  - [对象模式](#对象模式)
+  - [函数模式](#函数模式)
+- [HTML5 `History` 模式](#html5-history-模式)
+  - [后端配置例子](#后端配置例子)
+  - [警告](#警告)
+
+<!-- /TOC -->
 
 ## 介绍
 
