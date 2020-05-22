@@ -86,6 +86,7 @@
   - [添加 tooltip 组件](#添加-tooltip-组件)
   - [全部代码](#全部代码)
 - [小例子：实现日历图](#小例子实现日历图)
+  - [第一步：引入 js 文件](#第一步引入-js-文件)
 
 <!-- /TOC -->
 
@@ -3453,10 +3454,44 @@ function hideTooltip(dataIndex) {
 
 ## 小例子：实现日历图
 
+在 ECharts 中，我们新增了日历坐标系，如何快速写出一个日历图呢？
 
+```js
+function getVirtulData(year) {
+  year = year || '2017';
+  var date = +echarts.number.parseDate(year + '-01-01');
+  var end = +echarts.number.parseDate(year + '-12-31');
+  var dayTime = 3600 * 24 * 1000;
+  var data = [];
+  for (var time = date; time <= end; time += dayTime) {
+    data.push([
+      echarts.format.formatTime('yyyy-MM-dd', time),
+      Math.floor(Math.random() * 10000)
+    ]);
+  }
+  return data;
+}
 
+option = {
+  visualMap: {
+    show: false,
+    min: 0,
+    max: 10000
+  },
+  calendar: {
+    range: '2017'
+  },
+  series: {
+    type: 'heatmap',
+    coordinateSystem: 'calendar',
+    data: getVirtulData(2017)
+  }
+};
+```
 
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=calendar-simple)
 
+### 第一步：引入 js 文件
 
 
 
