@@ -96,6 +96,12 @@
 - [旭日图](#旭日图)
   - [引入相关文件](#引入相关文件)
   - [最简单的旭日图](#最简单的旭日图)
+  - [颜色等样式调整](#颜色等样式调整)
+  - [按层配置样式](#按层配置样式)
+  - [数据下钻](#数据下钻)
+  - [高亮相关扇形块](#高亮相关扇形块)
+  - [总结](#总结)
+- [自定义系列](#自定义系列)
 
 <!-- /TOC -->
 
@@ -4019,58 +4025,277 @@ option = {
 
 ### 最简单的旭日图
 
+创建旭日图需要在 `series` 配置项中声明类型为 `'sunburst'` 的系列，并且以树形结构声明其 `data` ：
 
+```js
+var option = {
+  series: {
+    type: 'sunburst',
+    data: [{
+      name: 'A',
+      value: 10,
+      children: [{
+        value: 3,
+        name: 'Aa'
+      }, {
+        value: 5,
+        name: 'Ab'
+      }]
+    }, {
+      name: 'B',
+      children: [{
+        name: 'Ba',
+        value: 4
+      }, {
+        name: 'Bb',
+        value: 2
+      }]
+    }, {
+      name: 'C',
+      value: 3
+    }]
+  }
+};
+```
 
+得到以下结果：
 
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=doc-example/sunburst-simple)
 
+### 颜色等样式调整
 
+默认情况下会使用全局调色盘[【 color 】](https://echarts.apache.org/zh/option.html#color)分配最内层的颜色，其余层则与其父元素同色
 
+在旭日图中，扇形块的颜色有以下三种设置方式：
 
+* 在[【 series.data.itemStyle 】](https://echarts.apache.org/zh/option.html#series-sunburst.data.itemStyle)中设置每个扇形块的样式
 
+* 在[【 series.levels.itemStyle 】](https://echarts.apache.org/zh/option.html#series-sunburst.levels.itemStyle)中设置每一层的样式
 
+* 在[【 series.itemStyle 】](https://echarts.apache.org/zh/option.html#series-sunburst.itemStyle)中设置整个旭日图的样式
 
+上述三者的优先级是从高到低的，也就是说，配置了 `series.data.itemStyle` 的扇形块将会覆盖 `series.levels.itemStyle` 和 `series.itemStyle` 的设置
 
+下面，我们将整体的颜色设为灰色 `'#aaa'` ，将最内层的颜色设为蓝色 `'blue'` ，将 `Aa` 、`B` 这两块设为红色 `'red'`
 
+```js
+var option = {
+  series: {
+    type: 'sunburst',
+    itemStyle: {
+      color: '#aaa'
+    },
+    data: [{
+      name: 'A',
+      value: 10,
+      children: [{
+        name: 'Aa',
+        value: 3,
+        itemStyle: {
+          color: 'red'
+        }
+      }, {
+        name: 'Ab',
+        value: 5
+      }]
+    }, {
+      name: 'B',
+      itemStyle: {
+        color: 'red'
+      },
+      children: [{
+        name: 'Ba',
+        value: 4
+      }, {
+        name: 'Bb',
+        value: 2
+      }]
+    }, {
+      name: 'C',
+      value: 3
+    }],
+    levels: [{
+      // 留给数据下钻的节点属性
+    }, {
+      itemStyle: {
+        color: 'blue'
+      }
+    }]
+  }
+};
+```
 
+效果为：
 
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=doc-example/sunburst-color)
 
+### 按层配置样式
 
+旭日图是一种有层次的结构，为了方便同一层样式的配置，我们提供了[【 levels 】](https://echarts.apache.org/zh/option.html#series-sunburst.levels)配置项
 
+* 它是一个数组，其中的第 `0` 项表示数据下钻后返回上级的图形，其后的每一项分别表示从圆心向外层的层级
 
+例如，假设我们没有数据下钻功能，并且希望将最内层的扇形块的颜色设为红色，文字设为蓝色，可以这样设置：
 
+```js
+series: {
+  // ...
+  levels: [
+    {
+      // 留给数据下钻点的空白配置
+    },
+    {
+      // 最靠内测的第一层
+      itemStyle: {
+        color: 'red'
+      },
+      label: {
+        color: 'blue'
+      }
+    },
+    {
+      // 第二层 ...
+    }
+  ]
+}
+```
 
+> 在实际使用的过程中，你会发现按层配置样式是一个很常用的功能，能够很大程度上提高配置的效率
 
+### 数据下钻
 
+旭日图默认支持数据下钻，也就是说，当点击了扇形块之后，将以该扇形块的数据作为根节点，便于进一步了解该数据的细节：
 
+```js
+var data = [{
+  name: 'Grandpa',
+  children: [{
+    name: 'Uncle Leo',
+    value: 15,
+    children: [{
+      name: 'Cousin Jack',
+      value: 2
+    }, {
+      name: 'Cousin Mary',
+      value: 5,
+      children: [{
+        name: 'Jackson',
+        value: 2
+      }]
+    }, {
+      name: 'Cousin Ben',
+      value: 4
+    }]
+  }, {
+    name: 'Father',
+    value: 10,
+    children: [{
+      name: 'Me',
+      value: 5
+    }, {
+      name: 'Brother Peter',
+      value: 1
+    }]
+  }]
+}, {
+  name: 'Nancy',
+  children: [{
+    name: 'Uncle Nike',
+    children: [{
+      name: 'Cousin Betty',
+      value: 1
+    }, {
+      name: 'Cousin Jenny',
+      value: 2
+    }]
+  }]
+}];
 
+option = {
+  series: {
+    type: 'sunburst',
+    // highlightPolicy: 'ancestor',
+    data: data,
+    radius: [0, '90%'],
+    label: {
+      rotate: 'radial'
+    }
+  }
+};
+```
 
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=doc-example/sunburst-color)
 
+当数据下钻后，中间会出现一个用于返回上一层的图形，该图形的样式可以通过[【 levels[0] 】](https://echarts.apache.org/zh/option.html#series-sunburst.levels)配置
 
+* 如果不需要数据下钻功能，可以通过将[【 nodeClick 】](https://echarts.apache.org/zh/option.html#series-sunburst.nodeClick)设置为 `false` 关闭
 
+* 或者将其设为 `'link'` ，并将[【 data.link 】](https://echarts.apache.org/zh/option.html#series-sunburst.data.link)设为点击扇形块对应打开的链接
 
+### 高亮相关扇形块
 
+旭日图支持鼠标移动到某扇形块时，高亮相关数据块的操作，可以通过设置[【 highlightPolicy 】](https://echarts.apache.org/zh/option.html#series-sunburst.highlightPolicy)，包括以下几种高亮方式：
 
+值|说明
+-|-
+'descendant'（默认值）|高亮鼠标移动所在扇形块与其后代元素
+'ancestor'|高亮鼠标所在扇形块与其祖先元素
+'self'|仅高亮鼠标所在扇形块
+'none'|不会淡化（downplay）其他元素
 
+上面提到的 **`高亮`**
 
+* 对于鼠标所在的扇形块，会使用 `emphasis` 样式
 
+* 对于其他相关扇形块，则会使用 `highlight` 样式
 
+通过这种方式，可以很方便地实现突出显示相关数据的需求
 
+具体来说，对于配置项：
 
+```js
+itemStyle: {
+  color: 'yellow',
+    borderWidth: 2,
+      emphasis: {
+    color: 'red'
+  },
+  highlight: {
+    color: 'orange'
+  },
+  downplay: {
+    color: '#ccc'
+  }
+}
+```
 
+`highlightPolicy` 为 `'descendant'` 或 `'ancestor'` 的效果分别为：
 
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=doc-example/sunburst-highlight-descendant)
 
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=doc-example/sunburst-highlight-ancestor)
 
+### 总结
 
+上面的教程主要讲述的是如何入门使用旭日图，感兴趣的用户可以在[【配置项手册】](https://echarts.apache.org/zh/option.html#series-sunburst)查看更完整的文档
 
+在灵活应用这些配置项之后，就能做出丰富多彩的旭日图了！
 
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=sunburst-book)
 
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=sunburst-drink)
 
+## 自定义系列
 
+[【自定义系列（ custom series ）】](https://echarts.apache.org/zh/option.html#series-custom)是一种系列的类型
 
+* 它把绘制图形元素这一步留给开发者去做
 
+* 从而开发者能在坐标系中自由绘制出自己需要的图表
 
+ECharts 为什么会要支持 **`自定义系列`** 呢？
 
-
+ECharts 内置支持的图表类型是最常见的图表类型，但是图表类型是难于穷举的，有很多小众的需求 ECharts 并不能内置的支持。那么就需要提供一种方式来让开发者自己扩展。另一方面，所提供的扩展方式要尽可能得简单，例如图形元素创建和释放、过渡动画、tooltip、数据区域缩放（dataZoom）、视觉映射（visualMap）等功能，尽量在 ECharts 中内置得处理，使开发者不必纠结于这些细节。综上考虑形成了 自定义系列（custom series）
 
 
 
