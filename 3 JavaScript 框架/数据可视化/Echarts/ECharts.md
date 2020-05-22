@@ -102,6 +102,7 @@
   - [高亮相关扇形块](#高亮相关扇形块)
   - [总结](#总结)
 - [自定义系列](#自定义系列)
+  - [（一）renderItem 方法](#一renderitem-方法)
 
 <!-- /TOC -->
 
@@ -4295,21 +4296,104 @@ itemStyle: {
 
 ECharts 为什么会要支持 **`自定义系列`** 呢？
 
-ECharts 内置支持的图表类型是最常见的图表类型，但是图表类型是难于穷举的，有很多小众的需求 ECharts 并不能内置的支持。那么就需要提供一种方式来让开发者自己扩展。另一方面，所提供的扩展方式要尽可能得简单，例如图形元素创建和释放、过渡动画、tooltip、数据区域缩放（dataZoom）、视觉映射（visualMap）等功能，尽量在 ECharts 中内置得处理，使开发者不必纠结于这些细节。综上考虑形成了 自定义系列（custom series）
+* ECharts 内置支持的图表类型是最常见的图表类型，但是图表类型是难于穷举的，有很多小众的需求 ECharts 并不能内置的支持
 
+  那么就需要提供一种方式来让开发者自己扩展
 
+* 另一方面，所提供的扩展方式要尽可能得简单
 
+  例如图形元素创建和释放、过渡动画、tooltip 、数据区域缩放（ dataZoom ）、视觉映射（ visualMap ）等功能，尽量在 ECharts 中内置得处理，使开发者不必纠结于这些细节
 
+* 综上考虑形成了 **`自定义系列（ custom series ）`**
 
+例如，下面的例子使用 custom series 扩展出了 x-range 图：
 
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=custom-profile)
 
+> 更多的例子参见[【 custom examples 】](https://echarts.apache.org/examples.html#chart-type-custom)
 
+### （一）renderItem 方法
 
+开发者自定义的图形元素渲染逻辑，是通过书写[【 `renderItem` 】](https://echarts.apache.org/zh/option.html#series-custom.renderItem)函数实现的，例如：
 
+```js
+var option = {
+  ...,
+  series: [{
+    type: 'custom',
+    renderItem: function (params, api) {
+      // ...
+    },
+    data: data
+  }]
+}
+```
 
+在渲染阶段，对于[【 series.data 】](https://echarts.apache.org/zh/option.html#series-custom.data)中的每个数据项（为方便描述，这里称为 `dataItem` )，会调用此[【 renderItem 】](https://echarts.apache.org/zh/option.html#series-custom.renderItem)函数
 
+* 这个 `renderItem` 函数的职责，就是返回一个（或者一组） **`图形元素定义`**
 
+* **`图形元素定义`** 中包括图形元素的类型、位置、尺寸、样式等
 
+* ECharts 会根据这些 **`图形元素定义`** 来渲染出图形元素
+
+如下的示意：
+
+```js
+var option = {
+  ...,
+  series: [{
+    type: 'custom',
+    renderItem: function (params, api) {
+      // 对于 data 中的每个 dataItem，都会调用这个 renderItem 函数
+      // 但是注意，并不一定是按照 data 的顺序调用
+
+      // 这里进行一些处理，例如，坐标转换。
+      // 这里使用 api.value(0) 取出当前 dataItem 中第一个维度的数值。
+      var categoryIndex = api.value(0);
+      // 这里使用 api.coord(...) 将数值在当前坐标系中转换成为屏幕上的点的像素值。
+      var startPoint = api.coord([api.value(1), categoryIndex]);
+      var endPoint = api.coord([api.value(2), categoryIndex]);
+      // 这里使用 api.size(...) 获得 Y 轴上数值范围为 1 的一段所对应的像素长度。
+      var height = api.size([0, 1])[1] * 0.6;
+
+      // shape 属性描述了这个矩形的像素位置和大小。
+      // 其中特殊得用到了 echarts.graphic.clipRectByRect，意思是，
+      // 如果矩形超出了当前坐标系的包围盒，则剪裁这个矩形。
+      // 如果矩形完全被剪掉，会返回 undefined.
+      var rectShape = echarts.graphic.clipRectByRect({
+        // 矩形的位置和大小。
+        x: startPoint[0],
+        y: startPoint[1] - height / 2,
+        width: endPoint[0] - startPoint[0],
+        height: height
+      }, {
+        // 当前坐标系的包围盒。
+        x: params.coordSys.x,
+        y: params.coordSys.y,
+        width: params.coordSys.width,
+        height: params.coordSys.height
+      });
+
+      // 这里返回为这个 dataItem 构建的图形元素定义。
+      return rectShape && {
+        // 表示这个图形元素是矩形。还可以是 'circle', 'sector', 'polygon' 等等。
+        type: 'rect',
+        shape: rectShape,
+        // 用 api.style(...) 得到默认的样式设置。这个样式设置包含了
+        // option 中 itemStyle 的配置和视觉映射得到的颜色。
+        style: api.style()
+      };
+    },
+    data: [
+      [12, 44, 55, 60], // 这是第一个 dataItem
+      [53, 31, 21, 56], // 这是第二个 dataItem
+      [71, 33, 10, 20], // 这是第三个 dataItem
+      ...
+      ]
+  }]
+}
+```
 
 
 
