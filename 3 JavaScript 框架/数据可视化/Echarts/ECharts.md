@@ -87,6 +87,15 @@
   - [全部代码](#全部代码)
 - [小例子：实现日历图](#小例子实现日历图)
   - [第一步：引入 js 文件](#第一步引入-js-文件)
+  - [第二步：指定 DOM 元素作为图表容器](#第二步指定-dom-元素作为图表容器)
+  - [第三步：配置参数](#第三步配置参数)
+  - [附完整示例代码](#附完整示例代码)
+  - [自定义配置参数](#自定义配置参数)
+  - [日历坐标系的其他形式](#日历坐标系的其他形式)
+  - [其他更丰富的效果](#其他更丰富的效果)
+- [旭日图](#旭日图)
+  - [引入相关文件](#引入相关文件)
+  - [最简单的旭日图](#最简单的旭日图)
 
 <!-- /TOC -->
 
@@ -3493,74 +3502,522 @@ option = {
 
 ### 第一步：引入 js 文件
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+下载的最新完整版本 `echarts.min.js` 即可，无需再单独引入其他文件
+
+```html
+<script src="echarts.min.js"></script>
+<script>
+  // ...
+</script>
+```
+
+### 第二步：指定 DOM 元素作为图表容器
+
+和 ECharts 中的其他图表一样，创建一个DOM来作为绘制图表的容器
+
+```html
+<div id="main" style="width=100%; height = 400px"></div>
+```
+
+使用 ECharts 进行初始化
+
+```js
+var myChart = echarts.init(document.getElementById('main'));
+```
+
+### 第三步：配置参数
+
+以常见的日历图为例: `calendar` 坐标 + `heatmap` 图
+
+```js
+var option = {
+  visualMap: {
+    show: false,
+    min: 0,
+    max: 1000
+  },
+  calendar: {
+    range: '2017'
+  },
+  series: {
+    type: 'heatmap',
+    coordinateSystem: 'calendar',
+    data: [['2017-01-02', 900], ['2017-01-02', 877], ['2017-01-02', 699], ...]
+  }
+}
+myChart.setOption(option);
+```
+
+在 heatmap 图的基础上，加上 `coordinateSystem: 'calendar'` 和 `calendar: { range: '2017' }` ，heatmap 图就秒变为日历图了
+
+> 若发现图表没有正确显示，你可以检查以下几种可能：
+> * JS 文件是否正确加载
+> * `echarts` 变量是否存在
+> * 控制台是否报错
+> * DOM 元素在 `echarts.init` 的时候是否有高度和宽度
+> * 若为 `type: heatmap` ，检查是否配置了 `visualMap`
+
+### 附完整示例代码
+
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>ECharts</title>
+  <script src="echarts.min.js"></script>
+</head>
+
+<body>
+  <div id="main" style="width:100%;height:400px;"></div>
+  <script type="text/javascript">
+    var myChart = echarts.init(document.getElementById('main'));
+
+    // 模拟数据
+    function getVirtulData(year) {
+      year = year || '2017';
+      var date = +echarts.number.parseDate(year + '-01-01');
+      var end = +echarts.number.parseDate(year + '-12-31');
+      var dayTime = 3600 * 24 * 1000;
+      var data = [];
+      for (var time = date; time <= end; time += dayTime) {
+        data.push([
+          echarts.format.formatTime('yyyy-MM-dd', time),
+          Math.floor(Math.random() * 10000)
+        ]);
+      }
+      return data;
+    }
+    var option = {
+      visualMap: {
+        show: false,
+        min: 0,
+        max: 10000
+      },
+      calendar: {
+        range: '2017'
+      },
+      series: {
+        type: 'heatmap',
+        coordinateSystem: 'calendar',
+        data: getVirtulData(2017)
+      }
+    };
+    myChart.setOption(option);
+  </script>
+</body>
+
+</html>
+```
+
+以上就是绘制最简日历图的步骤了，如若还想进一步私人定制，还可以通过自定义配置参数来实现
+
+### 自定义配置参数
+
+使用日历坐标绘制日历图时，支持自定义各项属性:
+
+属性|说明
+-|-
+[【 range 】](https://echarts.apache.org/zh/option.html#calendar.range)|设置时间的范围，可支持某年、某月、某天，还可支持跨年
+[【 cellSize 】](https://echarts.apache.org/zh/option.html#calendar.cellSize)|设置日历格的大小，可支持设置不同高宽，还可支持自适应 auto
+[【 width 】](https://echarts.apache.org/zh/option.html#calendar.width)、[【 height 】](https://echarts.apache.org/zh/option.html#calendar.height)|也可以直接设置改日历图的整体高宽，让其基于已有的高宽全部自适应
+[【 orient 】](https://echarts.apache.org/zh/option.html#calendar.orient)|设置坐标的方向，既可以横着也可以竖着
+[【 splitLine 】](https://echarts.apache.org/zh/option.html#calendar.splitLine)|设置分隔线样式，也可以直接不显示
+[【 itemStyle 】](https://echarts.apache.org/zh/option.html#calendar.itemStyle)|设置日历格的样式，背景色、方框线颜色大小类型、透明度均可自定义，甚至还能加阴影
+[【 dayLabel 】](https://echarts.apache.org/zh/option.html#calendar.dayLabel)|设置坐标中 **`星期样式`** ，可以设置星期从第几天开始，快捷设置中英文、甚至是自定义中英文混搭、或局部不显示、通过 `formatter` 可以想怎么显示就怎么显示
+[【 monthLabel 】](https://echarts.apache.org/zh/option.html#calendar.monthLabel)|设置坐标中 **`月样式`** ，和星期一样（可快捷设置中英文和自定义混搭）
+[【 yearLabel 】](https://echarts.apache.org/zh/option.html#calendar.yearLabel)|设置坐标中 **`年样式`** ，默认显示一年，通过 `formatter` 文字可以想显示什么就能通过 string function 任性自定义，上下左右方位随便选
+
+> 完整的配置项参数参见[【 calendar API 】](https://echarts.apache.org/zh/option.html#calendar)
+
+### 日历坐标系的其他形式
+
+日历坐标系是一种新的 ECharts 坐标系，提供了在日历上绘制图表的能力
+
+* 所以除了制作常用的日历图外
+
+* 我们可以在热力图、散点图、关系图中使用日历坐标系
+
+在日历坐标系中使用热力图：
+
+```js
+function getVirtulData(year) {
+  year = year || '2017';
+  var date = +echarts.number.parseDate(year + '-01-01');
+  var end = +echarts.number.parseDate((+year + 1) + '-01-01');
+  var dayTime = 3600 * 24 * 1000;
+  var data = [];
+  for (var time = date; time < end; time += dayTime) {
+    data.push([
+      echarts.format.formatTime('yyyy-MM-dd', time),
+      Math.floor(Math.random() * 10000)
+    ]);
+  }
+  return data;
+}
+
+option = {
+  title: {
+    top: 30,
+    left: 'center',
+    text: '2016年某人每天的步数'
+  },
+  tooltip: {},
+  visualMap: {
+    min: 0,
+    max: 10000,
+    type: 'piecewise',
+    orient: 'horizontal',
+    left: 'center',
+    top: 65,
+    textStyle: {
+      color: '#000'
+    }
+  },
+  calendar: {
+    top: 120,
+    left: 30,
+    right: 30,
+    cellSize: ['auto', 13],
+    range: '2016',
+    itemStyle: {
+      borderWidth: 0.5
+    },
+    yearLabel: { show: false }
+  },
+  series: {
+    type: 'heatmap',
+    coordinateSystem: 'calendar',
+    data: getVirtulData(2016)
+  }
+};
+```
+
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=calendar-heatmap)
+
+在日历坐标系中使用散点图：
+
+```js
+function getVirtulData(year) {
+  year = year || '2017';
+  var date = +echarts.number.parseDate(year + '-01-01');
+  var end = +echarts.number.parseDate((+year + 1) + '-01-01');
+  var dayTime = 3600 * 24 * 1000;
+  var data = [];
+  for (var time = date; time < end; time += dayTime) {
+    data.push([
+      echarts.format.formatTime('yyyy-MM-dd', time),
+      Math.floor(Math.random() * 10000)
+    ]);
+  }
+  return data;
+}
+
+var data = getVirtulData(2016);
+
+option = {
+  backgroundColor: '#404a59',
+
+  title: {
+    top: 30,
+    text: '2016年某人每天的步数',
+    subtext: '数据纯属虚构',
+    left: 'center',
+    textStyle: {
+      color: '#fff'
+    }
+  },
+  tooltip: {
+    trigger: 'item'
+  },
+  legend: {
+    top: '30',
+    left: '100',
+    data: ['步数', 'Top 12'],
+    textStyle: {
+      color: '#fff'
+    }
+  },
+  calendar: [{
+    top: 100,
+    left: 'center',
+    range: ['2016-01-01', '2016-06-30'],
+    splitLine: {
+      show: true,
+      lineStyle: {
+        color: '#000',
+        width: 4,
+        type: 'solid'
+      }
+    },
+    yearLabel: {
+      formatter: '{start}  1st',
+      textStyle: {
+        color: '#fff'
+      }
+    },
+    itemStyle: {
+      color: '#323c48',
+      borderWidth: 1,
+      borderColor: '#111'
+    }
+  }, {
+    top: 340,
+    left: 'center',
+    range: ['2016-07-01', '2016-12-31'],
+    splitLine: {
+      show: true,
+      lineStyle: {
+        color: '#000',
+        width: 4,
+        type: 'solid'
+      }
+    },
+    yearLabel: {
+      formatter: '{start}  2nd',
+      textStyle: {
+        color: '#fff'
+      }
+    },
+    itemStyle: {
+      color: '#323c48',
+      borderWidth: 1,
+      borderColor: '#111'
+    }
+  }],
+  series: [
+    {
+      name: '步数',
+      type: 'scatter',
+      coordinateSystem: 'calendar',
+      data: data,
+      symbolSize: function (val) {
+        return val[1] / 500;
+      },
+      itemStyle: {
+        color: '#ddb926'
+      }
+    },
+    {
+      name: '步数',
+      type: 'scatter',
+      coordinateSystem: 'calendar',
+      calendarIndex: 1,
+      data: data,
+      symbolSize: function (val) {
+        return val[1] / 500;
+      },
+      itemStyle: {
+        color: '#ddb926'
+      }
+    },
+    {
+      name: 'Top 12',
+      type: 'effectScatter',
+      coordinateSystem: 'calendar',
+      calendarIndex: 1,
+      data: data.sort(function (a, b) {
+        return b[1] - a[1];
+      }).slice(0, 12),
+      symbolSize: function (val) {
+        return val[1] / 500;
+      },
+      showEffectOn: 'render',
+      rippleEffect: {
+        brushType: 'stroke'
+      },
+      hoverAnimation: true,
+      itemStyle: {
+        color: '#f4e925',
+        shadowBlur: 10,
+        shadowColor: '#333'
+      },
+      zlevel: 1
+    },
+    {
+      name: 'Top 12',
+      type: 'effectScatter',
+      coordinateSystem: 'calendar',
+      data: data.sort(function (a, b) {
+        return b[1] - a[1];
+      }).slice(0, 12),
+      symbolSize: function (val) {
+        return val[1] / 500;
+      },
+      showEffectOn: 'render',
+      rippleEffect: {
+        brushType: 'stroke'
+      },
+      hoverAnimation: true,
+      itemStyle: {
+        color: '#f4e925',
+        shadowBlur: 10,
+        shadowColor: '#333'
+      },
+      zlevel: 1
+    }
+  ]
+};
+```
+
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=calendar-effectscatter)
+
+还可以混合放置不同的图表，例如下例子，同时放置了热力图和关系图：
+
+```js
+var graphData = [
+  [
+    // Consider timeoffset, add two days to avoid overflow.
+    1485878400000 + 3600 * 24 * 1000 * 2,
+    260
+  ],
+  [
+    1486137600000,
+    200
+  ],
+  [
+    1486569600000,
+    279
+  ],
+  [
+    1486915200000,
+    847
+  ],
+  [
+    1487347200000,
+    241
+  ],
+  [
+    1487779200000 + 3600 * 24 * 1000 * 15,
+    411
+  ],
+  [
+    1488124800000 + 3600 * 24 * 1000 * 23,
+    985
+  ]
+];
+
+var links = graphData.map(function (item, idx) {
+  return {
+    source: idx,
+    target: idx + 1
+  };
+});
+links.pop();
+
+function getVirtulData(year) {
+  year = year || '2017';
+  var date = +echarts.number.parseDate(year + '-01-01');
+  var end = +echarts.number.parseDate((+year + 1) + '-01-01');
+  var dayTime = 3600 * 24 * 1000;
+  var data = [];
+  for (var time = date; time < end; time += dayTime) {
+    data.push([
+      echarts.format.formatTime('yyyy-MM-dd', time),
+      Math.floor(Math.random() * 1000)
+    ]);
+  }
+  return data;
+}
+
+option = {
+  tooltip: {},
+  calendar: {
+    top: 'middle',
+    left: 'center',
+    orient: 'vertical',
+    cellSize: 40,
+    yearLabel: {
+      margin: 50,
+      textStyle: {
+        fontSize: 30
+      }
+    },
+    dayLabel: {
+      firstDay: 1,
+      nameMap: 'cn'
+    },
+    monthLabel: {
+      nameMap: 'cn',
+      margin: 15,
+      textStyle: {
+        fontSize: 20,
+        color: '#999'
+      }
+    },
+    range: ['2017-02', '2017-03-31']
+  },
+  visualMap: {
+    min: 0,
+    max: 1000,
+    type: 'piecewise',
+    left: 'center',
+    bottom: 20,
+    inRange: {
+      color: ['#5291FF', '#C7DBFF']
+    },
+    seriesIndex: [1],
+    orient: 'horizontal'
+  },
+  series: [{
+    type: 'graph',
+    edgeSymbol: ['none', 'arrow'],
+    coordinateSystem: 'calendar',
+    links: links,
+    symbolSize: 15,
+    calendarIndex: 0,
+    itemStyle: {
+      color: 'yellow',
+      shadowBlue: 9,
+      shadowOffsetX: 1.5,
+      shadowOffsetY: 3,
+      shadowColor: '#555'
+    },
+    lineStyle: {
+      color: '#D10E00',
+      width: 1,
+      opacity: 1
+    },
+    data: graphData,
+    z: 20
+  }, {
+    type: 'heatmap',
+    coordinateSystem: 'calendar',
+    data: getVirtulData(2017)
+  }]
+};
+```
+
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=calendar-graph)
+
+### 其他更丰富的效果
+
+灵活利用 ECharts 图表和坐标系的组合，以及 API ，还可以实现更丰富的效果
+
+例如，制作农历：
+
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=calendar-lunar)
+
+例如，使用 chart.convertToPixel 接口，在日历坐标系绘制饼图
+
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=calendar-pie)
+
+## 旭日图
+
+[【旭日图（ Sunburst ）】](https://en.wikipedia.org/wiki/Pie_chart#Ring_chart_/_Sunburst_chart_/_Multilevel_pie_chart)由多层的环形图组成
+
+* 在数据结构上，内圈是外圈的父节点
+
+* 因此，它既能像[【饼图】](https://echarts.apache.org/zh/option.html#series-pie)一样表现局部和整体的占比，又能像[【矩形树图】](https://echarts.apache.org/zh/option.html#series-treemap)一样表现层级关系
+
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=sunburst-monochrome)
+
+### 引入相关文件
+
+旭日图是 ECharts 4.0 新增的图表类型，从[【 CDN 】](https://www.jsdelivr.com/package/npm/echarts)引入完整版的[【 echarts.min.js 】](https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js)
+
+### 最简单的旭日图
 
 
 
