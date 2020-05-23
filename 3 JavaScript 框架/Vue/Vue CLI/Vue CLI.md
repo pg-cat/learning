@@ -226,20 +226,26 @@ vue create hello-world
 > 警告
 >> 如果你在 Windows 上通过 minTTY 使用 Git Bash ，交互提示符并不工作
 > * 你必须通过 `winpty vue.cmd create hello-world` 启动这个命令
->> 不过，如果你仍想使用 `vue create hello-world` ，则可以通过在 `~/.bashrc` 文件中添加以下行来为命令添加别名
+>> 不过，如果你仍想使用 `vue create hello-world` ，则可以通过在 `~/.bashrc` 文件中添加以下行来为命令添加别名：
 >> * `alias vue='winpty vue.cmd'` 你需要重新启动 Git Bash 终端会话以使更新后的 bashrc 文件生效
 
+你会被提示选取一个 **`preset（预设）`**
 
+* 你可以选默认的包含了基本的 `Babel + ESLint` 设置的 preset ，也可以选 **`手动选择特性`** 来选取需要的特性
 
+![图片](https://cli.vuejs.org/cli-new-project.png)
 
+* 这个默认的设置非常适合快速创建一个新项目的原型，而手动设置则提供了更多的选项，它们是面向生产的项目更加需要的
 
+![图片](https://cli.vuejs.org/cli-select-features.png)
 
+如果你决定手动选择特性，在操作提示的最后你可以选择将已选项保存为一个将来可复用的 **`preset（预设）`**
 
-
-
-
-
-
+> `~/.vuerc`
+>> 被保存的 **`preset（预设）`** 将会存在用户的 home 目录下一个名为 `.vuerc` 的 JSON 文件里
+>> * 如果你想要修改被保存的 `preset /` 选项，可以编辑这个文件
+> * 在项目创建的过程中，你也会被提示选择喜欢的包管理器或使用[【淘宝 npm 镜像源】](https://npm.taobao.org/)以更快地安装依赖
+> * 这些选择也将会存入 ~/.vuerc
 
 
 
