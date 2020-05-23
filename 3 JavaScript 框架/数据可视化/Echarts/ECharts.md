@@ -120,6 +120,23 @@
 - [使用 Canvas 或者 SVG 渲染](#使用-canvas-或者-svg-渲染)
   - [选择哪种渲染器](#选择哪种渲染器)
   - [如何使用渲染器](#如何使用渲染器)
+- [在图表中支持无障碍访问](#在图表中支持无障碍访问)
+  - [整体修改描述](#整体修改描述)
+  - [定制模板描述](#定制模板描述)
+- [使用 ECharts GL 实现基础的三维可视化](#使用-echarts-gl-实现基础的三维可视化)
+  - [如何下载和引入 ECharts GL](#如何下载和引入-echarts-gl)
+  - [声明一个基础的三维笛卡尔坐标系](#声明一个基础的三维笛卡尔坐标系)
+  - [绘制三维的散点图](#绘制三维的散点图)
+  - [使用真实数据的三维散点图](#使用真实数据的三维散点图)
+  - [利用 visualMap 组件对三维散点图进行视觉编码](#利用-visualmap-组件对三维散点图进行视觉编码)
+  - [在笛卡尔坐标系上显示其它类型的三维图表](#在笛卡尔坐标系上显示其它类型的三维图表)
+  - [老板想要立体的柱状图效果](#老板想要立体的柱状图效果)
+- [在微信小程序中使用](#在微信小程序中使用)
+  - [体验示例小程序](#体验示例小程序)
+  - [下载](#下载)
+  - [引入组件](#引入组件)
+  - [创建图表](#创建图表)
+  - [暂不支持的功能](#暂不支持的功能)
 
 <!-- /TOC -->
 
@@ -5119,1200 +5136,573 @@ ECharts 从初始一直使用 Canvas 绘制图表（除了对 `IE8-` 使用 `VML
 
 ### 如何使用渲染器
 
+ECharts 默认使用 Canvas 渲染
 
+如果想使用 SVG 渲染，ECharts 代码中须包括有 SVG 渲染器模块
 
+* ECharts 的[【预构建文件】](https://www.jsdelivr.com/package/npm/echarts)中，[【常用版】](https://cdn.jsdelivr.net/npm/echarts/dist/echarts.common.min.js)和[【完整版】](https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js)已经包含了 SVG 渲染器，可直接使用
 
+  而 精简版 没有包括
 
+* 如果[【在线自定义构建 ECharts 】](https://echarts.apache.org/zh/builder.html)，则需要勾上页面下方的 **`SVG 渲染`**
 
+* 如果[【线下自定义构建 ECharts 】](https://echarts.apache.org/zh/tutorial.html#自定义构建%20ECharts)，则须引入 SVG 渲染器模块，即：
 
+```js
+import 'zrender/lib/svg/svg';
+```
 
+然后，我们就可以在代码中，初始化图表实例时，[【传入参数】](https://echarts.apache.org/zh/api.html#echarts.init)选择渲染器类型：
 
+```js
+// 使用 Canvas 渲染器（默认）
+var chart = echarts.init(containerDom, null, {renderer: 'canvas'});
+// 等价于：
+var chart = echarts.init(containerDom);
 
+// 使用 SVG 渲染器
+var chart = echarts.init(containerDom, null, {renderer: 'svg'});
+```
 
+## 在图表中支持无障碍访问
 
+W3C 制定了无障碍富互联网应用规范集（[【 WAI-ARIA 】](https://www.w3.org/WAI/intro/aria)，the Accessible Rich Internet Applications Suite），致力于使得网页内容和网页应用能够被更多残障人士访问
 
+* ECharts 4.0 遵从这一规范，支持自动根据图表配置项智能生成描述，使得盲人可以在朗读设备的帮助下了解图表内容，让图表可以被更多人群访问
 
+* 默认关闭，需要通过将[【 aria.show 】](https://echarts.apache.org/zh/option.html#aria.show)设置为 `true` 开启
 
+  开启后，会根据图表、数据、标题等情况，自动智能生成关于图表的描述，用户也可以通过配置项修改描述
 
+对于配置项：
 
+```js
+option = {
+  aria: {
+    show: true
+  },
+  title: {
+    text: '某站点用户访问来源',
+    left: 'center'
+  },
+  series: [
+    {
+      name: '访问来源',
+      type: 'pie',
+      data: [
+        { value: 335, name: '直接访问' },
+        { value: 310, name: '邮件营销' },
+        { value: 234, name: '联盟广告' },
+        { value: 135, name: '视频广告' },
+        { value: 1548, name: '搜索引擎' }
+      ]
+    }
+  ]
+};
+```
 
+[【示例：点击查看在线实例】](https://echarts.apache.org/examples/zh/editor.html?c=doc-example/aria-pie)
 
+生成的图表 DOM 上，会有一个 `aria-label` 属性，在朗读设备的帮助下，盲人能够了解图表的内容，其值为：
 
+```
+这是一个关于“某站点用户访问来源”的图表。图表类型是饼图，表示访问来源。其数据是——直接访问的数据是335，邮件营销的数据是310，联盟广告的数据是234，视频广告的数据是135，搜索引擎的数据是1548。
+```
 
+### 整体修改描述
 
+对于有些图表，默认生成的数据点的描述并不足以表现整体的信息
 
+比如下图的散点图，默认生成的描述可以包含数据点的坐标值，但是知道几百几千个点的坐标并不能帮助我们有效地理解图表表达的信息
 
+![图片](https://echarts.apache.org/zh/documents/asset/img/aria-example.png)
 
+这时候，用户可以通过[【 aria.description 】](https://echarts.apache.org/zh/option.html#aria.description)配置项指定图表的整体描述
 
+### 定制模板描述
 
+除了整体性修改描述之外，我们还提供了生成描述的模板，可以方便地进行细粒度的修改
 
+生成描述的基本流程为，如果[【 aria.show 】](https://echarts.apache.org/zh/option.html#aria.show)设置为 `true` ，则生成无障碍访问描述，否则不生成
 
+* 如果定义了[【 aria.description 】](https://echarts.apache.org/zh/option.html#aria.description)，则将其作为图表的完整描述，否则根据模板拼接生成描述
 
+* 我们提供了默认的生成描述的算法，仅当生成的描述不太合适时，才需要修改这些模板，甚至使用 `aria.description` 完全覆盖
 
+使用模板拼接时，先根据是否存在标题[【 title.text 】](https://echarts.apache.org/zh/tutorial.html#title.text)决定使用[【 aria.general.withTitle 】](https://echarts.apache.org/zh/option.html#aria.general.withTitle)还是[【 aria.general.withoutTitle 】](https://echarts.apache.org/zh/option.html#aria.general.withoutTitle)作为整体性描述
 
+* 其中，`aria.general.withTitle` 配置项包括模板变量 `'{title}'` ，将会被替换成图表标题
 
+* 也就是说，如果 `aria.general.withTitle` 被设置为 **`'图表的标题是：{title}'`** ，则如果包含标题 **`'价格分布图'`** ，这部分的描述为 **`'图表的标题是：价格分布图'`**
 
+拼接完标题之后，会依次拼接系列的描述（[【 aria.series 】](https://echarts.apache.org/zh/option.html#aria.series)），和每个系列的数据的描述（[【 aria.data 】](https://echarts.apache.org/zh/option.html#aria.data)）
 
+* 同样，每个模板都有可能包括模板变量，用以替换实际的值
 
+> 完整的描述生成流程请参见[【 ARIA 文档】](https://echarts.apache.org/zh/option.html#aria)
 
+## 使用 ECharts GL 实现基础的三维可视化
 
+ECharts GL（后面统一简称 GL ）为 ECharts 补充了丰富的三维可视化组件，这篇文章我们会简单介绍如何基于 GL 实现一些常见的三维可视化作品
 
+* 实际上如果你对 ECharts 有一定了解的话，也可以很快的上手 GL
 
+* GL 的配置项完全是按照 ECharts 的标准和上手难度来设计的
 
+在看完文章之后，你可以前往[【官方示例】](http://echarts.baidu.com/examples/index.html#chart-type-globe)和[【 Gallery 】](http://gallery.echartsjs.com/explore.html#tags=echarts-gl)去了解更多使用 GL 制作的示例
 
+* 对于文章中我们没法解释到的代码，也可以前往[【 GL 配置项手册】](http://echarts.baidu.com/option-gl.html)查看具体的配置项使用方法
 
+### 如何下载和引入 ECharts GL
 
+为了不再增加已经很大了的 ECharts 完整版的体积
 
+* 我们将 GL 作为扩展包的形式提供，和诸如水球图这样的扩展类似
 
+* 如果要使用 GL 里的各种组件，只需要在引入 `echarts.min.js` 的基础上再引入一个 `echarts-gl.min.js`
 
+你可以从[【官网】](http://echarts.baidu.com/download.html)下载最新版的 GL ，然后在页面中通过标签引入：
 
+```html
+<script src="lib/echarts.min.js"></script>
+<script src="lib/echarts-gl.min.js"></script>
+```
 
+如果你的项目使用 webpack 或者 rollup 来打包代码的话，也可以通过 npm 安装后引入
 
+```sh
+npm install echarts
+npm install echarts-gl
+```
 
+```js
+// 通过 ES6 的 import 语法引入 ECharts 和 ECharts GL
+import echarts from 'echarts';
+import 'echarts-gl';
+```
 
+### 声明一个基础的三维笛卡尔坐标系
 
+引入 ECharts 和 ECharts GL 后，我们先来声明一个基础的三维笛卡尔坐标系用于绘制三维的散点图，柱状图，曲面图等常见的统计图
 
+在 ECharts 中我们有[【 grid 】](http://echarts.baidu.com/option.html#grid)组件用于提供一个矩形的区域放置一个二维的笛卡尔坐标系，以及笛卡尔坐标系上上的 x 轴（[【 xAxis 】](http://echarts.baidu.com/option.html#xAxis)）和 y 轴（[【 yAxis 】](http://echarts.baidu.com/option.html#yAxis)）
 
+* 对于三维的笛卡尔坐标系，我们在 GL 中提供了[【 grid3D 】](http://echarts.baidu.com/option-gl.html#grid3D)组件用于划分一块三维的笛卡尔空间
 
+* 以及放置在这个 `grid3D` 上的：
 
+  * [【 xAxis3D 】](http://echarts.baidu.com/option-gl.html#xAxis3D)
+  * [【 yAxis3D 】](http://echarts.baidu.com/option-gl.html#yAxis3D)
+  * [【 zAxis3D 】](http://echarts.baidu.com/option-gl.html#zAxis3D)
 
+> 小提示：在 GL 中我们对除了 `globe` 之外所有的三维组件和系列都加了 3D 的后缀用以区分
+>> 例如三维的散点图就是 `scatter3D` ，三维的地图就是 `map3D` 等等
 
+下面这段代码就声明了一个最简单的三维笛卡尔坐标系
 
+```js
+var option = {
+  // 需要注意的是我们不能跟 grid 一样省略 grid3D
+  grid3D: {},
 
+  // 默认情况下, x, y, z 分别是从 0 到 1 的数值轴
+  xAxis3D: {},
+  yAxis3D: {},
+  zAxis3D: {}
+}
+```
 
+效果如下：
 
+![图片](https://echarts.apache.org/zh/documents/asset/img/gl/grid3D-basic.png)
 
+跟二维的笛卡尔坐标系一样，每个轴都会有多种类型，默认是数值轴
 
+* 如果需要是类目轴的话，简单的设置为 `type: 'category'` 就行了
 
+### 绘制三维的散点图
 
+声明好笛卡尔坐标系后，我们先试试用一份程序生成的正态分布数据在这个三维的笛卡尔坐标系中画散点图
 
+下面这段是生成正态分布数据的代码，你可以先不用关心这段代码是怎么工作的，只需要知道它生成了一份三维的正态分布数据放在 `data` 数组中：
 
+```js
+function makeGaussian(amplitude, x0, y0, sigmaX, sigmaY) {
+  return function (amplitude, x0, y0, sigmaX, sigmaY, x, y) {
+    var exponent = -(
+      (Math.pow(x - x0, 2) / (2 * Math.pow(sigmaX, 2)))
+      + (Math.pow(y - y0, 2) / (2 * Math.pow(sigmaY, 2)))
+    );
+    return amplitude * Math.pow(Math.E, exponent);
+  }.bind(null, amplitude, x0, y0, sigmaX, sigmaY);
+}
+// 创建一个高斯分布函数
+var gaussian = makeGaussian(50, 0, 0, 20, 20);
 
+var data = [];
+for (var i = 0; i < 1000; i++) {
+  // x, y 随机分布
+  var x = Math.random() * 100 - 50;
+  var y = Math.random() * 100 - 50;
+  var z = gaussian(x, y);
+  data.push([x, y, z]);
+}
+```
 
+生成的正态分布的数据大概长这样：
 
+```js
+[
+  [46.74395071259907, -33.88391024738553, 0.7754030099768191],
+  [-18.45302873809771, 16.88114775416834, 22.87772504105404],
+  [2.9908128281121336, -0.027699444453467947, 49.44400635911886],
+  // ...
+]
+```
 
+每一项都包含了 `x` , `y` , `z` 三个值，这三个值会分别被映射到笛卡尔坐标系的 x 轴，y 轴和 z 轴上
 
+然后我们可以使用 GL 提供的[【 scatter3D 】](http://echarts.baidu.com/option-gl.html#series-scatter3D)系列类型把这些数据画成三维空间中正态分布的点：
 
+```js
+option = {
+  grid3D: {},
+  xAxis3D: {},
+  yAxis3D: {},
+  zAxis3D: { max: 100 },
+  series: [{
+      type: 'scatter3D',
+      data: data
+  }]
+}
+```
 
+![图片](https://echarts.apache.org/zh/documents/asset/img/gl/scatter3D-gaussian.png)
 
+### 使用真实数据的三维散点图
 
+接下来我们来看一个使用真实多维数据的三维散点图例子
+
+* 可以先从 http://www.echartsjs.com/examples/data/asset/data/life-expectancy-table.json 获取这份数据
+
+* 格式化一下可以看到这份数据是很传统转成 JSON 后的表格格式
+
+  第一行是每一列数据的属性名，可以从这个属性名看出来每一列数据的含义，分别是人均收入，人均寿命，人口数量，国家和年份
+
+```js
+[
+  ["Income", "Life Expectancy", "Population", "Country", "Year"],
+  [815, 34.05, 351014, "Australia", 1800],
+  [1314, 39, 645526, "Canada", 1800],
+  [985, 32, 321675013, "China", 1800],
+  [864, 32.2, 345043, "Cuba", 1800],
+  [1244, 36.5731262, 977662, "Finland", 1800],
+  // ...
+]
+```
+
+在 ECharts 4 中我们可以使用 `dataset` 组件非常方便地引入这份数据
+
+* 如果对 `dataset` 还不熟悉的话可以看[【 dataset使用教程】](http://echarts.baidu.com/tutorial.html#使用%20dataset%20管理数据)
+
+```js
+$.get('data/asset/data/life-expectancy-table.json', function (data) {
+  myChart.setOption({
+    grid3D: {},
+    xAxis3D: {},
+    yAxis3D: {},
+    zAxis3D: {},
+    dataset: {
+      source: data
+    },
+    series: [
+      {
+        type: 'scatter3D',
+        symbolSize: 2.5
+      }
+    ]
+  })
+});
+```
+
+![图片](https://echarts.apache.org/zh/documents/asset/img/gl/scatter3D-life.png)
+
+默认会把前三列，也就是收入（ Income ），人均寿命（ Life Expectancy ），人口（ Population ）分别放到 `x` 、`y` 、`z` 轴上
+
+使用 encode 属性我们还可以将指定列的数据映射到指定的坐标轴上，从而省去很多繁琐的数据转换代码
+
+* 例如我们将 x 轴换成是国家（ Country ），y 轴换成年份（ Year ），z 轴换成收入（ Income ），可以看到不同国家不同年份的人均收入分布
+
+```js
+myChart.setOption({
+  grid3D: {},
+
+  // 因为 x 轴和 y 轴都是类目数据
+  // 所以需要设置 type: 'category' 保证正确显示数据
+  xAxis3D: {
+    type: 'category'
+  },
+  yAxis3D: {
+    type: 'category'
+  },
+
+  zAxis3D: {},
+  dataset: {
+    source: data
+  },
+  series: [
+    {
+      type: 'scatter3D',
+      symbolSize: 2.5,
+      encode: {
+        // 维度的名字默认就是表头的属性名
+        x: 'Country',
+        y: 'Year',
+        z: 'Income',
+        tooltip: [0, 1, 2, 3, 4]
+      }
+    }
+  ]
+});
+```
+
+### 利用 visualMap 组件对三维散点图进行视觉编码
+
+刚才多维数据的例子中，我们还有几个维度（列）没能表达出来，利用 ECharts 内置的[【 visualMap 】](http://echarts.baidu.com/option.html#visualMap)组件我们可以继续将第四个维度编码成颜色
+
+```js
+myChart.setOption({
+  grid3D: {
+    viewControl: {
+      // 使用正交投影
+      projection: 'orthographic'
+    }
+  },
+  xAxis3D: {
+    type: 'category'
+  },
+  yAxis3D: {
+    type: 'log'
+  },
+  zAxis3D: {},
+  visualMap: {
+    calculable: true,
+    max: 100,
+    // 维度的名字默认就是表头的属性名
+    dimension: 'Life Expectancy',
+    inRange: {
+      color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+    }
+  },
+  dataset: {
+    source: data
+  },
+  series: [
+    {
+      type: 'scatter3D',
+      symbolSize: 5,
+      encode: {
+        // 维度的名字默认就是表头的属性名
+        x: 'Country',
+        y: 'Population',
+        z: 'Income',
+        tooltip: [0, 1, 2, 3, 4]
+      }
+    }
+  ]
+})
+```
 
+这段代码中我们又在刚才的例子基础上加入了 `visualMap` 组件，将 `Life Expectancy` 这一列数据映射到了不同的颜色
 
+* 除此之外我们还把原来默认的透视投影改成了正交投影
 
+* 正交投影在某些场景中可以避免因为近大远小所造成的表达错误
 
+![图片](https://echarts.apache.org/zh/documents/asset/img/gl/scatter3D-color.png)
 
+当然，除了 `visualMap` 组件，还可以利用其它的 ECharts 内置组件并且充分利用这些组件的交互效果，比如[【 `legend` 】](http://echarts.baidu.com/option.html#legend)
 
+* 也可以像[【三维散点图和散点矩阵结合使用】](http://echarts.baidu.com/examples/editor.html?c=scatter3d-scatter&gl=1)这个例子一样实现二维和三维的系列混搭
 
+在实现 GL 的时候我们尽可能地把 WebGL 和 Canvas 之间的差异屏蔽了到最小，从而让 GL 的使用可以更加方便自然
 
+### 在笛卡尔坐标系上显示其它类型的三维图表
 
+除了散点图，我们也可以通过 GL 在三维的笛卡尔坐标系上绘制其它类型的三维图表
 
+* 比如刚才例子中将 `scatter3D` 类型改成 `bar3D` 就可以变成一个三维的柱状图
 
+![图片](https://echarts.apache.org/zh/documents/asset/img/gl/bar3D.png)
 
+* 还有机器学习中会用到的三维曲面图[【 surface 】](http://echarts.baidu.com/option-gl.html#series-surface)，三维曲面图常用来表达平面上的数据走势，刚才的正态分布数据我们也可以像下面这样画成曲面图
 
+```js
+var data = [];
+// 曲面图要求给入的数据是网格形式按顺序分布。
+for (var y = -50; y <= 50; y++) {
+  for (var x = -50; x <= 50; x++) {
+    var z = gaussian(x, y);
+    data.push([x, y, z]);
+  }
+}
+option = {
+  grid3D: {},
+  xAxis3D: {},
+  yAxis3D: {},
+  zAxis3D: { max: 60 },
+  series: [{
+    type: 'surface',
+    data: data
+  }]
+}
+```
 
+![图片](https://echarts.apache.org/zh/documents/asset/img/gl/surface.png)
 
+### 老板想要立体的柱状图效果
 
+最后，我们经常会被问到如何用 ECharts 画只有二维数据的立体柱状图效果
 
+* 一般来说我们是不推荐这么做的，因为这种不必要的立体柱状图很容易造成错误的表达，具体可以见我们[【柱状图使用指南】](http://vis.baidu.com/chartusage/bar/)中的解释
 
+* 但是如果有一些其他因素导致必须得画成立体的柱状图的话，用 GL 也可以实现
 
+  [【丶灬豆奶】](http://gallery.echartsjs.com/explore.html?u=bd-3056387051)和[【阿洛儿啊】](http://gallery.echartsjs.com/explore.html?u=bd-809368804)在 Gallery 已经写了类似的例子，大家可以参考
 
+[【 3D 堆积柱状图】](https://gallery.echartsjs.com/editor.html?c=xSJsdlo2hb)
 
+[【 3D 柱状图】](https://gallery.echartsjs.com/editor.html?c=xryQDPYK0b)
 
+## 在微信小程序中使用
 
+我们接到了很多微信小程序开发者的反馈，表示他们强烈需要像 ECharts 这样的可视化工具
 
+* 但是微信小程序是不支持 DOM 操作的，Canvas 接口也和浏览器不尽相同
 
+* 因此，我们和微信小程序官方团队合作，提供了 ECharts 的微信小程序版本
 
+  开发者可以通过熟悉的 ECharts 配置方式，快速开发图表，满足各种可视化需求
 
+### 体验示例小程序
 
+在微信中扫描下面的二维码即可体验 ECharts Demo ：
 
+![图片](https://github.com/ecomfe/echarts-for-weixin/raw/master/img/weixin-app.jpg)
 
+### 下载
 
+为了兼容小程序 Canvas ，我们提供了一个小程序的组件，用这种方式可以方便地使用 ECharts ：
 
+* 首先，下载 GitHub 上的[【 ecomfe/echarts-for-weixin 】](https://github.com/ecomfe/echarts-for-weixin)项目
 
+* 其中，`ec-canvas` 是我们提供的组件，其他文件是如何使用该组件的示例
 
+`ec-canvas` 目录下有一个 `echarts.js` ，默认我们会在每次 `echarts-for-weixin` 项目发版的时候替换成最新版的 ECharts
 
+* 如有必要，可以自行从 ECharts 项目中下载[【最新发布版】](https://github.com/apache/incubator-echarts/releases)，或者从[【官网自定义构建】](https://echarts.apache.org/builder.html)以减小文件大小
 
+### 引入组件
 
+微信小程序的项目创建可以参见[【微信公众平台官方文档】](https://mp.weixin.qq.com/debug/wxadoc/dev/quickstart/basic/getting-started.html)
 
+* 在创建项目之后，可以将下载的[【 ecomfe/echarts-for-weixin 】](https://github.com/ecomfe/echarts-for-weixin)项目完全替换新建的项目，然后将修改代码
 
+  如果采用完全替换的方式，需要将 `project.config.json` 中的 `appid` 替换成在公众平台申请的项目 `id`
 
+  `pages` 目录下的每个文件夹是一个页面，可以根据情况删除不需要的页面，并且在 `app.json` 中删除对应页面
 
+* 或者仅拷贝 `ec-canvas` 目录到新建的项目下，然后做相应的调整
 
+  如果仅拷贝 `ec-canvas` 目录，则可以参考 `pages/bar` 目录下的几个文件的写法
 
+### 创建图表
 
+首先，在 `pages/bar` 目录下新建以下几个文件：
 
+* index.js
+* index.json
+* index.wxml
+* index.wxss
 
+并且在 `app.json` 的 `pages` 中增加 `'pages/bar/index'`
 
+`index.json` 配置如下：
 
+```js
+{
+  "usingComponents": {
+    "ec-canvas": "../../ec-canvas/ec-canvas"
+  }
+}
+```
 
+这一配置的作用是，允许我们在 `pages/bar/index.wxml` 中使用 `<ec-canvas>` 组件
 
+> 注意：路径的相对位置要写对，如果目录结构和本例相同，就应该像上面这样配置
 
+`index.wxml` 中，我们创建了一个 `<ec-canvas>` 组件，内容如下：
 
+```js
+<view class="container">
+  <ec-canvas id="mychart-dom-bar" canvas-id="mychart-bar" ec="{{ ec }}"></ec-canvas>
+</view>
+```
 
+其中 `ec` 是一个我们在 `index.js` 中定义的对象，它使得图表能够在页面加载后被初始化并设置
 
+index.js 的结构如下：
 
+```js
+function initChart(canvas, width, height) {
+  const chart = echarts.init(canvas, null, {
+    width: width,
+    height: height
+  });
+  canvas.setChart(chart);
 
+  var option = {
+    // ...
+  };
+  chart.setOption(option);
+  return chart;
+}
 
+Page({
+  data: {
+    ec: {
+      onInit: initChart
+    }
+  }
+});
+```
 
+这对于所有 ECharts 图表都是通用的，用户只需要修改上面 `option` 的内容，即可改变图表
 
+* option 的使用方法参见[【 ECharts 配置项文档】](https://echarts.apache.org/option.html)
 
+* 对于不熟悉 ECharts 的用户，可以参见[【 5 分钟上手 ECharts 】](https://echarts.apache.org/tutorial.html#5%20分钟上手%20ECharts)教程
 
+> 完整的例子请参见[【 ecomfe/echarts-for-weixin 】](https://github.com/ecomfe/echarts-for-weixin)项目
 
+### 暂不支持的功能
 
+ECharts 中的绝大部分功能都支持小程序版本，因此这里仅说明不支持的功能，以及存在的问题
 
+以下功能尚不支持，如果有相关需求请在[【 issue 】](https://github.com/ecomfe/echarts-for-weixin/issues)中向我们反馈，对于反馈人数多的需求将优先支持：
 
+* Tooltip
+* 图片
+* 多个 zlevel 分层
 
+此外，目前还有一些 bug 尚未修复，部分需要小程序团队配合上线支持，但不影响基本的使用
 
+已知的 bug 包括：
 
+* 安卓平台：transform 的问题（会影响关系图边两端的标记位置、旭日图文字位置等）
 
+* iOS 平台：半透明略有变深的问题
 
+* iOS 平台：渐变色出现在定义区域之外的地方
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+如有其它问题，也欢迎在[【 issue 】](https://github.com/ecomfe/echarts-for-weixin/issues)中向我们反馈，谢谢！
