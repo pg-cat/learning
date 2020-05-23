@@ -10,7 +10,6 @@
   - [CLI 服务](#cli-服务)
   - [CLI 插件](#cli-插件)
 - [安装](#安装)
-- [== 基础 ==](#-基础-)
 - [快速原型开发](#快速原型开发)
   - [vue serve](#vue-serve)
   - [vue build](#vue-build)
@@ -129,7 +128,7 @@ yarn global add @vue/cli
 vue --version
 ```
 
-## == 基础 ==
+---
 
 ## 快速原型开发
 
@@ -220,7 +219,15 @@ vue build MyComponent.vue
 
 运行以下命令来创建一个新项目：
 
+```sh
+vue create hello-world
+```
 
+> 警告
+>> 如果你在 Windows 上通过 minTTY 使用 Git Bash ，交互提示符并不工作
+> * 你必须通过 `winpty vue.cmd create hello-world` 启动这个命令
+>> 不过，如果你仍想使用 `vue create hello-world` ，则可以通过在 `~/.bashrc` 文件中添加以下行来为命令添加别名
+>> * `alias vue='winpty vue.cmd'` 你需要重新启动 Git Bash 终端会话以使更新后的 bashrc 文件生效
 
 
 
