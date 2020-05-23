@@ -10,6 +10,7 @@
   - [CLI 服务](#cli-服务)
   - [CLI 插件](#cli-插件)
 - [安装](#安装)
+- [== 基础 ==](#-基础-)
 - [快速原型开发](#快速原型开发)
   - [vue serve](#vue-serve)
   - [vue build](#vue-build)
@@ -128,7 +129,7 @@ yarn global add @vue/cli
 vue --version
 ```
 
----
+## == 基础 ==
 
 ## 快速原型开发
 
