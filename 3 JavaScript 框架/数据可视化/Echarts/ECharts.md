@@ -103,6 +103,13 @@
   - [总结](#总结)
 - [自定义系列](#自定义系列)
   - [（一）renderItem 方法](#一renderitem-方法)
+  - [（二）使坐标轴的范围自适应数据范围](#二使坐标轴的范围自适应数据范围)
+  - [（三）设定 tooltip](#三设定-tooltip)
+  - [（四）超出坐标系范围的截取](#四超出坐标系范围的截取)
+  - [（五）关于 dataIndex](#五关于-dataindex)
+  - [（六）事件监听](#六事件监听)
+  - [（七）自定义矢量图形](#七自定义矢量图形)
+- [富文本标签](#富文本标签)
 
 <!-- /TOC -->
 
@@ -1817,7 +1824,7 @@ encode: {
 
 * 如果没有坐标系（如饼图）
 
-  * 取第一列（行）为名字，第二列（行）为数值
+  * 取第一列（行）为名字，第二列��行）为数值
 
     如果只有一列，则取第一列为数值
 
@@ -4341,47 +4348,54 @@ var option = {
 
 ```js
 var option = {
-  ...,
+  // ...,
   series: [{
     type: 'custom',
     renderItem: function (params, api) {
-      // 对于 data 中的每个 dataItem，都会调用这个 renderItem 函数
+      // 对于 data 中的每个 dataItem ，都会调用这个 renderItem 函数
       // 但是注意，并不一定是按照 data 的顺序调用
 
-      // 这里进行一些处理，例如，坐标转换。
-      // 这里使用 api.value(0) 取出当前 dataItem 中第一个维度的数值。
+      // 这里进行一些处理，例如，坐标转换
+      // 这里使用 api.value(0) 取出当前 dataItem 中第一个维度的数值
       var categoryIndex = api.value(0);
-      // 这里使用 api.coord(...) 将数值在当前坐标系中转换成为屏幕上的点的像素值。
+
+      // 这里使用 api.coord(...) 将数值在当前坐标系中转换成为屏幕上的点的像素值
       var startPoint = api.coord([api.value(1), categoryIndex]);
       var endPoint = api.coord([api.value(2), categoryIndex]);
-      // 这里使用 api.size(...) 获得 Y 轴上数值范围为 1 的一段所对应的像素长度。
+
+      // 这里使用 api.size(...) 获得 Y 轴上数值范围为 1 的一段所对应的像素长度
       var height = api.size([0, 1])[1] * 0.6;
 
-      // shape 属性描述了这个矩形的像素位置和大小。
-      // 其中特殊得用到了 echarts.graphic.clipRectByRect，意思是，
-      // 如果矩形超出了当前坐标系的包围盒，则剪裁这个矩形。
-      // 如果矩形完全被剪掉，会返回 undefined.
+      // shape 属性描述了这个矩形的像素位置和大小
+      // 其中特殊得用到了 echarts.graphic.clipRectByRect
+      // 意思是，如果矩形超出了当前坐标系的包围盒，则剪裁这个矩形
+      // 如果矩形完全被剪掉，会返回 undefined
       var rectShape = echarts.graphic.clipRectByRect({
-        // 矩形的位置和大小。
+
+        // 矩形的位置和大小
         x: startPoint[0],
         y: startPoint[1] - height / 2,
         width: endPoint[0] - startPoint[0],
         height: height
       }, {
-        // 当前坐标系的包围盒。
+
+        // 当前坐标系的包围盒
         x: params.coordSys.x,
         y: params.coordSys.y,
         width: params.coordSys.width,
         height: params.coordSys.height
       });
 
-      // 这里返回为这个 dataItem 构建的图形元素定义。
+      // 这里返回为这个 dataItem 构建的图形元素定义
       return rectShape && {
-        // 表示这个图形元素是矩形。还可以是 'circle', 'sector', 'polygon' 等等。
+        // 表示这个图形元素是矩形
+        // 还可以是 'circle', 'sector', 'polygon' 等等
         type: 'rect',
+
         shape: rectShape,
-        // 用 api.style(...) 得到默认的样式设置。这个样式设置包含了
-        // option 中 itemStyle 的配置和视觉映射得到的颜色。
+
+        // 用 api.style(...) 得到默认的样式设置
+        // 这个样式设置包含了 option 中 itemStyle 的配置和视觉映射得到的颜色
         style: api.style()
       };
     },
@@ -4389,55 +4403,204 @@ var option = {
       [12, 44, 55, 60], // 这是第一个 dataItem
       [53, 31, 21, 56], // 这是第二个 dataItem
       [71, 33, 10, 20], // 这是第三个 dataItem
-      ...
+      // ...
       ]
   }]
 }
 ```
 
+[【 renderItem 】](https://echarts.apache.org/zh/option.html#series-custom.renderItem)函数提供了两个参数：
 
+参数|说明
+-|-
+[【 params 】](https://echarts.apache.org/zh/option.html#series-custom.renderItem.arguments.params)|包含了当前数据信息（如 `seriesIndex` 、`dataIndex` 等等）和坐标系的信息（如坐标系包围盒的位置和尺寸）
+[【 api 】](https://echarts.apache.org/zh/option.html#series-custom.renderItem.arguments.api)|是一些开发者可调用的方法集合（如 `api.value()` 、`api.coord()` ）
 
+`renderItem` 函数须返回根据此 `dataItem` 绘制出的图形元素的定义信息，参见[【 renderItem.return 】](https://echarts.apache.org/zh/option.html#series-custom.renderItem.return)
 
+一般来说，`renderItem` 函数的主要逻辑，是将 `dataItem` 里的值映射到坐标系上的图形元素
 
+这一般需要用到[【 renderItem.arguments.api 】](https://echarts.apache.org/zh/option.html#series-custom.renderItem.arguments.api)中的两个函数：
 
+函数|说明
+-|-
+[【 api.value(...) 】](https://echarts.apache.org/zh/option.html#series-custom.renderItem.arguments.api.value)|意思是取出 `dataItem` 中的数值（例如 `api.value(0)` 表示取出当前 `dataItem` 中第一个维度的数值）
+[【 api.coord(...) 】](https://echarts.apache.org/zh/option.html#series-custom.renderItem.arguments.api.coord)|意思是进行坐标转换计算（例如 `var point = api.coord([api.value(0), api.value(1)])` 表示 `dataItem` 中的数值转换成坐标系上的点）
 
+> 有时候还需要用到[【 api.size(...) 】](https://echarts.apache.org/zh/option.html#series-custom.renderItem.arguments.api.size)函数，表示得到坐标系上一段数值范围对应的长度
 
+返回值中样式的设置可以使用[【 api.style(...) 】](https://echarts.apache.org/zh/option.html#series-custom.renderItem.arguments.api.style)函数，他能得到[【 series.itemStyle 】](https://echarts.apache.org/zh/option.html#series-custom.itemStyle)中定义的样式信息，以及视觉映射的样式信息
 
+* 也可以用这种方式覆盖这些样式信息：`api.style({fill: 'green', stroke: 'yellow'})`
 
+### （二）使坐标轴的范围自适应数据范围
 
+在[【直角坐标系（ grid ）】](https://echarts.apache.org/zh/option.html#grid)、[【极坐标系（ polar ）】](https://echarts.apache.org/zh/option.html#polar)中都有坐标轴
 
+* 坐标轴的刻度范围需要自适应当前显示出的数据的范围，否则绘制出的图形会超出去
 
+* 例如，在 **`直角坐标系（ grid ）`** 中，使用自定义系列的开发者，需要设定，`data` 中的哪些维度会对应到 `x` 轴上，哪些维度会对应到 `y` 轴上
 
+* 这件事通过[【 encode 】](https://echarts.apache.org/zh/option.html#series-custom.encode)来设定
 
+```js
+option = {
+  series: [{
+    type: 'custom',
+    renderItem: function () {
+      // ...
+    },
+    encode: {
 
+    // data 中『维度1』和『维度2』对应到 X 轴
+    x: [1, 2],
 
+    // data 中『维度0』对应到 Y 轴
+    y: 0
+  },
+    data: [
 
+      // 维度0  维度1  维度2  维度3
+      [12, 44, 55, 60], // 这是第一个 dataItem
+      [53, 31, 21, 56], // 这是第二个 dataItem
+      [71, 33, 10, 20], // 这是第三个 dataItem
+      // ...
+    ]
+  }]
+};
+```
 
+### （三）设定 tooltip
 
+当然，使用[【 tooltip.formatter 】](https://echarts.apache.org/zh/option.html#tooltip.formatter)可以任意定制 `tooltip` 中的内容。但是还有更简单的方法，通过[【 encode 】](https://echarts.apache.org/zh/option.html#series-custom.encode)和[【 dimensions 】](https://echarts.apache.org/zh/option.html#series-custom.dimensions)来设定：
 
+```js
+option = {
+  series: [{
+    type: 'custom',
+    renderItem: function () {
+      // ...
+    },
+    encode: {
+    x: [1, 2],
+    y: 0,
 
+    // 表示『维度2』和『维度3』要显示到 tooltip 中
+    tooltip: [2, 3]
+  },
+    // 表示给『维度2』和『维度3』分别取名为『年龄』和『满意度』，显示到 tooltip 中
+    dimensions: [null, null, '年龄', '满意度'],
+    data: [
 
+      // 维度0  维度1  维度2  维度3
+      [12, 44, 55, 60], // 这是第一个 dataItem
+      [53, 31, 21, 56], // 这是第二个 dataItem
+      [71, 33, 10, 20], // 这是第三个 dataItem
+      // ...
+    ]
+  }]
+};
+```
 
+上面，一个简单的 custome series 例子完成了
 
+### （四）超出坐标系范围的截取
 
+与[【 dataZoom 】](https://echarts.apache.org/zh/option.html#dataZoom)结合使用的时候，常常使用会设置[【 dataZoom.filterMode 】](https://echarts.apache.org/zh/option.html#dataZoom.filterMode)为 `'weakFilter'`
 
+* 这个设置的意思是：当 `dataItem` 部分超出坐标系边界的时候，`dataItem` 不会整体被过滤掉
 
+```js
+option = {
+  dataZoom: {
+    xAxisIndex: 0,
+    filterMode: 'weakFilter'
+  },
+  series: [{
+    type: 'custom',
+    renderItem: function () {
+      // ...
+    },
+    encode: {
+      // data 中『维度1』和『维度2』对应到 X 轴
+      x: [1, 2],
+      y: 0
+    },
+    data: [
+      // 维度0  维度1  维度2  维度3
+      [12, 44, 55, 60], // 这是第一个 dataItem
+      [53, 31, 21, 56], // 这是第二个 dataItem
+      [71, 33, 10, 20], // 这是第三个 dataItem
+      // ...
+    ]
+  }]
+};
+```
 
+在这个例子中，**`『维度 1 』`** 和 **`『维度2』`** 对应到 X 轴，`dataZoom` 组件控制 X 轴的缩放
 
+* 假如在缩放的过程中，某个 `dataItem` 的 **`『维度 1 』`** 超出了 X 轴的范围， **`『维度2』`** 还在 X 轴的范围中
 
+* 那么只要设置 `dataZoom.filterMode = 'weakFilter'` ，这个 `dataItem` 就不会被过滤掉
 
+* 从而还能够使用 `renderItem` 绘制图形（可以使用上面提到过的 `echarts.graphic.clipRectByRect` 把图形绘制成被坐标系剪裁过的样子）
 
+> 参见上面提到过的例子[【 Profile 】](https://echarts.apache.org/examples/zh/editor.html?c=custom-profile)
 
+### （五）关于 dataIndex
 
+开发者如果使用到的话应注意，[【 renderItem.arguments.params 】](https://echarts.apache.org/zh/option.html#series-custom.renderItem.arguments.params)中的 `dataIndex` 和 `dataIndexInside` 是有区别的：
 
+参数|说明
+-|-
+`dataIndex`|指的 dataItem 在原始数据中的 index
+`dataIndexInside`|指的是 dataItem 在当前数据窗口（参见[【 dataZoom 】](https://echarts.apache.org/zh/option.html#dataZoom)）中的 index
 
+> [【 renderItem.arguments.api 】](https://echarts.apache.org/zh/option.html#series-custom.renderItem.arguments.api)中使用的参数都是 `dataIndexInside` 而非 `dataIndex` ，因为从 `dataIndex` 转换成 `dataIndexInside` 需要时间开销
 
+### （六）事件监听
 
+```js
+chart.setOption({
+  // ...
+  series: {
+    type: 'custom',
+    renderItem: function () {
+      // ...
+      return {
+        type: 'group',
+        children: [{
+          type: 'circle'
+          // ...
+        }, {
+          type: 'circle',
+          name: 'aaa',
 
+          // 用户指定的信息，可以在 event handler 访问到
+          info: 12345,
+          // ...
+        }]
+      };
+    }
+  }
+});
+chart.on('click', { element: 'aaa' }, function (params) {
+  // 当 name 为 'aaa' 的图形元素被点击时，此回调被触发
+  console.log(params.info);
+});
+```
 
+### （七）自定义矢量图形
 
+自定义系列能支持使用[【 SVG PathData 】](http://www.w3.org/TR/SVG/paths.html#PathData)定义矢量路径
 
+* 从而可以使用矢量图工具中做出的图形
 
+* 参见[【 path 】](https://echarts.apache.org/zh/option.html#series-custom.renderItem.return_path)，以及例子[【 icons 】](https://echarts.apache.org/examples/editor.html?c=custom-calendar-icon)和[【 shapes 】](https://echarts.apache.org/examples/editor.html?c=custom-gantt-flight)
+
+> 更多的自定义系列的例子参见[【 custom examples 】](https://echarts.apache.org/examples.html#chart-type-custom)
+
+## 富文本标签
 
 
 
