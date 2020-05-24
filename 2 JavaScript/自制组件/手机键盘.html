@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<style>
+  input {
+    width: 100%;
+    height: 33px;
+    margin-bottom: 33px;
+    font-size: 23px;
+    letter-spacing: 10px;
+  }
+
+  .divA {
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    background: #eee;
+  }
+
+  .divA div {
+    width: 33%;
+    height: 66px;
+    text-align: center;
+    line-height: 66px;
+  }
+
+  .divA div:nth-child(2n+1) {
+    background: #fafafa;
+  }
+</style>
+
+<body>
+
+  <input id="int">
+
+  <div class="divA">
+    <div onclick="keyboard(1)">1</div>
+    <div onclick="keyboard(2)">2</div>
+    <div onclick="keyboard(3)">3</div>
+    <div onclick="keyboard(4)">4</div>
+    <div onclick="keyboard(5)">5</div>
+    <div onclick="keyboard(6)">6</div>
+    <div onclick="keyboard(7)">7</div>
+    <div onclick="keyboard(8)">8</div>
+    <div onclick="keyboard(9)">9</div>
+    <div onclick="keyboard('.')">.</div>
+    <div onclick="keyboard(0)">0</div>
+    <div onclick="keydel()">删除</div>
+  </div>
+
+</body>
+
+</html>
+
+<script>
+
+  function keyboard(i) {
+    let int = document.getElementById('int').value;
+    int += i;
+    console.log(int);
+    document.getElementById('int').value = int;
+  }
+
+  function keydel() {
+    console.log('又干掉了一个')
+  }
+
+
+
+
+
+
+
+
+
+</script>
