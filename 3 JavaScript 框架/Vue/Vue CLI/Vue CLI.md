@@ -71,6 +71,26 @@
   - [审查项目的 webpack 配置](#审查项目的-webpack-配置)
   - [以一个文件的方式使用解析好的配置](#以一个文件的方式使用解析好的配置)
 - [环境变量和模式](#环境变量和模式)
+  - [模式](#模式)
+  - [示例：Staging 模式](#示例staging-模式)
+  - [在客户端侧代码中使用环境变量](#在客户端侧代码中使用环境变量)
+  - [只在本地有效的变量](#只在本地有效的变量)
+- [构建目标](#构建目标)
+  - [应用](#应用)
+  - [库](#库)
+    - [Vue vs. JS/TS 入口文件](#vue-vs-jsts-入口文件)
+  - [Web Components 组件](#web-components-组件)
+    - [注册多个 Web Components 组件的包](#注册多个-web-components-组件的包)
+    - [异步 Web Components 组件](#异步-web-components-组件)
+- [部署](#部署)
+  - [通用指南](#通用指南)
+    - [本地预览](#本地预览)
+    - [使用 history.pushState 的路由](#使用-historypushstate-的路由)
+    - [CORS](#cors)
+    - [PWA](#pwa)
+  - [平台指南](#平台指南)
+    - [GitHub Pages](#github-pages)
+      - [手动推送更新](#手动推送更新)
 
 <!-- /TOC -->
 
@@ -1547,156 +1567,355 @@ vue inspect --plugins
 
 ## 环境变量和模式
 
+你可以替换你的项目根目录中的下列文件来指定环境变量：
 
+```sh
+.env                # 在所有的环境中被载入
+.env.local          # 在所有的环境中被载入，但会被 git 忽略
+.env.[mode]         # 只在指定的模式中被载入
+.env.[mode].local   # 只在指定的模式中被载入，但会被 git 忽略
+```
 
+一个环境文件只包含环境变量的 **`键=值`** 对：
 
+```
+FOO=bar
+VUE_APP_SECRET=secret
+```
 
+被载入的变量将会对 `vue-cli-service` 的所有命令、插件和依赖可用
 
+> 环境加载属性
+>> 为一个特定模式准备的环境文件 (例如 `.env.production` ) 将会比一般的环境文件 (例如 `.env` ) 拥有更高的优先级
+> * 此外，Vue CLI 启动时已经存在的环境变量拥有最高优先级，并不会被 `.env` 文件覆写
 
+> `NODE_ENV`
+>> 如果在环境中有默认的 `NODE_ENV` ，你应该移除它或在运行 `vue-cli-service` 命令的时候明确地设置 `NODE_ENV`
 
+### 模式
 
+模式是 Vue CLI 项目中一个重要的概念
 
+默认情况下，一个 Vue CLI 项目有三个模式：
 
+模式|说明
+-|-
+`development`|模式用于 `vue-cli-service serve`
+`production`|模式用于 `vue-cli-service build` 和 `vue-cli-service test:e2e`
+`test`|模式用于 `vue-cli-service test:unit`
 
+> 注意：模式不同于 `NODE_ENV` ，一个模式可以包含多个环境变量
+>> 也就是说，每个模式都会将 `NODE_ENV` 的值设置为模式的名称
+> * 比如在 `development` 模式下 `NODE_ENV` 的值会被设置为 `"development"`
 
+你可以通过为 `.env` 文件增加后缀来设置某个模式下特有的环境变量
 
+* 比如，如果你在项目根目录创建一个名为 `.env.development` 的文件
 
+* 那么在这个文件里声明过的变量就只会在 `development` 模式下被载入
 
+你可以通过传递 `--mode` 选项参数为命令行覆写默认的模式
 
+* 例如，如果你想要在构建命令中使用开发环境变量，请在你的 `package.json` 脚本中加入：
 
+```
+"dev-build": "vue-cli-service build --mode development",
+```
 
+### 示例：Staging 模式
 
+假设我们有一个应用包含以下 `.env` 文件：
 
+```
+VUE_APP_TITLE=My App
+```
 
+和 `.env.staging` 文件：
 
+```
+NODE_ENV=production
+VUE_APP_TITLE=My App (staging)
+```
 
+* `vue-cli-service build` 会加载可能存在的 `.env` 、`.env.production` 和 `.env.production.local` 文件然后构建出生产环境应用
 
+* `vue-cli-service build --mode staging` 会在 staging 模式下加载可能存在的 `.env` 、`.env.staging` 和 `.env.staging.local` 文件然后构建出生产环境应用
 
+这两种情况下，根据 `NODE_ENV` ，构建出的应用都是生产环境应用，但是在 staging 版本中，`process.env.VUE_APP_TITLE` 被覆写成了另一个值
 
+### 在客户端侧代码中使用环境变量
 
+只有以 `VUE_APP_` 开头的变量会被 `webpack.DefinePlugin` 静态嵌入到客户端侧的包中
 
+你可以在应用的代码中这样访问它们：
 
+```js
+console.log(process.env.VUE_APP_SECRET)
+```
 
+在构建过程中，`process.env.VUE_APP_SECRET` 将会被相应的值所取代
 
+* 在 `VUE_APP_SECRET=secret` 的情况下，它会被替换为 `"secret"`
 
+除了 `VUE_APP_*` 变量之外，在你的应用代码中始终可用的还有两个特殊的变量：
 
+特殊变量|说明
+-|-
+`NODE_ENV`|会是 `"development"` 、`"production"` 或 `"test"` 中的一个（具体的值取决于应用运行的模式）
+`BASE_URL`|会和 `vue.config.js` 中的 `publicPath` 选项相符，即你的应用会部署到的基础路径
 
+所有解析出来的环境变量都可以在 public/index.html 中以[【 HTML 插值】](https://cli.vuejs.org/zh/guide/html-and-static-assets.html#插值)中介绍的方式使用
 
+> 提示
+>> 你可以在 `vue.config.js` 文件中计算环境变量
+> * 它们仍然需要以 `VUE_APP_` 前缀开头
+> * 这可以用于版本信息：
 
+```js
+process.env.VUE_APP_VERSION = require('./package.json').version
 
+module.exports = {
+  // config
+}
+```
 
+### 只在本地有效的变量
 
+有的时候你可能有一些不应该提交到代码仓库中的变量，尤其是当你的项目托管在公共仓库时
 
+* 这种情况下你应该使用一个 `.env.local` 文件取而代之
 
+* 本地环境文件默认会被忽略，且出现在 `.gitignore` 中
 
+`.local` 也可以加在指定模式的环境文件上，比如 `.env.development.local` 将会在 `development` 模式下被载入，且被 git 忽略
 
+## 构建目标
 
+当你运行 `vue-cli-service build` 时，你可以通过 `--target` 选项指定不同的构建目标
 
+* 它允许你将相同的源代码根据不同的用例生成不同的构建
 
+### 应用
 
+应用模式是默认的模式
 
+在这个模式中：
 
+* `index.html` 会带有注入的资源和 resource hint
 
+* 第三方库会被分到一个独立包以便更好的缓存
 
+* 小于 `4kb` 的静态资源会被内联在 JavaScript 中
 
+* `public` 中的静态资源会被复制到输出目录中
 
+### 库
 
+> 关于 IE 兼容性的提醒
+>> 在库模式中，项目的 `publicPath` 是根据主文件的加载路径[【动态设置】](https://github.com/vuejs/vue-cli/blob/dev/packages/@vue/cli-service/lib/commands/build/setPublicPath.js)的（用以支持动态的资源加载能力）
+> * 但是这个功能用到了 `document.currentScript` ，而 IE 浏览器并不支持这一特性
+> * 所以如果网站需要支持 IE 的话，建议使用库之前先在页面上引入[【 current-script-polyfill 】](https://www.npmjs.com/package/current-script-polyfill)
 
+> 注意对 Vue 的依赖
+>> 在库模式中，Vue 是外置的
+> * 这意味着包中不会有 Vue ，即便你在代码中导入了 Vue
+> * 如果这个库会通过一个打包器使用，它将尝试通过打包器以依赖的方式加载 Vue
+> * 否则就会回退到一个全局的 Vue 变量
+>> 要避免此行为，可以在 `build` 命令中添加 `--inline-vue` 标志
+> * `vue-cli-service build --target lib --inline-vue`
 
+你可以通过下面的命令将一个单独的入口构建为一个库：
 
+```
+vue-cli-service build --target lib --name myLib [entry]
+```
 
+```
+File                     Size                     Gzipped
 
+dist/myLib.umd.min.js    13.28 kb                 8.42 kb
+dist/myLib.umd.js        20.95 kb                 10.22 kb
+dist/myLib.common.js     20.57 kb                 10.09 kb
+dist/myLib.css           0.33 kb                  0.23 kb
+```
 
+这个入口可以是一个 `.js` 或一个 `.vue` 文件
 
+* 如果没有指定入口，则会使用 `src/App.vue`
 
+构建一个库会输出：
 
+输出|说明
+-|-
+`dist/myLib.common.js`|一个给打包器用的 CommonJS 包 (不幸的是，webpack 目前还并没有支持 ES modules 输出格式的包)
+`dist/myLib.umd.js`|一个直接给浏览器或 AMD loader 使用的 UMD 包
+`dist/myLib.umd.min.js`|压缩后的 UMD 构建版本
+`dist/myLib.css`|提取出来的 CSS 文件 (可以通过在 `vue.config.js` 中设置 `css: { extract: false }` 强制内联)
 
+> 警告
+>> 如果你在开发一个库或多项目仓库 ( monorepo )，请注意导入 CSS 是具有副作用的
+> * 请确保在 `package.json` 中移除 `"sideEffects": false` ，否则 CSS 代码块会在生产环境构建时被 webpack 丢掉
 
+#### Vue vs. JS/TS 入口文件
 
+当使用一个 `.vue` 文件作为入口时，你的库会直接暴露这个 Vue 组件本身，因为组件始终是默认导出的内容
 
+* 然而，当你使用一个 `.js` 或 `.ts` 文件作为入口时，它可能会包含具名导出，所以库会暴露为一个模块
 
+* 也就是说你的库必须在 UMD 构建中通过 `window.yourLib.default` 访问，或在 CommonJS 构建中通过 `const myLib = require('mylib').default` 访问
 
+如果你没有任何具名导出并希望直接暴露默认导出，你可以在 `vue.config.js` 中使用以下 webpack 配置：
 
+```js
+module.exports = {
+  configureWebpack: {
+    output: {
+      libraryExport: 'default'
+    }
+  }
+}
+```
 
+### Web Components 组件
 
+> 兼容性提示
+>> Web Components 模式不支持 IE11 及更低版本[【更多细节】](https://github.com/vuejs/vue-docs-zh-cn/blob/master/vue-web-component-wrapper/README.md#%E5%85%BC%E5%AE%B9%E6%80%A7)
 
+> 注意对 Vue 的依赖
+>> 在 Web Components 模式中，Vue 是外置的
+> * 这意味着包中不会有 Vue ，即便你在代码中导入了 Vue
+> * 这里的包会假设在页面中已经有一个可用的全局变量 `Vue`
 
+你可以通过下面的命令将一个单独的入口构建为一个 Web Components 组件：
 
+```
+vue-cli-service build --target wc --name my-element [entry]
+```
 
+> 注意：这里的入口应该是一个 `*.vue` 文件
+>> Vue CLI 将会把这个组件自动包裹并注册为 Web Components 组件，无需在 `main.js` 里自行注册
+> * 也可以在开发时把 `main.js` 作为 demo app 单独使用
 
+该构建将会产生一个单独的 JavaScript 文件 (及其压缩后的版本)，将所有的东西都内联起来
 
+* 当这个脚本被引入网页时，会注册自定义组件 `<my-element>` ，其使用 `@vue/web-component-wrapper` 包裹了目标的 Vue 组件
 
+* 这个包裹器会自动代理属性、特性、事件和插槽
 
+> 请查阅[【 `@vue/web-component-wrapper` 的文档】](https://github.com/vuejs/vue-docs-zh-cn/blob/master/vue-web-component-wrapper/README.md)了解更多细节
 
+> 注意：这个包依赖了在页面上全局可用的 Vue
 
+这个模式允许你的组件的使用者以一个普通 DOM 元素的方式使用这个 Vue 组件：
 
+```html
+<script src="https://unpkg.com/vue"></script>
+<script src="path/to/my-element.js"></script>
 
+<!-- 可在普通 HTML 中或者其它任何框架中使用 -->
+<my-element></my-element>
+```
 
+#### 注册多个 Web Components 组件的包
 
+当你构建一个 Web Components 组件包的时候，你也可以使用一个 glob 表达式作为入口指定多个组件目标：
 
+```
+vue-cli-service build --target wc --name foo 'src/components/*.vue'
+```
 
+当你构建多个 web component 时，`--name` 将会用于设置前缀，同时自定义元素的名称会由组件的文件名推导得出
 
+* 比如一个名为 `HelloWorld.vue` 的组件携带 `--name foo` 将会生成的自定义元素名为 `<foo-hello-world>`
 
+#### 异步 Web Components 组件
 
+当指定多个 Web Components 组件作为目标时，这个包可能会变得非常大，并且用户可能只想使用你的包中注册的一部分组件
 
+* 这时异步 Web Components 模式会生成一个 `code-split` 的包
 
+* 带一个只提供所有组件共享的运行时，并预先注册所有的自定义组件小入口文件
 
+一个组件真正的实现只会在页面中用到自定义元素相应的一个实例时按需获取：
 
+```
+vue-cli-service build --target wc-async --name foo 'src/components/*.vue'
+```
 
+```
+File                Size                        Gzipped
 
+dist/foo.0.min.js    12.80 kb                    8.09 kb
+dist/foo.min.js      7.45 kb                     3.17 kb
+dist/foo.1.min.js    2.91 kb                     1.02 kb
+dist/foo.js          22.51 kb                    6.67 kb
+dist/foo.0.js        17.27 kb                    8.83 kb
+dist/foo.1.js        5.24 kb                     1.64 kb
+```
 
+现在用户在该页面上只需要引入 Vue 和这个入口文件即可：
 
+```html
+<script src="https://unpkg.com/vue"></script>
+<script src="path/to/foo.min.js"></script>
 
+<!-- foo-one 的实现的 chunk 会在用到的时候自动获取 -->
+<foo-one></foo-one>
+```
 
+## 部署
 
+### 通用指南
 
+* 如果你用 Vue CLI 处理静态资源并和后端框架一起作为部署的一部分
 
+  那么你需要的仅仅是确保 Vue CLI 生成的构建文件在正确的位置，并遵循后端框架的发布方式即可
 
+* 如果你独立于后端部署前端应用
 
+  也就是说后端暴露一个前端可访问的 API ，然后前端实际上是纯静态应用
 
+  那么你可以将 `dist` 目录里构建的内容部署到任何静态文件服务器中，但要确保正确的[【 publicPath 】](https://cli.vuejs.org/zh/config/#publicpath)
 
+#### 本地预览
 
+`dist` 目录需要启动一个 HTTP 服务器来访问 (除非你已经将 `publicPath` 配置为了一个相对的值)，所以以 `file://` 协议直接打开 `dist/index.html` 是不会工作的
 
+在本地预览生产环境构建最简单的方式就是使用一个 `Node.js` 静态文件服务器，例如[【 serve 】](https://github.com/zeit/serve)：
 
+```sh
+npm install -g serve
 
+# -s 参数的意思是将其架设在 Single-Page Application 模式下
+# 这个模式会处理即将提到的路由问题
+serve -s dist
+```
 
+#### 使用 history.pushState 的路由
 
+如果你在 `history` 模式下使用 Vue Router ，是无法搭配简单的静态文件服务器的
 
+* 例如，如果你使用 Vue Router 为 `/todos/42/` 定义了一个路由，开发服务器已经配置了相应的 `localhost:3000/todos/42` 响应
 
+  但是一个为生产环境构建架设的简单的静态服务器会却会返回 `404`
 
+* 为了解决这个问题，你需要配置生产环境服务器，将任何没有匹配到静态文件的请求回退到 `index.html`
 
+  Vue Router 的文档提供了[【常用服务器配置指引】](https://router.vuejs.org/zh/guide/essentials/history-mode.html)
 
+#### CORS
 
+如果前端静态内容是部署在与后端 API 不同的域名上，你需要适当地配置[【 CORS 】](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS)
 
+#### PWA
 
+如果你使用了 PWA 插件，那么应用必须架设在 HTTPS 上，这样[【 Service Worker 】](https://developer.mozilla.org/zh-CN/docs/Web/API/Service_Worker_API)才能被正确注册
 
+### 平台指南
 
+#### GitHub Pages
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+##### 手动推送更新
 
 
 
