@@ -51,6 +51,26 @@
     - [构建一个多页应用](#构建一个多页应用)
   - [处理静态资源](#处理静态资源)
     - [从相对路径导入](#从相对路径导入)
+    - [URL 转换规则](#url-转换规则)
+    - [public 文件夹](#public-文件夹)
+    - [何时使用 public 文件夹](#何时使用-public-文件夹)
+- [CSS 相关](#css-相关)
+  - [引用静态资源](#引用静态资源)
+  - [预处理器](#预处理器)
+    - [自动化导入](#自动化导入)
+  - [PostCSS](#postcss)
+  - [CSS Modules](#css-modules)
+  - [向预处理器 Loader 传递选项](#向预处理器-loader-传递选项)
+- [webpack 相关](#webpack-相关)
+  - [简单的配置方式](#简单的配置方式)
+  - [链式操作 (高级)](#链式操作-高级)
+    - [修改 Loader 选项](#修改-loader-选项)
+    - [添加一个新的 Loader](#添加一个新的-loader)
+    - [替换一个规则里的 Loader](#替换一个规则里的-loader)
+    - [修改插件选项](#修改插件选项)
+  - [审查项目的 webpack 配置](#审查项目的-webpack-配置)
+  - [以一个文件的方式使用解析好的配置](#以一个文件的方式使用解析好的配置)
+- [环境变量和模式](#环境变量和模式)
 
 <!-- /TOC -->
 
@@ -1020,159 +1040,512 @@ module.exports = {
 
 #### 从相对路径导入
 
+当你在 JavaScript 、CSS 或 `*.vue` 文件中使用相对路径 (必须以 `.` 开头) 引用一个静态资源时，该资源将会被包含进入 webpack 的依赖图中
 
+* 在其编译过程中，所有诸如 `<img src="...">` 、`background: url(...)` 和 `CSS @import` 的资源 URL 都会被解析为一个模块依赖
 
+例如，`url(./image.png)` 会被翻译为 `require('./image.png')` ，而：
 
+```html
+<img src="./image.png">
+```
 
+将会被编译到：
 
+```js
+h('img', { attrs: { src: require('./image.png') }})
+```
 
+在其内部，我们通过 `file-loader` 用版本哈希值和正确的公共基础路径来决定最终的文件路径
 
+* 再用 `url-loader` 将小于 `4kb` 的资源内联，以减少 HTTP 请求的数量
 
+你可以通过[【 chainWebpack 】](https://cli.vuejs.org/zh/config/#chainwebpack)调整内联文件的大小限制
 
+* 例如，下列代码会将其限制设置为 `10kb`
 
+```js
+// vue.config.js
+module.exports = {
+  chainWebpack: config => {
+    config.module
+      .rule('images')
+      .use('url-loader')
+        .loader('url-loader')
+        .tap(options => Object.assign(options, { limit: 10240 }))
+  }
+}
+```
 
+#### URL 转换规则
 
+* 如果 URL 是一个 **`绝对路径`** (例如 `/images/foo.png` )，它将会被保留不变
 
+* 如果 URL 以 `.` 开头，它会作为一个相对模块请求被解释且基于你的文件系统中的目录结构进行解析
 
+* 如果 URL 以 `~` 开头，其后的任何内容都会作为一个模块请求被解析
 
+  这意味着你甚至可以引用 Node 模块中的资源：
 
+  ```html
+  <img src="~some-npm-package/foo.png">
+  ```
 
+* 如果 URL 以 `@` 开头，它也会作为一个模块请求被解析
 
+  它的用处在于 Vue CLI 默认会设置一个指向 `<projectRoot>/src` 的别名 `@` (仅作用于模版中)
 
+#### public 文件夹
 
+任何放置在 `public` 文件夹的静态资源都会被简单的复制，而不经过 webpack
 
+* 你需要通过绝对路径来引用它们
 
+我们推荐将资源作为你的模块依赖图的一部分导入，这样它们会通过 webpack 的处理并获得如下好处：
 
+* 脚本和样式表会被压缩且打包在一起，从而避免额外的网络请求
 
+* 文件丢失会直接在编译时报错，而不是到了用户端才产生 `404` 错误
 
+* 最终生成的文件名包含了内容哈希，因此你不必担心浏览器会缓存它们的老版本
 
+public 目录提供的是一个 **`应急手段`** ，当你通过绝对路径引用它时，留意应用将会部署到哪里
 
+如果你的应用没有部署在域名的根部，那么你需要为你的 URL 配置[【 publicPath 】](https://cli.vuejs.org/zh/config/#publicpath)前缀：
 
+* 在 `public/index.html` 或其它通过 `html-webpack-plugin` 用作模板的 HTML 文件中，你需要通过 `<%= BASE_URL %>` 设置链接前缀：
 
+  ```html
+  <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+  ```
 
+* 在模板中，你首先需要向你的组件传入基础 URL ：
 
+  ```js
+  data () {
+    return {
+      publicPath: process.env.BASE_URL
+    }
+  }
+  ```
 
+  然后：
 
+  ```html
+  <img :src="`${publicPath}my-image.png`">
+  ```
 
+#### 何时使用 public 文件夹
 
+* 你需要在构建输出中指定一个文件的名字
 
+* 你有上千个图片，需要动态引用它们的路径
 
+* 有些库可能和 webpack 不兼容，这时你除了将其用一个独立的 `<script>` 标签引入没有别的选择
 
+## CSS 相关
 
+Vue CLI 项目天生支持[【 PostCSS 】](http://postcss.org/)、[【 CSS Modules 】](https://github.com/css-modules/css-modules)和包含[【 Sass 】](https://sass-lang.com/)、[【 Less 】](http://lesscss.org/)、[【 Stylus 】](http://stylus-lang.com/)在内的预处理器
 
+### 引用静态资源
 
+所有编译后的 CSS 都会通过[【 css-loader 】](https://github.com/webpack-contrib/css-loader)来解析其中的 `url()` 引用，并将这些引用作为模块请求来处理
 
+* 这意味着你可以根据本地的文件结构用相对路径来引用静态资源
 
+* 另外要注意的是如果你想要引用一个 npm 依赖中的文件，或是想要用 webpack alias ，则需要在路径前加上 `~` 的前缀来避免歧义
 
+> 更多细节请参考[【处理静态资源】](https://cli.vuejs.org/zh/guide/html-and-static-assets.html#处理静态资源)
 
+### 预处理器
 
+你可以在创建项目的时候选择预处理器 ( Sass / Less / Stylus )
 
+* 如果当时没有选好，内置的 webpack 仍然会被预配置为可以完成所有的处理
 
+你也可以手动安装相应的 webpack loader ：
 
+```sh
+# Sass
+npm install -D sass-loader sass
 
+# Less
+npm install -D less-loader less
 
+# Stylus
+npm install -D stylus-loader stylus
+```
 
+然后你就可以导入相应的文件类型，或在 `*.vue` 文件中这样来使用：
 
+```vue
+<style lang="scss">
+$color: red;
+</style>
+```
 
+#### 自动化导入
 
+如果你想自动化导入文件 (用于颜色、变量、mixin……)，你可以使用[【 style-resources-loader 】](https://github.com/yenshih/style-resources-loader)
 
+这里有一个关于 Stylus 的在每个单文件组件和 Stylus 文件中导入 `./src/styles/imports.styl` 的例子：
 
+```js
+// vue.config.js
+const path = require('path')
 
+module.exports = {
+  chainWebpack: config => {
+    const types = ['vue-modules', 'vue', 'normal-modules', 'normal']
+    types.forEach(type => addStyleResource(config.module.rule('stylus').oneOf(type)))
+  },
+}
 
+function addStyleResource (rule) {
+  rule.use('style-resource')
+    .loader('style-resources-loader')
+    .options({
+      patterns: [
+        path.resolve(__dirname, './src/styles/imports.styl'),
+      ],
+    })
+}
+```
 
+> 你也可以选择使用[【 vue-cli-plugin-style-resources-loader 】](https://www.npmjs.com/package/vue-cli-plugin-style-resources-loader)
 
+### PostCSS
 
+Vue CLI 内部使用了 PostCSS
 
+* 你可以通过 `.postcssrc` 或任何[【 postcss-load-config 】](https://github.com/michael-ciniawsky/postcss-load-config)支持的配置源来配置 PostCSS
 
+* 也可以通过 `vue.config.js` 中的 `css.loaderOptions.postcss` 配置[【 postcss-loader 】](https://github.com/postcss/postcss-loader)
 
+我们默认开启了[【 autoprefixer 】](https://github.com/postcss/autoprefixer)
 
+* 如果要配置目标浏览器，可使用 `package.json` 的[【 browserslist 】](https://cli.vuejs.org/zh/guide/browser-compatibility.html#browserslist)字段
 
+> 关于 CSS 中浏览器前缀规则的注意事项
+>> 在生产环境构建中，Vue CLI 会优化 CSS 并基于目标浏览器抛弃不必要的浏览器前缀规则
+> * 因为默认开启了 `autoprefixer` ，你只使用无前缀的 CSS 规则即可
 
+### CSS Modules
 
+你可以通过 `<style module>` 以开箱即用的方式[【在 `*.vue` 文件中使用 CSS Modules 】](https://vue-loader.vuejs.org/zh/guide/css-modules.html)
 
+* 如果想在 JavaScript 中作为 CSS Modules 导入 CSS 或其它预处理文件，该文件应该以 `.module.(css|less|sass|scss|styl)` 结尾：
 
+```js
+import styles from './foo.module.css'
+// 所有支持的预处理器都一样工作
+import sassStyles from './foo.module.scss'
+```
 
+* 如果你想去掉文件名中的 `.module` ，可以设置 `vue.config.js` 中的 `css.requireModuleExtension` 为 `false` ：
 
+```js
+// vue.config.js
+module.exports = {
+  css: {
+    requireModuleExtension: false
+  }
+}
+```
 
+* 如果你希望自定义生成的 CSS Modules 模块的类名，可以通过 `vue.config.js` 中的 `css.loaderOptions.css` 选项来实现
 
+  所有的 `css-loader` 选项在这里都是支持的，例如 `localIdentName` 和 `camelCase`
 
+```js
+// vue.config.js
+module.exports = {
+  css: {
+    loaderOptions: {
+      css: {
+        // 注意：以下配置在 Vue CLI v4 与 v3 之间存在差异。
+        // Vue CLI v3 用户可参考 css-loader v1 文档
+        // https://github.com/webpack-contrib/css-loader/tree/v1.0.1
+        modules: {
+          localIdentName: '[name]-[hash]'
+        },
+        localsConvention: 'camelCaseOnly'
+      }
+    }
+  }
+}
+```
 
+### 向预处理器 Loader 传递选项
 
+有的时候你想要向 webpack 的预处理器 loader 传递选项
 
+* 你可以使用 `vue.config.js` 中的 `css.loaderOptions` 选项
 
+比如你可以这样向所有 Sass / Less 样式传入共享的全局变量：
 
+```js
+// vue.config.js
+module.exports = {
+  css: {
+    loaderOptions: {
+      // 给 sass-loader 传递选项
+      sass: {
 
+        // `@/` 是 `src/` 的别名
+        // 所以这里假设你有 `src/variables.sass` 这个文件
+        // 注意：在 sass-loader v7 中，这个选项名是 "data"
+        prependData: `@import "~@/variables.sass"`
+      },
 
+      // 默认情况下 `sass` 选项会同时对 `sass` 和 `scss` 语法同时生效
+      // 因为 `scss` 语法在内部也是由 sass-loader 处理的
+      // 但是在配置 `data` 选项的时候
+      // `scss` 语法会要求语句结尾必须有分号，`sass` 则要求必须没有分号
+      // 在这种情况下，我们可以使用 `scss` 选项，对 `scss` 语法进行单独配置
+      scss: {
+        prependData: `@import "~@/variables.scss";`
+      },
 
+      // 给 less-loader 传递 Less.js 相关选项
+      less:{
+        // http://lesscss.org/usage/#less-options-strict-units `Global Variables`
+        // `primary` is global variables fields name
+        globalVars: {
+          primary: '#fff'
+        }
+      }
+    }
+  }
+}
+```
 
+Loader 可以通过 `loaderOptions` 配置，包括：
 
+* [【 css-loader 】](https://github.com/webpack-contrib/css-loader)
+* [【 postcss-loader 】](https://github.com/postcss/postcss-loader)
+* [【 sass-loader 】](https://github.com/webpack-contrib/sass-loader)
+* [【 less-loader 】](https://github.com/webpack-contrib/less-loader)
+* [【 stylus-loader 】](https://github.com/shama/stylus-loader)
 
+> 提示
+>> 这样做比使用 `chainWebpack` 手动指定 loader 更推荐，因为这些选项需要应用在使用了相应 loader 的多个地方
+
+## webpack 相关
 
+### 简单的配置方式
 
+调整 webpack 配置最简单的方式就是在 `vue.config.js` 中的 `configureWebpack` 选项提供一个对象：
 
+```js
+// vue.config.js
+module.exports = {
+  configureWebpack: {
+    plugins: [
+      new MyAwesomeWebpackPlugin()
+    ]
+  }
+}
+```
 
+该对象将会被[【 webpack-merge 】](https://github.com/survivejs/webpack-merge)合并入最终的 webpack 配置
+
+> 警告
+>> 有些 webpack 选项是基于 `vue.config.js` 中的值设置的，所以不能直接修改
+> * 例如你应该修改 `vue.config.js` 中的 `outputDir` 选项而不是修改 `output.path`
+> * 你应该修改 `vue.config.js` 中的 `publicPath` 选项而不是修改 `output.publicPath`
+>> 这样做是因为 `vue.config.js` 中的值会被用在配置里的多个地方，以确保所有的部分都能正常工作在一起
 
+如果你需要基于环境有条件地配置行为，或者想要直接修改配置，那就换成一个函数 (该函数会在环境变量被设置之后懒执行)
+
+* 该方法的第一个参数会收到已经解析好的配置
+
+* 在函数内，你可以直接修改配置，或者返回一个将会被合并的对象
+
+```js
+// vue.config.js
+module.exports = {
+  configureWebpack: config => {
+    if (process.env.NODE_ENV === 'production') {
+      // 为生产环境修改配置...
+    } else {
+      // 为开发环境修改配置...
+    }
+  }
+}
+```
+
+### 链式操作 (高级)
 
+Vue CLI 内部的 webpack 配置是通过[【 webpack-chain 】](https://github.com/mozilla-neutrino/webpack-chain)维护的
 
+* 这个库提供了一个 webpack 原始配置的上层抽象，使其可以定义具名的 loader 规则和具名插件，并有机会在后期进入这些规则并对它们的选项进行修改
 
+* 它允许我们更细粒度的控制其内部配置
+
+> 提示
+>> 当你打算链式访问特定的 loader 时，[【 vue inspect 】](https://cli.vuejs.org/zh/guide/webpack.html#审查项目的-webpack-配置)会非常有帮助
+
+接下来有一些常见的在 `vue.config.js` 中的 `chainWebpack` 修改的例子：
+
+#### 修改 Loader 选项
+
+```js
+// vue.config.js
+module.exports = {
+  chainWebpack: config => {
+    config.module
+      .rule('vue')
+      .use('vue-loader')
+        .loader('vue-loader')
+        .tap(options => {
+          // 修改它的选项...
+          return options
+        })
+  }
+}
+```
 
+> 提示
+>> 对于 CSS 相关 loader 来说，我们推荐使用[【 css.loaderOptions 】](https://cli.vuejs.org/zh/config/#css-loaderoptions)而不是直接链式指定 loader
+> * 这是因为每种 CSS 文件类型都有多个规则，而 `css.loaderOptions` 可以确保你通过一个地方影响所有的规则
 
+#### 添加一个新的 Loader
 
+```js
+// vue.config.js
+module.exports = {
+  chainWebpack: config => {
+    // GraphQL Loader
+    config.module
+      .rule('graphql')
+      .test(/\.graphql$/)
+      .use('graphql-tag/loader')
+        .loader('graphql-tag/loader')
+        .end()
+      // 你还可以再添加一个 loader
+      .use('other-loader')
+        .loader('other-loader')
+        .end()
+  }
+}
+```
 
+#### 替换一个规则里的 Loader
 
+如果你想要替换一个已有的[【基础 loader 】](https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-service/lib/config/base.js)，例如为内联的 SVG 文件使用 `vue-svg-loader` 而不是加载这个文件：
 
+```js
+// vue.config.js
+module.exports = {
+  chainWebpack: config => {
+    const svgRule = config.module.rule('svg')
 
+    // 清除已有的所有 loader
+    // 如果你不这样做，接下来的 loader 会附加在该规则现有的 loader 之后
+    svgRule.uses.clear()
 
+    // 添加要替换的 loader
+    svgRule
+      .use('vue-svg-loader')
+        .loader('vue-svg-loader')
+  }
+}
+```
 
+#### 修改插件选项
 
+```js
+// vue.config.js
+module.exports = {
+  chainWebpack: config => {
+    config
+      .plugin('html')
+      .tap(args => {
+        return [/* 传递给 html-webpack-plugin's 构造函数的新参数 */]
+      })
+  }
+}
+```
 
+你需要熟悉[【 webpack-chain 的 API 】](https://github.com/mozilla-neutrino/webpack-chain#getting-started)并[【阅读一些源码】](https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-service/lib/config)以便了解如何最大程度利用好这个选项
 
+* 但是比起直接修改 webpack 配置，它的表达能力更强，也更为安全
 
+* 比方说你想要将 `index.html` 默认的路径从 `/Users/username/proj/public/index.html` 改为 `/Users/username/proj/app/templates/index.html`
 
+  通过参考[【 html-webpack-plugin 】](https://github.com/jantimon/html-webpack-plugin#options)你能看到一个可以传入的选项列表
 
+  我们可以在下列配置中传入一个新的模板路径来改变它：
 
+```js
+// vue.config.js
+module.exports = {
+  chainWebpack: config => {
+    config
+      .plugin('html')
+      .tap(args => {
+        args[0].template = '/Users/username/proj/app/templates/index.html'
+        return args
+      })
+  }
+}
+```
 
+你可以通过接下来要讨论的工具 `vue inspect` 来确认变更
 
+### 审查项目的 webpack 配置
 
+因为 `@vue/cli-service` 对 webpack 配置进行了抽象，所以理解配置中包含的东西会比较困难，尤其是当你打算自行对其调整的时候
 
+* `vue-cli-service` 暴露了 `inspect` 命令用于审查解析好的 webpack 配置
 
+  那个全局的 `vue` 可执行程序同样提供了 `inspect` 命令，这个命令只是简单的把 `vue-cli-service inspect` 代理到了你的项目中
 
+* 该命令会将解析出来的 webpack 配置、包括链式访问规则和插件的提示打印到 stdout
 
+你可以将其输出重定向到一个文件以便进行查阅：
 
+```sh
+vue inspect > output.js
+```
 
+> 注意：它输出的并不是一个有效的 webpack 配置文件，而是一个用于审查的被序列化的格式
 
+你也可以通过指定一个路径来审查配置的一小部分：
 
+```sh
+# 只审查第一条规则
+vue inspect module.rules.0
+```
 
+或者指向一个规则或插件的名字：
 
+```sh
+vue inspect --rule vue
+vue inspect --plugin html
+```
 
+最后，你可以列出所有规则和插件的名字：
 
+```sh
+vue inspect --rules
+vue inspect --plugins
+```
 
+### 以一个文件的方式使用解析好的配置
 
+有些外部工具可能需要通过一个文件访问解析好的 webpack 配置，比如那些需要提供 webpack 配置路径的 IDE 或 CLI
 
+在这种情况下你可以使用如下路径：
 
+```
+<projectRoot>/node_modules/@vue/cli-service/webpack.config.js
+```
 
+该文件会动态解析并输出 `vue-cli-service` 命令中使用的相同的 webpack 配置，包括那些来自插件甚至是你自定义的配置
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+## 环境变量和模式
 
 
 
