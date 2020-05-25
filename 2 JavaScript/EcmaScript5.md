@@ -1,4 +1,23 @@
-# JavaScript 第五代和第六代常用语法
+<!-- TOC -->
+
+- [变量声明的改变](#变量声明的改变)
+  - [let](#let)
+  - [const](#const)
+- [箭头函数](#箭头函数)
+- [导入导出的方式](#导入导出的方式)
+- [遍历数组的七种方式](#遍历数组的七种方式)
+  - [for 循环遍历数组](#for-循环遍历数组)
+- [解构对象，对象产出](#解构对象对象产出)
+- [es6 字符串的三个方法](#es6-字符串的三个方法)
+- [展开运算符](#展开运算符)
+- [proto 原型](#proto-原型)
+- [Class 类 语法糖](#class-类-语法糖)
+- [iterators 迭代器](#iterators-迭代器)
+- [get/set 函数](#getset-函数)
+  - [Map 对象](#map-对象)
+  - [set 对象](#set-对象)
+
+<!-- /TOC -->
 
 ## 变量声明的改变
 
@@ -88,7 +107,7 @@ let add = (a,b) => a + b
 
 ## 遍历数组的七种方式
 
-### for循环遍历数组
+### for 循环遍历数组
 
 ```js
 // 第一种
@@ -284,7 +303,7 @@ var time = new String();
 console.log(time);
 ```
 
-# Class 类 语法糖
+## Class 类 语法糖
 
 使用class关键词来修饰一个对象
 
@@ -311,7 +330,7 @@ let zhangfan = new Teacher('黄瓜');
 zhangfan.cook();
 ```
 
-# iterators 迭代器
+## iterators 迭代器
 
 迭代就是轮流交换
 
@@ -319,7 +338,7 @@ zhangfan.cook();
 
 - 判断条件 ? 判断条件为真发生什么 : 判断条件为假发生什么;
 
-## get/set函数
+## get/set 函数
 
 - get 拿取东西的方法
 
@@ -331,7 +350,7 @@ zhangfan.cook();
 
 > get 和 set 一般可以看做是函数的两个部分
 
-### Map对象
+### Map 对象
 
 Map 对象，类似于 Java 中的字典，和 js 中的对象的最大区别在于，map 对象的键，可以使用函数，对象，或者数组
 
