@@ -39,6 +39,8 @@
   - [Hello World](#hello-world)
     - [如何阅读本指南](#如何阅读本指南)
     - [预备知识](#预备知识)
+  - [JSX 简介](#jsx-简介)
+    - [为什么使用 JSX ？](#为什么使用-jsx-)
 
 <!-- /TOC -->
 
@@ -638,16 +640,41 @@ ReactDOM.render(
 
 ### 预备知识
 
+React 是一个 JavaScript 库，所以我们假设你对 JavaScript 语言已有基本的了解
 
+* 如果你对自己的基础不自信，我们推荐[【通过 JavaScript 教程】](https://developer.mozilla.org/en-US/docs/Web/JavaScript/A_re-introduction_to_JavaScript)检查你的基础知识储备水平，使得你能够无压力的阅读本指南
 
+* 这可能会花费你 30 分钟到 1 个小时的时间，但这样做的好处是你不会觉得同时在学习 React 和 JavaScript
 
+> 注意
+>> 本指南的示例中偶尔会使用一些 JavaScript 新语法
+> * 如果你在过去几年中并没有使用过 JavaScript ，大多数情况下[【这三点】](https://gist.github.com/gaearon/683e676101005de0add59e8bb345340c)应该能帮到你
 
+## JSX 简介
 
+考虑如下变量声明：
 
+```js
+const element = <h1>Hello, world!</h1>;
+```
 
+这个有趣的标签语法既不是字符串也不是 HTML
 
+它被称为 JSX，是一个 JavaScript 的语法扩展
 
+* 我们建议在 React 中配合使用 JSX ，JSX 可以很好地描述 UI 应该呈现出它应有交互的本质形式
 
+* JSX 可能会使人联想到模版语言，但它具有 JavaScript 的全部功能
+
+* JSX 可以生成 React **`元素`**
+
+### 为什么使用 JSX ？
+
+React 认为渲染逻辑本质上与其他 UI 逻辑内在耦合，比如，在 UI 中需要绑定处理事件、在某些时刻状态发生变化时需要通知到 UI，以及需要在 UI 中展示准备好的数据。
+
+React 并没有采用将标记与逻辑进行分离到不同文件这种人为地分离方式，而是通过将二者共同存放在称之为“组件”的松散耦合单元之中，来实现关注点分离。我们将在后面章节中深入学习组件。如果你还没有适应在 JS 中使用标记语言，这个会议讨论应该可以说服你。
+
+React 不强制要求使用 JSX，但是大多数人发现，在 JavaScript 代码中将 JSX 和 UI 放在一起时，会在视觉上有辅助作用。它还可以使 React 显示更多有用的错误和警告消息
 
 
 
