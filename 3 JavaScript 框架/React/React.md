@@ -49,8 +49,6 @@
 
 ## == 安装 ==
 
-<a href="#">TOP</a>
-
 React 是一个用于构建用户界面的 JavaScript 库
 
 ## 在网站中添加 React
@@ -614,8 +612,6 @@ Next.js 项目使用了这个工作流
 ---
 
 ## == 核心概念 ==
-
-<a href="#" style="position: fixed;bottom: 0;right: 0;">TOP</a>
 
 ## Hello World
 
