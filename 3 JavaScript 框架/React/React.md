@@ -42,6 +42,10 @@
 - [JSX 简介](#jsx-简介)
   - [为什么使用 JSX ？](#为什么使用-jsx-)
   - [在 JSX 中嵌入表达式](#在-jsx-中嵌入表达式)
+  - [JSX 也是一个表达式](#jsx-也是一个表达式)
+  - [JSX 特定属性](#jsx-特定属性)
+  - [使用 JSX 指定子元素](#使用-jsx-指定子元素)
+  - [JSX 防止注入攻击](#jsx-防止注入攻击)
 
 <!-- /TOC -->
 
@@ -626,6 +630,8 @@ ReactDOM.render(
 
 它将在页面上展示一个 `Hello, world!` 的标题
 
+> [【在 CodePen 上尝试】](https://react.docschina.org/redirect-to-codepen/hello-world)
+
 ### 如何阅读本指南
 
 在本指南中，我们将研究 React 应用程序的组成部分：元素和组件
@@ -687,44 +693,111 @@ React [【不强制要求】](https://react.docschina.org/docs/react-without-jsx
 
 ### 在 JSX 中嵌入表达式
 
-在下面的例子中，我们声明了一个名为 name 的变量，然后在 JSX 中使用它，并将它包裹在大括号中：
+在下面的例子中，我们声明了一个名为 `name` 的变量，然后在 JSX 中使用它，并将它包裹在大括号中：
 
+```js
+const name = 'Josh Perez';
+const element = <h1>Hello, {name}</h1>;
 
+ReactDOM.render(
+  element,
+  document.getElementById('root')
+);
+```
 
+在 JSX 语法中，你可以在大括号内放置任何有效的[【 JavaScript 表达式】](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators#Expressions)
 
+* 例如 `2 + 2` `user.firstName` 或 `formatName(user)` 都是有效的 JavaScript 表达式
 
+在下面的示例中，我们将调用 JavaScript 函数 `formatName(user)` 的结果，并将结果嵌入到 `<h1>` 元素中
 
+```js
+function formatName(user) {
+  return user.firstName + ' ' + user.lastName;
+}
 
+const user = {
+  firstName: 'Harper',
+  lastName: 'Perez'
+};
 
+const element = (
+  <h1>
+    Hello, {formatName(user)}!
+  </h1>
+);
 
+ReactDOM.render(
+  element,
+  document.getElementById('root')
+);
+```
 
+> [【在 CodePen 上尝试】](https://react.docschina.org/redirect-to-codepen/introducing-jsx)
 
+为了便于阅读，我们会将 JSX 拆分为多行
 
+* 同时，我们建议将内容包裹在括号中，虽然这样做不是强制要求的
 
+* 但是这可以避免遇到[【自动插入分号】](http://stackoverflow.com/q/2846283)陷阱
 
+### JSX 也是一个表达式
 
+在编译之后，JSX 表达式会被转为普通 JavaScript 函数调用，并且对其取值后得到 JavaScript 对象
 
+* 也就是说，你可以在 `if` 语句和 `for` 循环的代码块中使用 JSX ，将 JSX 赋值给变量，把 JSX 当作参数传入，以及从函数中返回 JSX ：
 
+```js
+function getGreeting(user) {
+  if (user) {
+    return <h1>Hello, {formatName(user)}!</h1>;
+  }
+  return <h1>Hello, Stranger.</h1>;
+}
+```
 
+### JSX 特定属性
 
+你可以通过使用引号，来将属性值指定为字符串字面量：
 
+```js
+const element = <div tabIndex="0"></div>;
+```
 
+也可以使用大括号，来在属性值中插入一个 JavaScript 表达式：
 
+```js
+const element = <img src={user.avatarUrl}></img>;
+```
 
+在属性中嵌入 JavaScript 表达式时，不要在大括号外面加上引号
 
+* 你应该仅使用引号（对于字符串值）或大括号（对于表达式）中的一个，对于同一属性不能同时使用这两种符号
 
+> 警告：
+>> 因为 JSX 语法上更接近 JavaScript 而不是 HTML ，所以 React DOM 使用 `camelCase`（小驼峰命名）来定义属性的名称，而不使用 HTML 属性名称的命名约定
+> * 例如，JSX 里的 `class` 变成了[【 className 】](https://developer.mozilla.org/en-US/docs/Web/API/Element/className)，而 `tabindex` 则变为[【 tabIndex 】](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/tabIndex)
 
+### 使用 JSX 指定子元素
 
+假如一个标签里面没有内容，你可以使用 `/>` 来闭合标签，就像 XML 语法一样：
 
+```js
+const element = <img src={user.avatarUrl} />;
+```
 
+JSX 标签里能够包含很多子元素：
 
+```js
+const element = (
+  <div>
+    <h1>Hello!</h1>
+    <h2>Good to see you here.</h2>
+  </div>
+);
+```
 
-
-
-
-
-
-
+### JSX 防止注入攻击
 
 
 
