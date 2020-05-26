@@ -4,6 +4,10 @@
 
 ![图片](http://www.ruanyifeng.com/blogimg/asset/2015/bg2015033101.png)
 
+<!-- TOP -->
+
+<a href="#" style="position:'fixed';bottom:0;right:0">TOP</a>
+
 <!-- TOC -->
 
 - [== 安装 ==](#-安装-)
