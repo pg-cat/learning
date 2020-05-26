@@ -46,6 +46,9 @@
   - [JSX 特定属性](#jsx-特定属性)
   - [使用 JSX 指定子元素](#使用-jsx-指定子元素)
   - [JSX 防止注入攻击](#jsx-防止注入攻击)
+  - [JSX 表示对象](#jsx-表示对象)
+- [元素渲染](#元素渲染)
+  - [将一个元素渲染为 DOM](#将一个元素渲染为-dom)
 
 <!-- /TOC -->
 
@@ -799,30 +802,85 @@ const element = (
 
 ### JSX 防止注入攻击
 
+你可以安全地在 JSX 当中插入用户输入内容：
 
+```js
+const title = response.potentiallyMaliciousInput;
+// 直接使用是安全的：
+const element = <h1>{title}</h1>;
+```
 
+React DOM 在渲染所有输入内容之前，默认会进行[【转义】](https://stackoverflow.com/questions/7381974/which-characters-need-to-be-escaped-on-html)
 
+* 它可以确保在你的应用中，永远不会注入那些并非自己明确编写的内容
 
+* 所有的内容在渲染之前都被转换成了字符串
 
+* 这样可以有效地防止[【 XSS（cross-site-scripting, 跨站脚本）】](https://en.wikipedia.org/wiki/Cross-site_scripting)攻击
 
+### JSX 表示对象
 
+Babel 会把 JSX 转译成一个名为 `React.createElement()` 函数调用
 
+以下两种示例代码完全等效：
 
+```js
+const element = (
+  <h1 className="greeting">
+    Hello, world!
+  </h1>
+);
+```
 
+```js
+const element = React.createElement(
+  'h1',
+  {className: 'greeting'},
+  'Hello, world!'
+);
+```
 
+`React.createElement()` 会预先执行一些检查，以帮助你编写无错代码，但实际上它创建了一个这样的对象：
 
+```js
+// 注意：这是简化过的结构
+const element = {
+  type: 'h1',
+  props: {
+    className: 'greeting',
+    children: 'Hello, world!'
+  }
+};
+```
 
+这些对象被称为 **`React 元素`**
 
+* 它们描述了你希望在屏幕上看到的内容
 
+* React 通过读取这些对象，然后使用它们来构建 DOM 以及保持随时更新
 
+> 提示：
+>> 我们推荐在你使用的编辑器中，使用[【 “Babel” 提供的语言定义】](https://babeljs.io/docs/editors)，来正确地高亮显示 ES6 和 JSX 代码。本网站使用与其兼容的[【 Oceanic Next 】](https://github.com/voronianski/oceanic-next-color-scheme/)配色方案
 
+## 元素渲染
 
+元素是构成 React 应用的最小砖块
 
+* 元素描述了你在屏幕上想看到的内容
 
+```js
+const element = <h1>Hello, world</h1>;
+```
 
+与浏览器的 DOM 元素不同，React 元素是创建开销极小的普通对象
 
+* React DOM 会负责更新 DOM 来与 React 元素保持一致
 
+> 注意：
+>> 你可能会将元素与另一个被熟知的概念 **`组件`** 混淆起来
+> * 组件是由元素构成的
 
+### 将一个元素渲染为 DOM
 
 
 
