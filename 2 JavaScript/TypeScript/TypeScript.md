@@ -958,57 +958,182 @@ f(true);  // returns '10'
 f(false); // returns 'undefined'
 ```
 
+有些读者可能要多看几遍这个例子：变量 x是定义在 *`if 语句里面`* ，但是我们却可以在语句的外面访问它
 
+- 这是因为 var 声明可以在包含它的函数，模块，命名空间或全局作用域内部任何位置被访问，包含它的代码块对此没有什么影响
 
+- 有些人称此为 *`var 作用域或函数作用域`* ，函数参数也使用函数作用域
 
+这些作用域规则可能会引发一些错误，其中之一就是，多次声明同一个变量并不会报错：
 
+```ts
+function sumMatrix(matrix: number[][]) {
+    var sum = 0;
+    for (var i = 0; i < matrix.length; i++) {
+        var currentRow = matrix[i];
+        for (var i = 0; i < currentRow.length; i++) {
+            sum += currentRow[i];
+        }
+    }
 
+    return sum;
+}
+```
 
+这里很容易看出一些问题，里层的 *`for 循环`* 会覆盖变量 `i` ，因为所有 `i` 都引用相同的函数作用域内的变量
 
+- 有经验的开发者们很清楚，这些问题可能在代码审查时漏掉，引发无穷的麻烦
 
+#### 捕获变量怪异之处
 
+快速的猜一下下面的代码会返回什么：
 
+```ts
+for (var i = 0; i < 10; i++) {
+    setTimeout(function() { console.log(i); }, 100 * i);
+}
+```
 
+介绍一下，`setTimeout` 会在若干毫秒的延时后执行一个函数（等待其它代码执行完毕）
 
+看一下结果：
 
+```
+10
+10
+10
+10
+10
+10
+10
+10
+10
+10
+```
 
+很多 JavaScript 程序员对这种行为已经很熟悉了，但如果你很不解，你并不是一个人
 
+- 大多数人期望输出结果是这样：
 
+```
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+```
 
+还记得我们上面提到的捕获变量吗？
 
+> 我们传给 `setTimeout` 的每一个函数表达式实际上都引用了相同作用域里的同一个 `i`
 
+让我们花点时间思考一下这是为什么：
 
+- `setTimeout` 在若干毫秒后执行一个函数，并且是在 `for` 循环结束后
 
+- *`for 循环`* 结束后，`i` 的值为 `10`
 
+- 所以当函数被调用的时候，它会打印出 `10`
 
+一个通常的解决方法是使用立即执行的函数表达式（IIFE）来捕获每次迭代时 `i` 的值：
 
+```ts
+for (var i = 0; i < 10; i++) {
+    // capture the current state of 'i'
+    // by invoking a function with its current value
+    (function(i) {
+        setTimeout(function() { console.log(i); }, 100 * i);
+    })(i);
+}
+```
 
+参数 i 会覆盖 for 循环里的i，但是因为我们起了同样的名字，所以我们不用怎么改 for 循环体里的代码
 
+### let 声明
 
+现在你已经知道了 `var` 存在一些问题，这恰好说明了为什么用 `let` 语句来声明变量（除了名字不同外，`let` 与 `var` 的写法一致）
 
+```ts
+let hello = "Hello!";
+```
 
+主要的区别不在语法上，而是语义，我们接下来会深入研究
 
+#### 块作用域
 
+当用 let 声明一个变量，它使用的是词法作用域或块作用域
 
+- 不同于使用 var 声明的变量那样可以在包含它们的函数外访问，块作用域变量在包含它们的块或 for 循环之外是不能访问的
 
+```ts
+function f(input: boolean) {
+    let a = 100;
 
+    if (input) {
+        // Still okay to reference 'a'
+        let b = a + 1;
+        return b;
+    }
 
+    // Error: 'b' doesn't exist here
+    return b;
+}
+```
 
+这里我们定义了 `2` 个变量 `a` 和 `b` ，`a` 的作用域是 `f` 函数体内，而 `b` 的作用域是 `if` 语句块里
 
+- 在 `catch` 语句里声明的变量也具有同样的作用域规则
 
+```ts
+try {
+    throw "oh no!";
+}
+catch (e) {
+    console.log("Oh well.");
+}
 
+// Error: 'e' doesn't exist here
+console.log(e);
+```
 
+拥有块级作用域的变量的另一个特点是，它们不能在被声明之前读或写
 
+- 虽然这些变量始终 **`存在`** 于它们的作用域里，但在直到声明它的代码之前的区域都属于 **`暂时性死区`**
 
+- 它只是用来说明我们不能在 `let` 语句之前访问它们，幸运的是 TypeScript 可以告诉我们这些信息
 
+```ts
+a++; // illegal to use 'a' before it's declared;
+let a;
+```
 
+> 注意一点，我们仍然可以在一个拥有块作用域变量被声明前获取它
+> - 只是我们不能在变量声明前去调用那个函数
+> - 如果生成代码目标为 `ES2015` ，现代的运行时会抛出一个错误；然而，现今 TypeScript 是不会报错的
 
+```ts
+function foo() {
+    // okay to capture 'a'
+    return a;
+}
 
+// 不能在'a'被声明前调用'foo'
+// 运行时应该抛出错误
+foo();
 
+let a;
+```
 
+> 关于 **`暂时性死区`** 的更多信息，查看这里[【 Mozilla Developer Network 】](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let#Temporal_dead_zone_and_errors_with_let)
 
+#### 重定义及屏蔽
 
-
+我们提过使用 var 声明时，它不在乎你声明多少次，你只会得到 1 个
 
 
 
