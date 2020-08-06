@@ -1,4 +1,4 @@
-【2020.8.6】以下部分整理自[【 Python 官方文档】【版本号 3.8.5 】](https://docs.python.org/zh-cn/3.8/tutorial/index.html)
+【2020.8.6】以下部分整理自[【 Python 官方文档（版本号 3.8.5 ）】](https://docs.python.org/zh-cn/3.8/tutorial/index.html)
 
 ---
 
@@ -769,66 +769,318 @@ Please enter an integer: 42
 More
 ```
 
+可以有零个或多个[【 `elif` 】](https://docs.python.org/zh-cn/3.8/reference/compound_stmts.html#elif)部分，以及一个可选的[【 `else` 】](https://docs.python.org/zh-cn/3.8/reference/compound_stmts.html#else)部分
 
+- 关键字 `elif` 是 `else if` 的缩写，适合用于避免过多的缩进
 
+- 一个 `if ... elif ... elif ...` 序列可以看作是其他语言中的 `switch` 或 `case` 语句的替代
 
+### 4.2. for 语句
 
+Python 中的[【 `for` 】](https://docs.python.org/zh-cn/3.8/reference/compound_stmts.html#for)语句与你在 `C` 或 `Pascal` 中所用到的有所不同
 
+- Python 中的 `for` 语句并不总是对算术递增的数值进行迭代（如同 `Pascal` ），或是给予用户定义迭代步骤和暂停条件的能力（如同 `C` ）
 
+- 而是对任意序列进行迭代（例如列表或字符串），条目的迭代顺序与它们在序列中出现的顺序一致
 
+例如（此处英文为双关语）：
 
+```py
+>>> # Measure some strings:
+... words = ['cat', 'window', 'defenestrate']
+>>> for w in words:
+...     print(w, len(w))
+...
+cat 3
+window 6
+defenestrate 12
+```
 
+在遍历同一个集合时修改该集合的代码可能很难获得正确的结果
 
+- 通常，更直接的做法是循环遍历该集合的副本或创建新集合：
 
+```py
+# Strategy:  Iterate over a copy
+for user, status in users.copy().items():
+    if status == 'inactive':
+        del users[user]
 
+# Strategy:  Create a new collection
+active_users = {}
+for user, status in users.items():
+    if status == 'active':
+        active_users[user] = status
+```
 
+### 4.3. range() 函数
 
+如果你确实需要遍历一个数字序列，内置函数[【 `range()` 】](https://docs.python.org/zh-cn/3.8/library/stdtypes.html#range)会派上用场，它生成算术级数
 
+```py
+>>> for i in range(5):
+...     print(i)
+...
+0
+1
+2
+3
+4
+```
 
+给定的终止数值并不在要生成的序列里：`range(10)` 会生成 `10` 个值，并且是以合法的索引生成一个长度为 `10` 的序列
 
+- `range` 也可以以另一个数字开头，或者以指定的幅度增加（甚至是负数；有时这也被叫做 **`步进`** ）
 
+```py
+range(5, 10)
+   5, 6, 7, 8, 9
 
+range(0, 10, 3)
+   0, 3, 6, 9
 
+range(-10, -100, -30)
+  -10, -40, -70
+```
 
+要以序列的索引来迭代，您可以将 `range()` 和 `len()` 组合如下
 
+```py
+>>> a = ['Mary', 'had', 'a', 'little', 'lamb']
+>>> for i in range(len(a)):
+...     print(i, a[i])
+...
+0 Mary
+1 had
+2 a
+3 little
+4 lamb
+```
 
+然而，在大多数这类情况下，使用[【 `enumerate()` 】](https://docs.python.org/zh-cn/3.8/library/functions.html#enumerate)函数比较方便，请参见[【循环的技巧】](https://docs.python.org/zh-cn/3.8/tutorial/datastructures.html#tut-loopidioms)
 
+如果你只打印 `range` ，会出现奇怪的结果：
 
+```py
+>>> print(range(10))
+range(0, 10)
+```
 
+> `range()` 所返回的对象在许多方面表现得像一个列表，但实际上却并不是
+> - 此对象会在你迭代它时基于所希望的序列返回连续的项
+> - 但它没有真正生成列表，这样就能节省空间
 
+我们称这样对象为[【 `iterable` 】](https://docs.python.org/zh-cn/3.8/glossary.html#term-iterable)，也就是说，适合作为这样的目标对象：
 
+- 函数和结构期望从中获取连续的项直到所提供的项全部耗尽
 
+- 我们已经看到 `for` 语句就是这样一种结构，而接受可迭代对象的函数的一个例子是[【 `sum()` 】](https://docs.python.org/zh-cn/3.8/library/functions.html#sum)
 
+```py
+>>> sum(range(4))  # 0 + 1 + 2 + 3
+6
+```
 
+最后，也许你会很好奇如何从一个指定范围内获取一个列表，以下是解决方案：
 
+```py
+>>> list(range(4))
+[0, 1, 2, 3]
+```
 
+> 在[【数据结构】](https://docs.python.org/zh-cn/3.8/tutorial/datastructures.html#tut-structures)章节中，我们将讨论[【 `list()` 】](https://docs.python.org/zh-cn/3.8/library/stdtypes.html#list)的更多细节
 
+### 4.4. break 和 continue 语句，以及循环中的 else 子句
 
+[【 `break` 】](https://docs.python.org/zh-cn/3.8/reference/simple_stmts.html#break)语句，和 `C` 中的类似，用于跳出最近的 `for` 或 `while` 循环
 
+循环语句可能带有 `else` 子句，它会在循环耗尽了可迭代对象 (使用 `for` ) 或循环条件变为假值 (使用 `while` ) 时被执行，但不会在循环被 `break` 语句终止时被执行
 
+以下搜索素数的循环就是这样的一个例子：
 
+```py
+>>> for n in range(2, 10):
+...     for x in range(2, n):
+...         if n % x == 0:
+...             print(n, 'equals', x, '*', n//x)
+...             break
+...     else:
+...         # loop fell through without finding a factor
+...         print(n, 'is a prime number')
+...
+2 is a prime number
+3 is a prime number
+4 equals 2 * 2
+5 is a prime number
+6 equals 2 * 3
+7 is a prime number
+8 equals 2 * 4
+9 equals 3 * 3
+```
 
+> 是的，这是正确的代码
+>> 仔细看：`else` 子句属于 `for` 循环，不属于 `if` 语句
 
+当和循环一起使用时，`else` 子句与[【 `try` 】](https://docs.python.org/zh-cn/3.8/reference/compound_stmts.html#try)语句中的 `else` 子句的共同点多于 `if` 语句中的同类子句：
 
+- `try` 语句中的 `else` 子句会在未发生异常时执行，而循环中的 `else` 子句则会在未发生 `break` 时执行
 
+- 有关 `try` 语句和异常的更多信息，请参阅[【处理异常】](https://docs.python.org/zh-cn/3.8/tutorial/errors.html#tut-handling)
 
+[【 `continue` 】](https://docs.python.org/zh-cn/3.8/reference/simple_stmts.html#continue)语句也是借鉴自 `C` 语言，表示继续循环中的下一次迭代：
 
+```py
+>>> for num in range(2, 10):
+...     if num % 2 == 0:
+...         print("Found an even number", num)
+...         continue
+...     print("Found a number", num)
+Found an even number 2
+Found a number 3
+Found an even number 4
+Found a number 5
+Found an even number 6
+Found a number 7
+Found an even number 8
+Found a number 9
+```
 
+### 4.5. pass 语句
 
+[【 `pass` 】](https://docs.python.org/zh-cn/3.8/reference/simple_stmts.html#pass)语句什么也不做
 
+当语法上需要一个语句，但程序需要什么动作也不做时，可以使用它，例如
 
+```py
+>>> while True:
+...     pass  # Busy-wait for keyboard interrupt (Ctrl+C)
+...
+```
 
+这通常用于创建最小的类：
 
+```py
+>>> class MyEmptyClass:
+...     pass
+...
+```
 
+pass 的另一个可以使用的场合是：在你编写新的代码时作为一个函数或条件子句体的占位符，允许你保持在更抽象的层次上进行思考
 
+- pass 会被静默地忽略
 
+```py
+>>> def initlog(*args):
+...     pass   # Remember to implement this!
+...
+```
 
+### 4.6. 定义函数
 
+我们可以创建一个输出任意范围内 Fibonacci 数列的函数
 
+```py
+>>> def fib(n):    # write Fibonacci series up to n
+...     """Print a Fibonacci series up to n."""
+...     a, b = 0, 1
+...     while a < n:
+...         print(a, end=' ')
+...         a, b = b, a+b
+...     print()
+...
+>>> # Now call the function we just defined:
+... fib(2000)
+0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597
+```
 
+- 关键字[【 `def` 】](https://docs.python.org/zh-cn/3.8/reference/compound_stmts.html#def)引入一个 **`函数定义`**
 
+  - 它必须后跟函数名称和带括号的形式参数列表
 
+  - 构成函数体的语句从下一行开始，并且必须缩进
 
+- 函数体的第一个语句可以（可选的）是字符串文字
+
+  这个字符串文字是函数的文档字符串或 `docstring`（有关文档字符串的更多信息，请参阅[【文档字符串】](https://docs.python.org/zh-cn/3.8/tutorial/controlflow.html#tut-docstrings)部分）
+  
+  有些工具使用文档字符串自动生成在线或印刷文档，或者让用户以交互式的形式浏览代码；在你编写的代码中包含文档字符串是一种很好的做法，所以要养成习惯
+
+- 函数的 **`执行`** 会引入一个用于函数局部变量的新符号表；更确切地说，函数中所有的变量赋值都将存储在局部符号表中
+
+  而变量引用会首先在局部符号表中查找，然后是外层函数的局部符号表，再然后是全局符号表，最后是内置名称的符号表
+  
+  因此，全局变量和外层函数的变量不能在函数内部直接赋值（除非是在[【 `global` 】](https://docs.python.org/zh-cn/3.8/reference/simple_stmts.html#global)语句中定义的全局变量，或者是在[【 `nonlocal` 】](https://docs.python.org/zh-cn/3.8/reference/simple_stmts.html#nonlocal)语句中定义的外层函数的变量），尽管它们可以被引用
+
+- 在函数被调用时，实际参数（实参）会被引入被调用函数的本地符号表中
+
+  因此，实参是通过 **`按值调用`** 传递的（其中 **`值`** 始终是对象 引用 而不是对象的值）
+  
+  当一个函数调用另外一个函数时，将会为该调用创建一个新的本地符号表
+
+函数定义会将函数名称与函数对象在当前符号表中进行关联
+
+- 解释器会将该名称所指向的对象识别为用户自定义函数
+
+- 其他名称也可指向同一个函数对象并可被用来访问访函数
+
+```py
+>>> fib
+<function fib at 10042ed0>
+>>> f = fib
+>>> f(100)
+0 1 1 2 3 5 8 13 21 34 55 89
+```
+
+如果你学过其他语言，你可能会认为 `fib` 不是函数而是一个过程，因为它并不返回值
+
+- 事实上，即使没有 `return` 语句的函数也会返回一个值，尽管它是一个相当无聊的值
+
+- 这个值称为 `None`（它是内置名称）
+
+- 一般来说解释器不会打印出单独的返回值 `None` ，如果你真想看到它，你可以使用 `print()`
+
+```py
+>>> fib(0)
+>>> print(fib(0))
+None
+```
+
+写一个返回斐波那契数列的列表（而不是把它打印出来）的函数：
+
+```py
+>>> def fib2(n):  # return Fibonacci series up to n
+...     """Return a list containing the Fibonacci series up to n."""
+...     result = []
+...     a, b = 0, 1
+...     while a < n:
+...         result.append(a)    # see below
+...         a, b = b, a+b
+...     return result
+...
+>>> f100 = fib2(100)    # call it
+>>> f100                # write the result
+[0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
+```
+
+此示例中，像往常一样，演示了一些新的 Python 功能：
+
+- `return` 语句会从函数内部返回一个值
+
+  不带表达式参数的 return 会返回 None
+  
+  函数执行完毕退出也会返回 None
+
+- `result.append(a)` 语句调用了列表对象 `result` 的 **`方法`**
+
+  方法是 **`属于`** 一个对象的函数，它被命名为 `obj.methodname` ，其中 `obj` 是某个对象（也可能是一个表达式），`methodname` 是由对象类型中定义的方法的名称
+  
+  不同的类型可以定义不同的方法
+  
+  不同类型的方法可以有相同的名称而不会引起歧义（可以使用 **`类`** 定义自己的对象类型和方法，请参阅[【类】](https://docs.python.org/zh-cn/3.8/tutorial/classes.html#tut-classes)）
+  
+  示例中的方法 `append()` 是为列表对象定义的；它会在列表的最后添加一个新的元素，在这个示例中它相当于 `result = result + [a]` ，但更高效
+
+### 4.7. 函数定义的更多形式
 
 
 
