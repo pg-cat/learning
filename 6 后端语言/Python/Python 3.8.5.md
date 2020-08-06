@@ -1,4 +1,4 @@
-【2019.12.2】以下部分整理自[【菜鸟教程：Python 教程】](https://www.runoob.com/python/python-tutorial.html)
+【2020.8.6】以下部分整理自[【 Python 官方文档】【版本号 3.8.5 】](https://docs.python.org/zh-cn/3.8/tutorial/index.html)
 
 ---
 
