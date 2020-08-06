@@ -1082,23 +1082,94 @@ None
 
 ### 4.7. 函数定义的更多形式
 
+给函数定义有可变数目的参数也是可行的
 
+这里有三种形式，可以组合使用：
 
+#### 4.7.1. 参数默认值
 
+最有用的形式是对一个或多个参数指定一个默认值
 
+这样创建的函数，可以用比定义时允许的更少的参数调用，比如：
 
+```py
+def ask_ok(prompt, retries=4, reminder='Please try again!'):
+    while True:
+        ok = input(prompt)
+        if ok in ('y', 'ye', 'yes'):
+            return True
+        if ok in ('n', 'no', 'nop', 'nope'):
+            return False
+        retries = retries - 1
+        if retries < 0:
+            raise ValueError('invalid user response')
+        print(reminder)
+```
 
+这个函数可以通过几种方式调用:
 
+- 只给出必需的参数：
 
+  `ask_ok('Do you really want to quit?')`
 
+- 给出一个可选的参数：
 
+  `ask_ok('OK to overwrite the file?', 2)`
 
+- 或者给出所有的参数：
 
+  `ask_ok('OK to overwrite the file?', 2, 'Come on, only yes or no!')`
 
+这个示例还介绍了 `in` 关键字，它可以测试一个序列是否包含某个值
 
+默认值是在 **`定义过程`** 中在函数定义处计算的，所以：
 
+```py
+i = 5
 
+def f(arg=i):
+    print(arg)
 
+i = 6
+f()
+```
+
+结果会打印 5
+
+> 重要警告：默认值只会执行一次
+>> 这条规则在默认值为可变对象（列表、字典以及大多数类实例）时很重要
+
+比如，下面的函数会存储在后续调用中传递给它的参数
+
+```py
+def f(a, L=[]):
+    L.append(a)
+    return L
+
+print(f(1))
+print(f(2))
+print(f(3))
+```
+
+这将打印出
+
+```
+[1]
+[1, 2]
+[1, 2, 3]
+```
+
+如果你不想要在后续调用之间共享默认值，你可以这样写这个函数：
+
+```py
+def f(a, L=None):
+    if L is None:
+        L = []
+    L.append(a)
+    return L
+```
+
+#### 4.7.2. 关键字参数
 
 
 
