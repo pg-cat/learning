@@ -1171,24 +1171,140 @@ def f(a, L=None):
 
 #### 4.7.2. 关键字参数
 
+也可以使用形如 `kwarg=value` 的 **`关键字参数`** 来调用函数
 
+```py
+def parrot(voltage, state='a stiff', action='voom', type='Norwegian Blue'):
+    print("-- This parrot wouldn't", action, end=' ')
+    print("if you put", voltage, "volts through it.")
+    print("-- Lovely plumage, the", type)
+    print("-- It's", state, "!")
+```
 
+- 接受一个必需的参数 `voltage` 和三个可选的参数 `state` `action` 和 `type`
 
+这个函数可以通过下面的任何一种方式调用：
 
+```py
+parrot(1000)                                          # 1 positional argument
+parrot(voltage=1000)                                  # 1 keyword argument
+parrot(voltage=1000000, action='VOOOOOM')             # 2 keyword arguments
+parrot(action='VOOOOOM', voltage=1000000)             # 2 keyword arguments
+parrot('a million', 'bereft of life', 'jump')         # 3 positional arguments
+parrot('a thousand', state='pushing up the daisies')  # 1 positional, 1 keyword
+```
 
+但下面的函数调用都是无效的：
 
+```py
+parrot()                     # required argument missing
+parrot(voltage=5.0, 'dead')  # non-keyword argument after a keyword argument
+parrot(110, voltage=220)     # duplicate value for the same argument
+parrot(actor='John Cleese')  # unknown keyword argument
+```
 
+在函数调用中，关键字参数必须跟随在位置参数的后面
 
+- 传递的所有关键字参数必须与函数接受的其中一个参数匹配
 
+  比如 `actor` 不是函数 `parrot` 的有效参数
 
+  它们的顺序并不重要
 
+- 这也包括非可选参数
 
+  比如 parrot(voltage=1000) 也是有效的
 
+  不能对同一个参数多次赋值
 
+下面是一个因为此限制而失败的例子：
 
+```cmd
+>>> def function(a):
+...     pass
+...
+>>> function(0, a=0)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: function() got multiple values for keyword argument 'a'
+```
 
+当存在一个形式为 `**name` 的最后一个形参时，它会接收一个字典 (参见[【映射类型 --- dict 】](https://docs.python.org/zh-cn/3.8/library/stdtypes.html#typesmapping))
 
+- 其中包含除了与已有形参相对应的关键字参数以外的所有关键字参数
 
+- 这可以与一个形式为 `*name` ，接收一个包含除了已有形参列表以外的位置参数的 **`元组`** 的形参 (将在下一小节介绍) 组合使用
+
+- `*name` 必须出现在 `**name` 之前
+
+例如，如果我们这样定义一个函数：
+
+```py
+def cheeseshop(kind, *arguments, **keywords):
+    print("-- Do you have any", kind, "?")
+    print("-- I'm sorry, we're all out of", kind)
+    for arg in arguments:
+        print(arg)
+    print("-" * 40)
+    for kw in keywords:
+        print(kw, ":", keywords[kw])
+```
+
+它可以像这样调用：
+
+```py
+cheeseshop("Limburger", "It's very runny, sir.",
+           "It's really very, VERY runny, sir.",
+           shopkeeper="Michael Palin",
+           client="John Cleese",
+           sketch="Cheese Shop Sketch")
+```
+
+当然它会打印：
+
+```cmd
+-- Do you have any Limburger ?
+-- I'm sorry, we're all out of Limburger
+It's very runny, sir.
+It's really very, VERY runny, sir.
+----------------------------------------
+shopkeeper : Michael Palin
+client : John Cleese
+sketch : Cheese Shop Sketch
+```
+
+> 注意：打印时关键字参数的顺序保证与调用函数时提供它们的顺序是相匹配的
+
+#### 4.7.3. 特殊参数
+
+默认情况下，函数的参数传递形式可以是位置参数或是显式的关键字参数
+
+- 为了确保可读性和运行效率，限制允许的参数传递形式是有意义的
+
+- 这样开发者只需查看函数定义即可确定参数项是仅按位置、按位置也按关键字，还是仅按关键字传递
+
+函数的定义看起来可以像是这样：
+
+```cmd
+def f(pos1, pos2, /, pos_or_kwd, *, kwd1, kwd2):
+      -----------    ----------     ----------
+        |             |                  |
+        |        Positional or keyword   |
+        |                                - Keyword only
+         -- Positional only
+```
+
+在这里 `/` 和 `*` 是可选的，如果使用这些符号则表明可以通过何种形参将参数值传递给函数：
+
+- 仅限位置
+
+- 位置或关键字
+
+- 以及仅限关键字
+
+> 关键字形参也被称为命名形参
+
+##### 4.7.3.1. 位置或关键字参数
 
 
 
